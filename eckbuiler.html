@@ -642,10 +642,13 @@ input:focus,textarea:focus,select:focus{
             </p>
 
             <p>
-                Monsters now contain their real ATK/DEF data,
-                normal monsters are supported, and tribute
-                candidates can be selected rather than
-                automatically sacrificing a random monster.
+                Any card you create here — with its real name,
+                stats, and description — is automatically pulled
+                into the actual duel engine's Deck Maker, where
+                you can build a full deck around it and play real
+                games with it. Effect text carries over as flavor
+                only, since a duel can't safely run whatever rules
+                text you type in.
             </p>
 
             <button class="action-button"
@@ -1287,14 +1290,41 @@ function repeatCard(template, count) {
 
 
 const PREMADE_DECKS = [
-
     {
         id: "starter_dragons",
-        name: "🐉 Dragon Power",
+        name: "🐉 Dragon's Fury",
         description:
-            "A straightforward Dragon-themed starter deck with powerful monsters and simple effects.",
+            "A Dragon-focused deck built for raw power and big Life Point swings. Excels at overwhelming stats; light on utility. (Extra Deck: Twin-Headed Fire Dragon, Radiant Dragon Knight, Neo Dragon Sovereign.)",
 
         cards: [
+
+            ...repeatCard({
+                name:"Baby Dragon",
+                type:"monster",
+                attribute:"WIND",
+                level:3,
+                monsterType:"Dragon",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:700,
+                defense:700,
+                description:
+                    "A small dragon still growing into its strength."
+            }, 4),
+
+            ...repeatCard({
+                name:"Dark Blade",
+                type:"monster",
+                attribute:"DARK",
+                level:4,
+                monsterType:"Warrior",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1800,
+                defense:1500,
+                description:
+                    "A warrior that fights using a dark blade."
+            }, 4),
 
             ...repeatCard({
                 name:"Blue-Eyes White Dragon",
@@ -1302,123 +1332,159 @@ const PREMADE_DECKS = [
                 attribute:"LIGHT",
                 level:8,
                 monsterType:"Dragon",
-                monsterCategory:"normal",
+                monsterCategory:"effect",
                 tuner:false,
                 attack:3000,
                 defense:2500,
                 description:
-                    "A legendary dragon that was said to have tremendous power."
-            }, 4),
+                    "A legendary dragon with devastating attack power."
+            }, 3),
 
             ...repeatCard({
-                name:"Alexandrite Dragon",
+                name:"Curse of Dragon",
                 type:"monster",
-                attribute:"LIGHT",
-                level:4,
+                attribute:"DARK",
+                level:5,
                 monsterType:"Dragon",
-                monsterCategory:"normal",
-                tuner:false,
-                attack:2000,
-                defense:100,
-                description:
-                    "A gem-like dragon with a brilliant body."
-            }, 16),
-
-            ...repeatCard({
-                name:"Mystical Space Typhoon",
-                type:"spell",
-                spellType:"Quick-Play Spell",
-                description:
-                    "Target 1 Spell/Trap on the field; destroy it."
-            }, 8),
-
-            ...repeatCard({
-                name:"Dragon's Rage",
-                type:"spell",
-                spellType:"Normal Spell",
-                description:
-                    "Target 1 Dragon monster you control; it gains 500 ATK until the end of this turn."
-            }, 7),
-
-            ...repeatCard({
-                name:"Dragon Shield",
-                type:"trap",
-                trapType:"Normal Trap",
-                description:
-                    "When an opponent's monster declares an attack: Target 1 Dragon monster you control; that monster cannot be destroyed by that battle."
-            }, 5)
-
-        ]
-    },
-
-    {
-        id: "starter_warriors",
-        name: "⚔️ Warrior Assault",
-        description:
-            "A Warrior starter deck focused on balanced attackers and combat tricks.",
-
-        cards: [
-
-            ...repeatCard({
-                name:"Gearfried the Iron Knight",
-                type:"monster",
-                attribute:"EARTH",
-                level:4,
-                monsterType:"Warrior",
                 monsterCategory:"effect",
                 tuner:false,
-                attack:1800,
-                defense:1600,
+                attack:2000,
+                defense:1500,
                 description:
-                    "This card cannot be equipped with Equip Cards."
-            }, 10),
+                    "A dragon shrouded in dark power."
+            }, 3),
 
             ...repeatCard({
-                name:"Marauding Captain",
+                name:"Giant Soldier of Stone",
                 type:"monster",
                 attribute:"EARTH",
                 level:3,
-                monsterType:"Warrior",
+                monsterType:"Rock",
                 monsterCategory:"effect",
                 tuner:false,
-                attack:1200,
-                defense:400,
+                attack:1300,
+                defense:2000,
                 description:
-                    "While this card is face-up on the field, your opponent cannot select another Warrior monster you control as an attack target."
-            }, 10),
+                    "A massive stone soldier that shrugs off blows."
+            }, 3),
 
             ...repeatCard({
-                name:"Reinforcement of the Army",
+                name:"Dragon's Call",
                 type:"spell",
                 spellType:"Normal Spell",
                 description:
-                    "Add 1 Level 4 or lower Warrior monster from your Deck to your hand."
-            }, 8),
+                    "Draw 2 cards."
+            }, 3),
 
             ...repeatCard({
-                name:"Warrior Charge",
+                name:"Power Boost",
                 type:"spell",
                 spellType:"Normal Spell",
                 description:
-                    "Target 1 Warrior monster you control; it gains 400 ATK until the end of this turn."
-            }, 7),
+                    "All face-up monsters you control gain 500 ATK until the end of the turn."
+            }, 3),
 
             ...repeatCard({
-                name:"Heroic Guard",
+                name:"Mirror Force",
                 type:"trap",
                 trapType:"Normal Trap",
                 description:
-                    "When a Warrior monster you control is targeted for an attack: That monster gains 500 ATK until the end of the Battle Phase."
-            }, 5)
+                    "When an opponent's monster declares an attack, destroy all Attack Position monsters your opponent controls."
+            }, 3),
 
-        ]
+            ...repeatCard({
+                name:"Magic Cylinder",
+                type:"trap",
+                trapType:"Normal Trap",
+                description:
+                    "When an opponent's monster declares an attack, negate the attack and inflict damage equal to that monster's ATK."
+            }, 3),
+
+            ...repeatCard({
+                name:"Battle Ox",
+                type:"monster",
+                attribute:"EARTH",
+                level:4,
+                monsterType:"Warrior",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1700,
+                defense:1000,
+                description:
+                    "A battle-hardened warrior with the head of an ox."
+            }, 2),
+
+            ...repeatCard({
+                name:"Kid Dragon",
+                type:"monster",
+                attribute:"WIND",
+                level:3,
+                monsterType:"Dragon",
+                monsterCategory:"effect",
+                tuner:true,
+                attack:900,
+                defense:600,
+                description:
+                    "[Tuner] A small dragon that lends its power to Synchro Summons."
+            }, 2),
+
+            ...repeatCard({
+                name:"Fissure",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy the opponent's monster with the lowest ATK on the field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Monster Reborn",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Special Summon 1 monster from either player's Graveyard to your field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Mystical Elf",
+                type:"monster",
+                attribute:"LIGHT",
+                level:4,
+                monsterType:"Spellcaster",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:800,
+                defense:2000,
+                description:
+                    "A gentle but resilient defender."
+            }, 1),
+
+            ...repeatCard({
+                name:"Healing Light",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Gain 1000 LP."
+            }, 1),
+
+            ...repeatCard({
+                name:"Dark Hole",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy all monsters on the field."
+            }, 1),
+
+        ],
+
+        extraDeck: []
+
     },
 
     {
         id: "starter_spellcasters",
-        name: "🔮 Spellcaster Magic",
+        name: "🪄 Magician's Power",
         description:
-            "A Spellcaster-themed starter deck using monsters and spells to control the field.",
+            "A Spellcaster deck built around Dark Magician's disruption. Strong at answering the board; lighter raw stats than Dragon's Fury. (Extra Deck: Flame Swordsman, Arcane Sovereign, Chimera Beast.)",
 
         cards: [
 
@@ -1428,46 +1494,1021 @@ const PREMADE_DECKS = [
                 attribute:"DARK",
                 level:7,
                 monsterType:"Spellcaster",
-                monsterCategory:"normal",
+                monsterCategory:"effect",
                 tuner:false,
                 attack:2500,
                 defense:2100,
                 description:
                     "The ultimate wizard in terms of attack and defense."
-            }, 8),
+            }, 5),
 
             ...repeatCard({
-                name:"Skilled Dark Magician",
+                name:"Summoned Skull",
                 type:"monster",
                 attribute:"DARK",
+                level:6,
+                monsterType:"Fiend",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:2500,
+                defense:1200,
+                description:
+                    "A fearsome fiend crackling with dark lightning."
+            }, 4),
+
+            ...repeatCard({
+                name:"Dark Blade",
+                type:"monster",
+                attribute:"DARK",
+                level:4,
+                monsterType:"Warrior",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1800,
+                defense:1500,
+                description:
+                    "A warrior that fights using a dark blade."
+            }, 3),
+
+            ...repeatCard({
+                name:"Giant Soldier of Stone",
+                type:"monster",
+                attribute:"EARTH",
+                level:3,
+                monsterType:"Rock",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1300,
+                defense:2000,
+                description:
+                    "A massive stone soldier that shrugs off blows."
+            }, 3),
+
+            ...repeatCard({
+                name:"Dragon's Call",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Draw 2 cards."
+            }, 3),
+
+            ...repeatCard({
+                name:"Power Boost",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "All face-up monsters you control gain 500 ATK until the end of the turn."
+            }, 3),
+
+            ...repeatCard({
+                name:"Mirror Force",
+                type:"trap",
+                trapType:"Normal Trap",
+                description:
+                    "When an opponent's monster declares an attack, destroy all Attack Position monsters your opponent controls."
+            }, 3),
+
+            ...repeatCard({
+                name:"Magic Cylinder",
+                type:"trap",
+                trapType:"Normal Trap",
+                description:
+                    "When an opponent's monster declares an attack, negate the attack and inflict damage equal to that monster's ATK."
+            }, 3),
+
+            ...repeatCard({
+                name:"Mystical Elf",
+                type:"monster",
+                attribute:"LIGHT",
                 level:4,
                 monsterType:"Spellcaster",
                 monsterCategory:"effect",
                 tuner:false,
-                attack:1900,
-                defense:1700,
+                attack:800,
+                defense:2000,
                 description:
-                    "Each time a Spell Card is activated, place 1 Spell Counter on this card."
-            }, 14),
+                    "A gentle but resilient defender."
+            }, 2),
 
             ...repeatCard({
-                name:"Dark Magic Attack",
+                name:"Battle Ox",
+                type:"monster",
+                attribute:"EARTH",
+                level:4,
+                monsterType:"Warrior",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1700,
+                defense:1000,
+                description:
+                    "A battle-hardened warrior with the head of an ox."
+            }, 2),
+
+            ...repeatCard({
+                name:"Magical Apprentice",
+                type:"monster",
+                attribute:"DARK",
+                level:2,
+                monsterType:"Spellcaster",
+                monsterCategory:"effect",
+                tuner:true,
+                attack:500,
+                defense:400,
+                description:
+                    "[Tuner] A young spellcaster still learning to channel her power."
+            }, 2),
+
+            ...repeatCard({
+                name:"Fissure",
                 type:"spell",
                 spellType:"Normal Spell",
                 description:
-                    "If you control a Dark Magician: Destroy all Spell/Trap Cards your opponent controls."
-            }, 10),
+                    "Destroy the opponent's monster with the lowest ATK on the field."
+            }, 2),
 
             ...repeatCard({
-                name:"Magician's Circle",
+                name:"Dark Hole",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy all monsters on the field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Monster Reborn",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Special Summon 1 monster from either player's Graveyard to your field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Healing Light",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Gain 1000 LP."
+            }, 1),
+
+        ],
+
+        extraDeck: []
+
+    },
+
+    {
+        id: "starter_warriors",
+        name: "⚔️ Warrior Assault",
+        description:
+            "An aggressive go-wide Warrior deck. Dark Blade scales with your board; Battle Ox pierces through defenses. Excels with numbers; lacks single big bombs. (Extra Deck: Flame Swordsman, Iron Blade General, Twin Blade Vanguard.)",
+
+        cards: [
+
+            ...repeatCard({
+                name:"Dark Blade",
+                type:"monster",
+                attribute:"DARK",
+                level:4,
+                monsterType:"Warrior",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1800,
+                defense:1500,
+                description:
+                    "A warrior that fights using a dark blade."
+            }, 6),
+
+            ...repeatCard({
+                name:"Mystical Elf",
+                type:"monster",
+                attribute:"LIGHT",
+                level:4,
+                monsterType:"Spellcaster",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:800,
+                defense:2000,
+                description:
+                    "A gentle but resilient defender."
+            }, 3),
+
+            ...repeatCard({
+                name:"Curse of Dragon",
+                type:"monster",
+                attribute:"DARK",
+                level:5,
+                monsterType:"Dragon",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:2000,
+                defense:1500,
+                description:
+                    "A dragon shrouded in dark power."
+            }, 3),
+
+            ...repeatCard({
+                name:"Baby Dragon",
+                type:"monster",
+                attribute:"WIND",
+                level:3,
+                monsterType:"Dragon",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:700,
+                defense:700,
+                description:
+                    "A small dragon still growing into its strength."
+            }, 3),
+
+            ...repeatCard({
+                name:"Dragon's Call",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Draw 2 cards."
+            }, 3),
+
+            ...repeatCard({
+                name:"Mirror Force",
                 type:"trap",
                 trapType:"Normal Trap",
                 description:
-                    "When a Spellcaster monster declares an attack: Each player can Special Summon 1 Spellcaster monster with 2000 or less ATK from their Deck in Attack Position."
-            }, 8)
+                    "When an opponent's monster declares an attack, destroy all Attack Position monsters your opponent controls."
+            }, 3),
 
-        ]
-    }
+            ...repeatCard({
+                name:"Magic Cylinder",
+                type:"trap",
+                trapType:"Normal Trap",
+                description:
+                    "When an opponent's monster declares an attack, negate the attack and inflict damage equal to that monster's ATK."
+            }, 3),
+
+            ...repeatCard({
+                name:"Giant Soldier of Stone",
+                type:"monster",
+                attribute:"EARTH",
+                level:3,
+                monsterType:"Rock",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1300,
+                defense:2000,
+                description:
+                    "A massive stone soldier that shrugs off blows."
+            }, 2),
+
+            ...repeatCard({
+                name:"Summoned Skull",
+                type:"monster",
+                attribute:"DARK",
+                level:6,
+                monsterType:"Fiend",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:2500,
+                defense:1200,
+                description:
+                    "A fearsome fiend crackling with dark lightning."
+            }, 2),
+
+            ...repeatCard({
+                name:"Battle Ox",
+                type:"monster",
+                attribute:"EARTH",
+                level:4,
+                monsterType:"Warrior",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1700,
+                defense:1000,
+                description:
+                    "A battle-hardened warrior with the head of an ox."
+            }, 2),
+
+            ...repeatCard({
+                name:"Warrior Cadet",
+                type:"monster",
+                attribute:"EARTH",
+                level:3,
+                monsterType:"Warrior",
+                monsterCategory:"effect",
+                tuner:true,
+                attack:1000,
+                defense:800,
+                description:
+                    "[Tuner] A disciplined recruit training for the battlefield."
+            }, 2),
+
+            ...repeatCard({
+                name:"Fissure",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy the opponent's monster with the lowest ATK on the field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Power Boost",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "All face-up monsters you control gain 500 ATK until the end of the turn."
+            }, 2),
+
+            ...repeatCard({
+                name:"Monster Reborn",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Special Summon 1 monster from either player's Graveyard to your field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Dark Hole",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy all monsters on the field."
+            }, 2),
+
+        ],
+
+        extraDeck: []
+
+    },
+
+    {
+        id: "extra_deck_vanguard",
+        name: "🔮 Extra Deck Vanguard",
+        description:
+            "A Tuner-heavy Machine toolbox deck. Search Tuners, Special Summon them without spending your Normal Summon, and flood the Extra Deck. Individually weaker stats, but the whole plan is assembling something bigger. (Extra Deck: Dual-Core Mechlord, Cyber Forge Overlord, Circuit Breaker Dragon, Overdrive Mech Commander, Turbo Gear Colossus, Machine Rank Three Overlord.)",
+
+        cards: [
+
+            ...repeatCard({
+                name:"Iron Golem Trooper",
+                type:"monster",
+                attribute:"EARTH",
+                level:3,
+                monsterType:"Machine",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1400,
+                defense:1600,
+                description:
+                    "While in Defense Position, this card gains 400 DEF."
+            }, 4),
+
+            ...repeatCard({
+                name:"Turbo Cannoneer",
+                type:"monster",
+                attribute:"EARTH",
+                level:4,
+                monsterType:"Machine",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1700,
+                defense:1200,
+                description:
+                    "A mobile artillery unit that fires on the move."
+            }, 4),
+
+            ...repeatCard({
+                name:"Clockwork Sprite",
+                type:"monster",
+                attribute:"LIGHT",
+                level:2,
+                monsterType:"Machine",
+                monsterCategory:"effect",
+                tuner:true,
+                attack:300,
+                defense:200,
+                description:
+                    "[Tuner] When Normal Summoned, add 1 Tuner monster from your Deck to your hand."
+            }, 3),
+
+            ...repeatCard({
+                name:"Circuit Runner",
+                type:"monster",
+                attribute:"LIGHT",
+                level:1,
+                monsterType:"Machine",
+                monsterCategory:"effect",
+                tuner:true,
+                attack:400,
+                defense:200,
+                description:
+                    "[Tuner] A featherweight drone built for split-second deployment."
+            }, 3),
+
+            ...repeatCard({
+                name:"Signal Drone",
+                type:"monster",
+                attribute:"LIGHT",
+                level:3,
+                monsterType:"Machine",
+                monsterCategory:"effect",
+                tuner:true,
+                attack:900,
+                defense:700,
+                description:
+                    "[Tuner] Relays commands across the battlefield in an instant."
+            }, 3),
+
+            ...repeatCard({
+                name:"Volt Armor",
+                type:"monster",
+                attribute:"LIGHT",
+                level:4,
+                monsterType:"Machine",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1600,
+                defense:1500,
+                description:
+                    "When this card is destroyed by battle, inflict 500 damage to the opponent who destroyed it."
+            }, 3),
+
+            ...repeatCard({
+                name:"Tuner's Call",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Add 1 Tuner monster from your Deck to your hand."
+            }, 3),
+
+            ...repeatCard({
+                name:"Rapid Mobilization",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Special Summon 1 Tuner monster from your hand. This does not use your Normal Summon."
+            }, 3),
+
+            ...repeatCard({
+                name:"Mirror Force",
+                type:"trap",
+                trapType:"Normal Trap",
+                description:
+                    "When an opponent's monster declares an attack, destroy all Attack Position monsters your opponent controls."
+            }, 3),
+
+            ...repeatCard({
+                name:"Dragon's Call",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Draw 2 cards."
+            }, 2),
+
+            ...repeatCard({
+                name:"Power Boost",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "All face-up monsters you control gain 500 ATK until the end of the turn."
+            }, 2),
+
+            ...repeatCard({
+                name:"Monster Reborn",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Special Summon 1 monster from either player's Graveyard to your field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Fissure",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy the opponent's monster with the lowest ATK on the field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Magic Cylinder",
+                type:"trap",
+                trapType:"Normal Trap",
+                description:
+                    "When an opponent's monster declares an attack, negate the attack and inflict damage equal to that monster's ATK."
+            }, 2),
+
+            ...repeatCard({
+                name:"Dark Hole",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy all monsters on the field."
+            }, 1),
+
+        ],
+
+        extraDeck: []
+
+    },
+
+    {
+        id: "grave_uprising",
+        name: "💀 Grave Uprising",
+        description:
+            "A Zombie deck built entirely around the Graveyard. Recur monsters, mill for fuel, and punish anyone who destroys your creatures. (Extra Deck: Grave Titan, Nightmare Reaper, Twin Grave Fiend.)",
+
+        cards: [
+
+            ...repeatCard({
+                name:"Skeleton Knight",
+                type:"monster",
+                attribute:"DARK",
+                level:4,
+                monsterType:"Zombie",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1500,
+                defense:1300,
+                description:
+                    "A restless warrior bound to the battlefield long after its death."
+            }, 4),
+
+            ...repeatCard({
+                name:"Bone Soldier",
+                type:"monster",
+                attribute:"DARK",
+                level:4,
+                monsterType:"Zombie",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1600,
+                defense:1200,
+                description:
+                    "When this card is destroyed by battle, inflict 300 damage to the opponent who destroyed it."
+            }, 4),
+
+            ...repeatCard({
+                name:"Mirror Force",
+                type:"trap",
+                trapType:"Normal Trap",
+                description:
+                    "When an opponent's monster declares an attack, destroy all Attack Position monsters your opponent controls."
+            }, 4),
+
+            ...repeatCard({
+                name:"Grave Ghoul",
+                type:"monster",
+                attribute:"EARTH",
+                level:2,
+                monsterType:"Zombie",
+                monsterCategory:"effect",
+                tuner:true,
+                attack:500,
+                defense:300,
+                description:
+                    "[Tuner] When sent to the Graveyard, add 1 Zombie-Type monster from your Deck to your hand."
+            }, 3),
+
+            ...repeatCard({
+                name:"Crypt Wraith",
+                type:"monster",
+                attribute:"DARK",
+                level:3,
+                monsterType:"Zombie",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:900,
+                defense:1000,
+                description:
+                    "When Normal Summoned, if you have 2+ monsters in your Graveyard, gain 500 LP."
+            }, 3),
+
+            ...repeatCard({
+                name:"Coffin Feast",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Send the top 2 cards of your Deck to the Graveyard."
+            }, 3),
+
+            ...repeatCard({
+                name:"Monster Reborn",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Special Summon 1 monster from either player's Graveyard to your field."
+            }, 3),
+
+            ...repeatCard({
+                name:"Magic Cylinder",
+                type:"trap",
+                trapType:"Normal Trap",
+                description:
+                    "When an opponent's monster declares an attack, negate the attack and inflict damage equal to that monster's ATK."
+            }, 3),
+
+            ...repeatCard({
+                name:"Grave Digger",
+                type:"monster",
+                attribute:"DARK",
+                level:6,
+                monsterType:"Zombie",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:2200,
+                defense:1400,
+                description:
+                    "When Normal Summoned, choose 1 monster in your Graveyard; add it to your hand."
+            }, 2),
+
+            ...repeatCard({
+                name:"Undead Overlord",
+                type:"monster",
+                attribute:"DARK",
+                level:7,
+                monsterType:"Zombie",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:2000,
+                defense:2000,
+                description:
+                    "While attacking, this card gains 200 ATK for each monster in your Graveyard."
+            }, 2),
+
+            ...repeatCard({
+                name:"Fissure",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy the opponent's monster with the lowest ATK on the field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Healing Light",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Gain 1000 LP."
+            }, 2),
+
+            ...repeatCard({
+                name:"Power Boost",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "All face-up monsters you control gain 500 ATK until the end of the turn."
+            }, 2),
+
+            ...repeatCard({
+                name:"Dragon's Call",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Draw 2 cards."
+            }, 2),
+
+            ...repeatCard({
+                name:"Dark Hole",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy all monsters on the field."
+            }, 1),
+
+        ],
+
+        extraDeck: []
+
+    },
+
+    {
+        id: "radiant_wardens",
+        name: "☀️ Radiant Wardens",
+        description:
+            "A Fairy deck built around Life Point gain and unbreakable defense — outlast your opponent and grind them down. (Extra Deck: Seraphic Avatar, Celestial Guardian, Twin Halo Seraph.)",
+
+        cards: [
+
+            ...repeatCard({
+                name:"Seraph Guardian",
+                type:"monster",
+                attribute:"LIGHT",
+                level:4,
+                monsterType:"Fairy",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1600,
+                defense:1800,
+                description:
+                    "When Normal Summoned, gain 300 LP."
+            }, 4),
+
+            ...repeatCard({
+                name:"Holy Sentinel",
+                type:"monster",
+                attribute:"LIGHT",
+                level:4,
+                monsterType:"Fairy",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1400,
+                defense:2000,
+                description:
+                    "While in Defense Position, this card gains 600 DEF."
+            }, 4),
+
+            ...repeatCard({
+                name:"Mirror Force",
+                type:"trap",
+                trapType:"Normal Trap",
+                description:
+                    "When an opponent's monster declares an attack, destroy all Attack Position monsters your opponent controls."
+            }, 4),
+
+            ...repeatCard({
+                name:"Magic Cylinder",
+                type:"trap",
+                trapType:"Normal Trap",
+                description:
+                    "When an opponent's monster declares an attack, negate the attack and inflict damage equal to that monster's ATK."
+            }, 4),
+
+            ...repeatCard({
+                name:"Radiant Cherub",
+                type:"monster",
+                attribute:"LIGHT",
+                level:2,
+                monsterType:"Fairy",
+                monsterCategory:"effect",
+                tuner:true,
+                attack:400,
+                defense:600,
+                description:
+                    "[Tuner] A small guardian spirit that lends its light to greater beings."
+            }, 3),
+
+            ...repeatCard({
+                name:"Lumina Cleric",
+                type:"monster",
+                attribute:"LIGHT",
+                level:3,
+                monsterType:"Fairy",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:900,
+                defense:1400,
+                description:
+                    "When Normal Summoned, if your LP is higher than your opponent's, draw 1 card."
+            }, 3),
+
+            ...repeatCard({
+                name:"Blessing of Dawn",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Gain 1500 LP."
+            }, 3),
+
+            ...repeatCard({
+                name:"Archon of Light",
+                type:"monster",
+                attribute:"LIGHT",
+                level:6,
+                monsterType:"Fairy",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:2100,
+                defense:1900,
+                description:
+                    "When Normal Summoned, gain 800 LP."
+            }, 2),
+
+            ...repeatCard({
+                name:"Empyrean Judge",
+                type:"monster",
+                attribute:"LIGHT",
+                level:7,
+                monsterType:"Fairy",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:2400,
+                defense:2300,
+                description:
+                    "Once per turn, this card cannot be destroyed by battle."
+            }, 2),
+
+            ...repeatCard({
+                name:"Healing Light",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Gain 1000 LP."
+            }, 2),
+
+            ...repeatCard({
+                name:"Monster Reborn",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Special Summon 1 monster from either player's Graveyard to your field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Fissure",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy the opponent's monster with the lowest ATK on the field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Power Boost",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "All face-up monsters you control gain 500 ATK until the end of the turn."
+            }, 2),
+
+            ...repeatCard({
+                name:"Dragon's Call",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Draw 2 cards."
+            }, 2),
+
+            ...repeatCard({
+                name:"Dark Hole",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy all monsters on the field."
+            }, 1),
+
+        ],
+
+        extraDeck: []
+
+    },
+
+    {
+        id: "demons_reckoning",
+        name: "👹 Demon's Reckoning",
+        description:
+            "A Fiend deck that trades safety for pressure — every kill hurts, and every turn is a countdown to your opponent's LP hitting zero. (Extra Deck: Chaos Devourer, Nightmare Sovereign, Twin Horror Fiend.)",
+
+        cards: [
+
+            ...repeatCard({
+                name:"Magic Cylinder",
+                type:"trap",
+                trapType:"Normal Trap",
+                description:
+                    "When an opponent's monster declares an attack, negate the attack and inflict damage equal to that monster's ATK."
+            }, 5),
+
+            ...repeatCard({
+                name:"Hellhound Stalker",
+                type:"monster",
+                attribute:"DARK",
+                level:4,
+                monsterType:"Fiend",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1900,
+                defense:1000,
+                description:
+                    "While attacking, this card gains 300 ATK."
+            }, 4),
+
+            ...repeatCard({
+                name:"Soul Reaper",
+                type:"monster",
+                attribute:"DARK",
+                level:4,
+                monsterType:"Fiend",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1700,
+                defense:1100,
+                description:
+                    "When this card destroys a monster by battle, inflict 300 damage to your opponent."
+            }, 4),
+
+            ...repeatCard({
+                name:"Mirror Force",
+                type:"trap",
+                trapType:"Normal Trap",
+                description:
+                    "When an opponent's monster declares an attack, destroy all Attack Position monsters your opponent controls."
+            }, 4),
+
+            ...repeatCard({
+                name:"Shadow Fiend",
+                type:"monster",
+                attribute:"DARK",
+                level:3,
+                monsterType:"Fiend",
+                monsterCategory:"effect",
+                tuner:true,
+                attack:700,
+                defense:500,
+                description:
+                    "[Tuner] A minor devil that thrives in the presence of stronger fiends."
+            }, 3),
+
+            ...repeatCard({
+                name:"Imp Raider",
+                type:"monster",
+                attribute:"DARK",
+                level:3,
+                monsterType:"Fiend",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:1100,
+                defense:700,
+                description:
+                    "A reckless raider that strikes before thinking."
+            }, 3),
+
+            ...repeatCard({
+                name:"Infernal Pact",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Inflict 800 damage to your opponent, then take 300 damage yourself."
+            }, 3),
+
+            ...repeatCard({
+                name:"Demon Overlord",
+                type:"monster",
+                attribute:"DARK",
+                level:6,
+                monsterType:"Fiend",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:2300,
+                defense:1500,
+                description:
+                    "When Normal Summoned, inflict 500 damage to your opponent."
+            }, 2),
+
+            ...repeatCard({
+                name:"Abyssal Devourer",
+                type:"monster",
+                attribute:"DARK",
+                level:7,
+                monsterType:"Fiend",
+                monsterCategory:"effect",
+                tuner:false,
+                attack:2700,
+                defense:1800,
+                description:
+                    "When this card destroys a monster by battle, inflict 800 damage to your opponent."
+            }, 2),
+
+            ...repeatCard({
+                name:"Fissure",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy the opponent's monster with the lowest ATK on the field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Dark Hole",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Destroy all monsters on the field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Monster Reborn",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Special Summon 1 monster from either player's Graveyard to your field."
+            }, 2),
+
+            ...repeatCard({
+                name:"Dragon's Call",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "Draw 2 cards."
+            }, 2),
+
+            ...repeatCard({
+                name:"Power Boost",
+                type:"spell",
+                spellType:"Normal Spell",
+                description:
+                    "All face-up monsters you control gain 500 ATK until the end of the turn."
+            }, 2),
+
+        ],
+
+        extraDeck: []
+
+    },
 
 ];
 
