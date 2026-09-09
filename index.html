@@ -1,0 +1,5075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Yu-Gi-Oh! Custom Duel</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at top, #292929, #070707 80%);
+    color: white;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* =====================================================
+   DECK SELECT
+===================================================== */
+
+.screen {
+    min-height: 100vh;
+    padding: 20px;
+}
+
+#deckSelectScreen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.deck-select-box {
+    width: 100%;
+    max-width: 1150px;
+    background: #191919;
+    border: 2px solid #b98b28;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.7);
+}
+
+.deck-select-box h1 {
+    text-align: center;
+    color: #e8c45a;
+    margin-top: 0;
+    font-size: 32px;
+}
+
+.deck-select-box > p {
+    text-align: center;
+    color: #aaa;
+}
+
+.deck-list {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(250px, 1fr));
+    gap: 18px;
+    margin-top: 25px;
+}
+
+.deck-option {
+    background:
+        linear-gradient(145deg, #292929, #111);
+    border: 2px solid #444;
+    border-radius: 12px;
+    padding: 20px;
+    transition: .15s;
+}
+
+.deck-option:hover {
+    transform: translateY(-3px);
+    border-color: #d6a928;
+}
+
+.deck-option.custom {
+    border-color: #536dfe;
+}
+
+.deck-option h2 {
+    color: #e8c45a;
+    margin-top: 0;
+}
+
+.deck-option p {
+    color: #aaa;
+    line-height: 1.5;
+}
+
+.deck-option button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 7px;
+    background: #d6a928;
+    color: #111;
+    font-weight: bold;
+}
+
+.deck-option .delete-button {
+    margin-top: 8px;
+    background: #7c2020;
+    color: white;
+}
+
+.deck-builder-button {
+    width: 100%;
+    margin-top: 22px;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: #536dfe;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* =====================================================
+   TOP BAR
+===================================================== */
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    background: #111;
+    border-bottom: 2px solid #b98b28;
+}
+
+.title {
+    color: #e8c45a;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.top-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.top-buttons button {
+    border: none;
+    border-radius: 7px;
+    padding: 9px 13px;
+    background: #444;
+    color: white;
+    font-weight: bold;
+}
+
+/* =====================================================
+   DUEL
+===================================================== */
+
+#duelScreen {
+    display: none;
+}
+
+.duel-container {
+    max-width: 1300px;
+    margin: auto;
+    padding: 12px;
+}
+
+.player-area {
+    background: #171717;
+    border: 1px solid #393939;
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.player-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.player-name {
+    color: #e8c45a;
+    font-weight: bold;
+}
+
+.lp {
+    font-size: 22px;
+    font-weight: bold;
+    color: #55d66b;
+}
+
+.lp.low {
+    color: #ff5454;
+}
+
+.field {
+    display: grid;
+    grid-template-columns:
+        repeat(5, 1fr);
+    gap: 7px;
+}
+
+.zone {
+    min-height: 145px;
+    border: 2px dashed #3e3e3e;
+    border-radius: 7px;
+    background: rgba(255,255,255,.025);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: #555;
+    font-size: 11px;
+    overflow: hidden;
+}
+
+.zone.occupied {
+    border-style: solid;
+}
+
+.zone.tribute-target {
+    border-color: #ff5454;
+    background:
+        rgba(255,84,84,.12);
+}
+
+.zone-title {
+    color: #777;
+    font-size: 11px;
+    margin: 8px 0 5px;
+}
+
+.spell-trap-field .zone {
+    min-height: 115px;
+}
+
+/* =====================================================
+   CARDS
+===================================================== */
+
+.card {
+    width: 104px;
+    height: 145px;
+    flex-shrink: 0;
+
+    border: 3px solid #171717;
+    border-radius: 6px;
+
+    padding: 4px;
+
+    color: black;
+
+    background: #b86b35;
+
+    box-shadow:
+        0 4px 10px rgba(0,0,0,.7);
+
+    position: relative;
+    overflow: hidden;
+
+    transition:
+        transform .12s,
+        outline .12s;
+}
+
+.card.monster {
+    background: #b86b35;
+}
+
+.card.fusion {
+    background: #68448e;
+}
+
+.card.spell {
+    background: #188c72;
+}
+
+.card.trap {
+    background: #a34891;
+}
+
+.card-name {
+    background: rgba(255,255,255,.92);
+    border: 1px solid #222;
+    font-size: 9px;
+    font-weight: bold;
+    padding: 3px;
+    min-height: 23px;
+    overflow: hidden;
+    line-height: 1.1;
+}
+
+.card-art {
+    height: 48px;
+    margin: 3px 0;
+
+    background:
+        radial-gradient(
+            circle,
+            #555,
+            #111
+        );
+
+    border: 2px solid #222;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: #ccc;
+    font-size: 8px;
+    text-align: center;
+}
+
+.card-level {
+    color: #a90000;
+    font-size: 8px;
+    height: 10px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.card-type {
+    background: rgba(255,255,255,.88);
+    border: 1px solid #222;
+    padding: 2px;
+    font-size: 7px;
+    font-weight: bold;
+}
+
+.card-effect {
+    background: #f1e7c8;
+    border: 1px solid #222;
+
+    margin-top: 2px;
+
+    padding: 3px;
+
+    height: 37px;
+
+    overflow: hidden;
+
+    font-size: 6.5px;
+
+    line-height: 1.2;
+
+    color: #111;
+}
+
+.card-stats {
+    position: absolute;
+    bottom: 3px;
+    left: 4px;
+    right: 4px;
+
+    background: rgba(255,255,255,.92);
+
+    border: 1px solid #222;
+
+    padding: 2px;
+
+    text-align: center;
+
+    font-size: 8px;
+    font-weight: bold;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    z-index: 5;
+}
+
+.card.selected {
+    outline: 3px solid #ffe15b;
+    transform: translateY(-12px);
+    z-index: 10;
+}
+
+.card.tribute-selected {
+    outline: 3px solid #ff5454;
+    transform: translateY(-8px);
+}
+
+.card.attack-target,
+.card-back.attack-target {
+    outline: 3px solid #55d6ff;
+    transform: translateY(-8px);
+}
+
+.card-back {
+    flex-shrink: 0;
+
+    width: 72px;
+    height: 105px;
+
+    background:
+        repeating-linear-gradient(
+            45deg,
+            #461919,
+            #461919 5px,
+            #711f1f 5px,
+            #711f1f 10px
+        );
+
+    border: 3px solid #171717;
+    border-radius: 5px;
+
+    box-shadow:
+        0 4px 10px rgba(0,0,0,.7);
+}
+
+/* =====================================================
+   HAND
+===================================================== */
+
+.hand-area {
+    margin-top: 8px;
+    padding: 8px;
+
+    background: #0b0b0b;
+
+    border: 1px solid #333;
+    border-radius: 8px;
+}
+
+.hand-title {
+    color: #888;
+    font-size: 11px;
+    margin-bottom: 6px;
+}
+
+.hand {
+    display: flex;
+    gap: 6px;
+
+    min-height: 150px;
+
+    overflow-x: auto;
+
+    padding: 4px;
+}
+
+/* =====================================================
+   CENTER
+===================================================== */
+
+.center {
+    display: grid;
+    grid-template-columns:
+        1fr 220px 1fr;
+
+    gap: 15px;
+
+    align-items: center;
+
+    margin: 10px 0;
+}
+
+.counter {
+    background: #151515;
+    border: 1px solid #333;
+    border-radius: 8px;
+
+    text-align: center;
+
+    padding: 10px;
+}
+
+.counter-number {
+    color: #e8c45a;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.counter-label {
+    color: #777;
+    font-size: 11px;
+}
+
+.turn-box {
+    background: #211b0c;
+
+    border: 2px solid #b98b28;
+
+    border-radius: 10px;
+
+    text-align: center;
+
+    padding: 12px;
+}
+
+.turn-label {
+    color: #888;
+    font-size: 10px;
+}
+
+.turn {
+    color: #e8c45a;
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 4px;
+}
+
+/* =====================================================
+   CONTROLS
+===================================================== */
+
+.controls {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    gap: 7px;
+
+    margin-top: 10px;
+}
+
+.controls button {
+    border: none;
+
+    border-radius: 7px;
+
+    padding: 12px 5px;
+
+    background: #d6a928;
+
+    color: #111;
+
+    font-weight: bold;
+}
+
+.controls button.secondary {
+    background: #444;
+    color: white;
+}
+
+.controls button.fusion-button {
+    background: #734ba3;
+    color: white;
+}
+
+.controls button.danger {
+    background: #7c2020;
+    color: white;
+}
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.status-box {
+    margin-top: 10px;
+
+    background: #211b0c;
+
+    border: 1px solid #8d7027;
+
+    color: #e8c45a;
+
+    border-radius: 8px;
+
+    padding: 10px;
+
+    text-align: center;
+
+    font-size: 12px;
+
+    min-height: 38px;
+}
+
+/* =====================================================
+   LOG
+===================================================== */
+
+.log {
+    margin-top: 10px;
+
+    background: #0c0c0c;
+
+    border: 1px solid #333;
+
+    border-radius: 8px;
+
+    height: 150px;
+
+    overflow-y: auto;
+
+    padding: 9px;
+
+    font-size: 12px;
+
+    color: #aaa;
+}
+
+.log-entry {
+    margin-bottom: 5px;
+}
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,.75);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 100;
+
+    padding: 20px;
+}
+
+.modal-box {
+    width: 100%;
+
+    max-width: 650px;
+
+    max-height: 85vh;
+
+    overflow-y: auto;
+
+    background: #181818;
+
+    border: 2px solid #b98b28;
+
+    border-radius: 14px;
+
+    padding: 22px;
+}
+
+.modal-box h2 {
+    margin-top: 0;
+
+    color: #e8c45a;
+}
+
+.card-detail {
+    background: #101010;
+
+    border: 1px solid #333;
+
+    border-radius: 8px;
+
+    padding: 10px;
+
+    margin-top: 8px;
+}
+
+.card-detail strong {
+    color: #e8c45a;
+}
+
+.effect-detail {
+    color: #ddd;
+    line-height: 1.5;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:700px) {
+
+    .screen {
+        padding: 10px;
+    }
+
+    .deck-select-box {
+        padding: 18px;
+    }
+
+    .top-bar {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .title {
+        font-size: 18px;
+    }
+
+    .top-buttons {
+        width: 100%;
+    }
+
+    .top-buttons button {
+        flex: 1;
+    }
+
+    .center {
+        grid-template-columns: 1fr;
+    }
+
+    .controls {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .field {
+        grid-template-columns:
+            repeat(5, 105px);
+
+        overflow-x: auto;
+    }
+
+    .zone {
+        min-height: 145px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     DECK SELECT
+===================================================== -->
+
+<div id="deckSelectScreen" class="screen">
+
+    <div class="deck-select-box">
+
+        <h1>⚔️ Choose Your Deck</h1>
+
+        <p>
+            Choose a premade deck or one of your saved custom decks.
+        </p>
+
+        <div id="deckList" class="deck-list"></div>
+
+        <button
+            class="deck-builder-button"
+            onclick="goToDeckBuilder()">
+
+            🃏 OPEN DECK BUILDER
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     DUEL
+===================================================== -->
+
+<div id="duelScreen">
+
+<header class="top-bar">
+
+    <div class="title">
+        ⚔️ Custom Duel
+    </div>
+
+    <div class="top-buttons">
+
+        <button onclick="newDuel()">
+            🔄 New Duel
+        </button>
+
+        <button onclick="goToDeckBuilder()">
+            🃏 Deck Builder
+        </button>
+
+    </div>
+
+</header>
+
+
+<div class="duel-container">
+
+<!-- OPPONENT -->
+
+<section class="player-area">
+
+    <div class="player-info">
+
+        <div class="player-name">
+            🤖 Opponent
+        </div>
+
+        <div id="opponentLP"
+             class="lp">
+
+            8000
+
+        </div>
+
+    </div>
+
+    <div id="opponentField"
+         class="field"></div>
+
+    <div class="zone-title">
+        Opponent Spell / Trap Zone
+    </div>
+
+    <div id="opponentSpellTrap"
+         class="field spell-trap-field"></div>
+
+    <div class="hand-area">
+
+        <div class="hand-title">
+            Opponent Hand
+        </div>
+
+        <div id="opponentHand"
+             class="hand"></div>
+
+    </div>
+
+</section>
+
+
+<!-- CENTER -->
+
+<div class="center">
+
+    <div class="counter">
+
+        <div id="opponentDeckCount"
+             class="counter-number">
+
+            40
+
+        </div>
+
+        <div class="counter-label">
+            Opponent Deck
+        </div>
+
+    </div>
+
+
+    <div class="turn-box">
+
+        <div class="turn-label">
+            CURRENT TURN
+        </div>
+
+        <div id="turnDisplay"
+             class="turn">
+
+            YOUR TURN
+
+        </div>
+
+    </div>
+
+
+    <div class="counter">
+
+        <div id="playerDeckCount"
+             class="counter-number">
+
+            40
+
+        </div>
+
+        <div class="counter-label">
+            Your Deck
+        </div>
+
+        <div style="
+            margin-top:8px;
+            color:#555;
+            font-size:10px;
+        ">
+
+            Extra Deck:
+            <span id="playerExtraDeckCount">
+                0
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- PLAYER -->
+
+<section class="player-area">
+
+    <div class="player-info">
+
+        <div class="player-name">
+            🧑 Player
+        </div>
+
+        <div id="playerLP"
+             class="lp">
+
+            8000
+
+        </div>
+
+    </div>
+
+
+    <div id="playerField"
+         class="field"></div>
+
+
+    <div class="zone-title">
+        Your Spell / Trap Zone
+    </div>
+
+
+    <div id="playerSpellTrap"
+         class="field spell-trap-field"></div>
+
+
+    <div class="hand-area">
+
+        <div class="hand-title">
+            Your Hand
+        </div>
+
+        <div id="playerHand"
+             class="hand"></div>
+
+    </div>
+
+</section>
+
+
+<div id="statusBox"
+     class="status-box">
+
+    Select a card.
+
+</div>
+
+
+<!-- CONTROLS -->
+
+<div class="controls">
+
+    <button onclick="drawCard()">
+        🃏 Draw
+    </button>
+
+    <button onclick="summonSelected()">
+        ⚔️ Summon (Attack)
+    </button>
+
+    <button onclick="setSelected()">
+        🛡️ Set (Defense)
+    </button>
+
+    <button onclick="confirmTributes()">
+        🩸 Confirm Tributes
+    </button>
+
+    <button onclick="attackSelected()">
+        💥 Attack
+    </button>
+
+    <button onclick="activateSelected()">
+        ✨ Activate / Set
+    </button>
+
+    <button class="fusion-button"
+            onclick="fusionSummon()">
+
+        🔥 Fusion
+
+    </button>
+
+    <button onclick="endTurn()">
+        ⏭ End Turn
+    </button>
+
+    <button class="secondary"
+            onclick="gainLP()">
+
+        ❤️ +1000
+
+    </button>
+
+    <button class="secondary"
+            onclick="loseLP()">
+
+        💔 -1000
+
+    </button>
+
+    <button class="secondary"
+            onclick="showDeckInfo()">
+
+        📋 Deck
+
+    </button>
+
+    <button class="secondary"
+            onclick="newDuel()">
+
+        🔄 Restart
+
+    </button>
+
+    <button class="danger"
+            onclick="surrender()">
+
+        🏳️ Surrender
+
+    </button>
+
+</div>
+
+
+<div id="gameLog"
+     class="log"></div>
+
+</div>
+</div>
+
+
+<!-- =====================================================
+     MODAL
+===================================================== -->
+
+<div id="modal"
+     class="modal hidden">
+
+    <div class="modal-box">
+
+        <h2 id="modalTitle">
+            Information
+        </h2>
+
+        <div id="modalContent"></div>
+
+        <div style="margin-top:15px;">
+
+            <button onclick="closeModal()"
+                    style="
+                    width:100%;
+                    padding:11px;
+                    border:none;
+                    border-radius:7px;
+                    background:#d6a928;
+                    font-weight:bold;">
+
+                Close
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   CARD DATABASE
+===================================================== */
+
+const CARD_DATABASE = {
+
+    blueEyes: {
+        id: "blueEyes",
+        name: "Blue-Eyes White Dragon",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 8,
+        monsterType: "Dragon",
+        atk: 3000,
+        def: 2500,
+        effect:
+            "A legendary dragon with devastating attack power."
+    },
+
+    darkMagician: {
+        id: "darkMagician",
+        name: "Dark Magician",
+        type: "monster",
+        attribute: "DARK",
+        level: 7,
+        monsterType: "Spellcaster",
+        atk: 2500,
+        def: 2100,
+        effect:
+            "The ultimate wizard in terms of attack and defense."
+    },
+
+    summonedSkull: {
+        id: "summonedSkull",
+        name: "Summoned Skull",
+        type: "monster",
+        attribute: "DARK",
+        level: 6,
+        monsterType: "Fiend",
+        atk: 2500,
+        def: 1200,
+        effect:
+            "If this monster destroys an opponent's monster by battle, inflict 500 damage to your opponent."
+    },
+
+    darkBlade: {
+        id: "darkBlade",
+        name: "Dark Blade",
+        type: "monster",
+        attribute: "DARK",
+        level: 4,
+        monsterType: "Warrior",
+        atk: 1800,
+        def: 1500,
+        effect:
+            "A warrior that fights using a dark blade."
+    },
+
+    mysticalElf: {
+        id: "mysticalElf",
+        name: "Mystical Elf",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 4,
+        monsterType: "Spellcaster",
+        atk: 800,
+        def: 2000,
+        effect:
+            "Once per turn, when this monster is attacked, you can gain 300 LP."
+    },
+
+    giantSoldier: {
+        id: "giantSoldier",
+        name: "Giant Soldier of Stone",
+        type: "monster",
+        attribute: "EARTH",
+        level: 3,
+        monsterType: "Rock",
+        atk: 1300,
+        def: 2000,
+        effect:
+            "A massive stone soldier. While in Defense Position, this monster gains 300 DEF."
+    },
+
+    curseDragon: {
+        id: "curseDragon",
+        name: "Curse of Dragon",
+        type: "monster",
+        attribute: "DARK",
+        level: 5,
+        monsterType: "Dragon",
+        atk: 2000,
+        def: 1500,
+        effect:
+            "Once per turn, this monster gains 300 ATK until the end of the turn."
+    },
+
+    babyDragon: {
+        id: "babyDragon",
+        name: "Baby Dragon",
+        type: "monster",
+        attribute: "WIND",
+        level: 3,
+        monsterType: "Dragon",
+        atk: 700,
+        def: 700,
+        effect:
+            "When this monster is Normal Summoned, draw 1 card."
+    },
+
+    summonDragon: {
+        id: "summonDragon",
+        name: "Dragon's Call",
+        type: "spell",
+        spellType: "Normal Spell",
+        effect:
+            "Draw 2 cards."
+    },
+
+    powerBoost: {
+        id: "powerBoost",
+        name: "Power Boost",
+        type: "spell",
+        spellType: "Normal Spell",
+        effect:
+            "All face-up monsters you currently control gain 500 ATK until the end of the turn."
+    },
+
+    darkHole: {
+        id: "darkHole",
+        name: "Dark Hole",
+        type: "spell",
+        spellType: "Normal Spell",
+        effect:
+            "Destroy all monsters on the field."
+    },
+
+    healingLight: {
+        id: "healingLight",
+        name: "Healing Light",
+        type: "spell",
+        spellType: "Normal Spell",
+        effect:
+            "Gain 1000 LP."
+    },
+
+    mirrorForce: {
+        id: "mirrorForce",
+        name: "Mirror Force",
+        type: "trap",
+        trapType: "Normal Trap",
+        effect:
+            "When an opponent's monster declares an attack, destroy all attack-position monsters your opponent controls."
+    },
+
+    magicCylinder: {
+        id: "magicCylinder",
+        name: "Magic Cylinder",
+        type: "trap",
+        trapType: "Normal Trap",
+        effect:
+            "When an opponent's monster declares an attack, negate the attack and inflict damage equal to that monster's ATK."
+    },
+
+    flameSwordsman: {
+        id: "flameSwordsman",
+        name: "Flame Swordsman",
+        type: "fusion",
+        attribute: "FIRE",
+        level: 5,
+        monsterType: "Warrior",
+        atk: 1800,
+        def: 1600,
+        materials: [
+            "Dark Blade",
+            "Summoned Skull"
+        ],
+        effect:
+            "A warrior who wields a blazing sword. Gains 300 ATK while battling a monster."
+    }
+
+};
+
+
+/* =====================================================
+   PREMADE DECKS
+===================================================== */
+
+const PREMADE_DECKS = {
+
+    dragon: {
+
+        name: "🐉 Dragon's Fury",
+
+        description:
+            "A Dragon-focused deck featuring Blue-Eyes, Curse of Dragon and Baby Dragon.",
+
+        cards: [
+
+            "blueEyes",
+            "blueEyes",
+            "blueEyes",
+
+            "curseDragon",
+            "curseDragon",
+            "curseDragon",
+
+            "babyDragon",
+            "babyDragon",
+            "babyDragon",
+            "babyDragon",
+            "babyDragon",
+            "babyDragon",
+
+            "darkBlade",
+            "darkBlade",
+            "darkBlade",
+            "darkBlade",
+
+            "giantSoldier",
+            "giantSoldier",
+            "giantSoldier",
+
+            "mysticalElf",
+            "mysticalElf",
+            "mysticalElf",
+
+            "summonDragon",
+            "summonDragon",
+            "summonDragon",
+
+            "powerBoost",
+            "powerBoost",
+            "powerBoost",
+
+            "healingLight",
+            "healingLight",
+            "healingLight",
+
+            "darkHole",
+            "darkHole",
+            "darkHole",
+
+            "mirrorForce",
+            "mirrorForce",
+            "mirrorForce",
+
+            "magicCylinder",
+            "magicCylinder",
+            "magicCylinder"
+
+        ],
+
+        extraDeck: [
+            "flameSwordsman"
+        ]
+
+    },
+
+
+    magician: {
+
+        name: "🪄 Magician's Power",
+
+        description:
+            "A Spellcaster deck built around Dark Magician and powerful support cards.",
+
+        cards: [
+
+            "darkMagician",
+            "darkMagician",
+            "darkMagician",
+
+            "summonedSkull",
+            "summonedSkull",
+            "summonedSkull",
+
+            "mysticalElf",
+            "mysticalElf",
+            "mysticalElf",
+
+            "darkBlade",
+            "darkBlade",
+            "darkBlade",
+
+            "giantSoldier",
+            "giantSoldier",
+            "giantSoldier",
+
+            "curseDragon",
+            "curseDragon",
+
+            "babyDragon",
+            "babyDragon",
+
+            "summonDragon",
+            "summonDragon",
+            "summonDragon",
+
+            "powerBoost",
+            "powerBoost",
+            "powerBoost",
+
+            "darkHole",
+            "darkHole",
+
+            "healingLight",
+            "healingLight",
+            "healingLight",
+
+            "mirrorForce",
+            "mirrorForce",
+            "mirrorForce",
+
+            "magicCylinder",
+            "magicCylinder",
+            "magicCylinder",
+
+            "darkMagician",
+            "darkMagician",
+
+            "summonedSkull",
+
+            "mysticalElf"
+
+        ],
+
+        extraDeck: [
+            "flameSwordsman"
+        ]
+
+    },
+
+
+    warrior: {
+
+        name: "⚔️ Warrior Assault",
+
+        description:
+            "An aggressive Warrior deck built around Dark Blade and powerful beaters.",
+
+        cards: [
+
+            "darkBlade",
+            "darkBlade",
+            "darkBlade",
+            "darkBlade",
+            "darkBlade",
+            "darkBlade",
+
+            "giantSoldier",
+            "giantSoldier",
+            "giantSoldier",
+            "giantSoldier",
+
+            "mysticalElf",
+            "mysticalElf",
+            "mysticalElf",
+
+            "summonedSkull",
+            "summonedSkull",
+
+            "curseDragon",
+            "curseDragon",
+            "curseDragon",
+
+            "babyDragon",
+            "babyDragon",
+            "babyDragon",
+
+            "summonDragon",
+            "summonDragon",
+            "summonDragon",
+
+            "powerBoost",
+            "powerBoost",
+            "powerBoost",
+            "powerBoost",
+
+            "healingLight",
+            "healingLight",
+            "healingLight",
+
+            "darkHole",
+            "darkHole",
+            "darkHole",
+
+            "mirrorForce",
+            "mirrorForce",
+            "mirrorForce",
+
+            "magicCylinder",
+            "magicCylinder",
+            "magicCylinder"
+
+        ],
+
+        extraDeck: [
+            "flameSwordsman"
+        ]
+
+    }
+
+};
+
+
+/* =====================================================
+   GAME STATE
+===================================================== */
+
+let player = createEmptyPlayer();
+let opponent = createEmptyPlayer();
+
+let selectedCard = null;
+let selectedFieldCard = null;
+let selectedSpellTrap = null;
+let selectedAttackTarget = null;
+
+let pendingSummonMode = "attack";
+
+let tributeSelection = [];
+
+let playerTurn = true;
+let duelOver = false;
+let turnNumber = 1;
+
+let currentDeckName = "";
+let currentDeckId = "";
+
+
+/* =====================================================
+   PLAYER
+===================================================== */
+
+function createEmptyPlayer() {
+
+    return {
+
+        deck: [],
+
+        hand: [],
+
+        field: [],
+
+        spellTrap: [],
+
+        extraDeck: [],
+
+        lp: 8000,
+
+        normalSummoned: false,
+
+        attackedThisTurn: [],
+
+        effectUsed: {}
+
+    };
+
+}
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+function cloneCard(id) {
+
+    const source =
+        CARD_DATABASE[id];
+
+    if (!source) {
+        return null;
+    }
+
+    return {
+        ...source,
+        atk: source.atk,
+        def: source.def
+    };
+
+}
+
+
+function shuffle(deck) {
+
+    for (
+        let i = deck.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() * (i + 1)
+            );
+
+        [
+            deck[i],
+            deck[j]
+        ] = [
+            deck[j],
+            deck[i]
+        ];
+
+    }
+
+    return deck;
+
+}
+
+
+function log(message) {
+
+    const box =
+        document.getElementById("gameLog");
+
+    const entry =
+        document.createElement("div");
+
+    entry.className =
+        "log-entry";
+
+    entry.innerHTML =
+        message;
+
+    box.appendChild(entry);
+
+    box.scrollTop =
+        box.scrollHeight;
+
+}
+
+
+function clearLog() {
+
+    document.getElementById(
+        "gameLog"
+    ).innerHTML = "";
+
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+function goToDeckBuilder() {
+
+    window.location.href =
+        "eckbuiler.html";
+
+}
+
+
+function newDuel() {
+
+    document
+        .getElementById("duelScreen")
+        .style.display = "none";
+
+    document
+        .getElementById("deckSelectScreen")
+        .classList
+        .remove("hidden");
+
+    duelOver = false;
+
+    renderDeckSelection();
+
+}
+
+
+/* =====================================================
+   CUSTOM DECKS
+===================================================== */
+
+function getCustomDecks() {
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem(
+                "yugiohCustomDecks"
+            ) || "{}"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        return {};
+
+    }
+
+}
+
+
+function deleteCustomDeck(name) {
+
+    const decks =
+        getCustomDecks();
+
+    delete decks[name];
+
+    localStorage.setItem(
+        "yugiohCustomDecks",
+        JSON.stringify(decks)
+    );
+
+    renderDeckSelection();
+
+}
+
+
+function buildCustomCards(ids) {
+
+    return (ids || [])
+        .map(id => cloneCard(id))
+        .filter(Boolean);
+
+}
+
+
+/* =====================================================
+   DECK SELECTION
+===================================================== */
+
+function renderDeckSelection() {
+
+    const list =
+        document.getElementById(
+            "deckList"
+        );
+
+    list.innerHTML = "";
+
+
+    Object.entries(PREMADE_DECKS)
+        .forEach(([id, deck]) => {
+
+            const box =
+                document.createElement("div");
+
+            box.className =
+                "deck-option";
+
+            box.innerHTML = `
+
+                <h2>
+                    ${escapeHTML(deck.name)}
+                </h2>
+
+                <p>
+                    ${escapeHTML(deck.description)}
+                </p>
+
+                <p>
+
+                    <strong>
+                        ${deck.cards.length}
+                        cards
+                    </strong>
+
+                    <br>
+
+                    Extra Deck:
+                    ${deck.extraDeck.length}
+
+                </p>
+
+                <button
+                    onclick="startDuel('${id}')">
+
+                    USE THIS DECK
+
+                </button>
+
+            `;
+
+            list.appendChild(box);
+
+        });
+
+
+    const customDecks =
+        getCustomDecks();
+
+
+    Object.entries(customDecks)
+        .forEach(([name, deck]) => {
+
+            const box =
+                document.createElement("div");
+
+            box.className =
+                "deck-option custom";
+
+            box.innerHTML = `
+
+                <h2>
+                    💾
+                    ${escapeHTML(
+                        deck.name || name
+                    )}
+                </h2>
+
+                <p>
+                    Saved Custom Deck
+                </p>
+
+                <p>
+
+                    <strong>
+                        ${(deck.cards || []).length}
+                        cards
+                    </strong>
+
+                    <br>
+
+                    Extra Deck:
+                    ${(deck.extraDeck || []).length}
+
+                </p>
+
+                <button
+                    onclick='startCustomDuel(${JSON.stringify(name)})'>
+
+                    USE THIS DECK
+
+                </button>
+
+                <button
+                    class="delete-button"
+                    onclick='deleteCustomDeck(${JSON.stringify(name)})'>
+
+                    DELETE
+
+                </button>
+
+            `;
+
+            list.appendChild(box);
+
+        });
+
+}
+
+
+/* =====================================================
+   BUILD PREMADE
+===================================================== */
+
+function buildDeck(deckId) {
+
+    const data =
+        PREMADE_DECKS[deckId];
+
+    if (!data) {
+        return [];
+    }
+
+    return data.cards
+        .map(cloneCard)
+        .filter(Boolean);
+
+}
+
+
+function buildExtraDeck(deckId) {
+
+    const data =
+        PREMADE_DECKS[deckId];
+
+    if (!data) {
+        return [];
+    }
+
+    return data.extraDeck
+        .map(cloneCard)
+        .filter(Boolean);
+
+}
+
+
+/* =====================================================
+   START PREMADE DUEL
+===================================================== */
+
+function startDuel(deckId) {
+
+    const data =
+        PREMADE_DECKS[deckId];
+
+    if (!data) {
+
+        alert("Deck not found.");
+
+        return;
+
+    }
+
+
+    currentDeckName =
+        data.name;
+
+    currentDeckId =
+        deckId;
+
+
+    player =
+        createEmptyPlayer();
+
+    opponent =
+        createEmptyPlayer();
+
+
+    player.deck =
+        shuffle(
+            buildDeck(deckId)
+        );
+
+
+    let opponentDeckId;
+
+    if (deckId === "dragon") {
+
+        opponentDeckId =
+            "magician";
+
+    } else if (deckId === "magician") {
+
+        opponentDeckId =
+            "warrior";
+
+    } else {
+
+        opponentDeckId =
+            "dragon";
+
+    }
+
+
+    opponent.deck =
+        shuffle(
+            buildDeck(
+                opponentDeckId
+            )
+        );
+
+
+    player.extraDeck =
+        buildExtraDeck(deckId);
+
+    opponent.extraDeck =
+        buildExtraDeck(
+            opponentDeckId
+        );
+
+
+    initializeDuel();
+
+}
+
+
+/* =====================================================
+   CUSTOM DUEL
+===================================================== */
+
+function startCustomDuel(name) {
+
+    const decks =
+        getCustomDecks();
+
+    const saved =
+        decks[name];
+
+    if (!saved) {
+
+        alert(
+            "Custom deck not found."
+        );
+
+        return;
+
+    }
+
+
+    const cards =
+        buildCustomCards(
+            saved.cards || []
+        );
+
+
+    if (cards.length < 1) {
+
+        alert(
+            "This custom deck has no valid cards."
+        );
+
+        return;
+
+    }
+
+
+    currentDeckName =
+        saved.name || name;
+
+    currentDeckId =
+        "custom:" + name;
+
+
+    player =
+        createEmptyPlayer();
+
+    opponent =
+        createEmptyPlayer();
+
+
+    player.deck =
+        shuffle(cards);
+
+
+    player.extraDeck =
+        buildCustomCards(
+            saved.extraDeck || []
+        );
+
+
+    opponent.deck =
+        shuffle(
+            buildDeck("dragon")
+        );
+
+    opponent.extraDeck =
+        buildExtraDeck("dragon");
+
+
+    initializeDuel();
+
+}
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+function initializeDuel() {
+
+    player.hand = [];
+    opponent.hand = [];
+
+    player.field = [];
+    opponent.field = [];
+
+    player.spellTrap = [];
+    opponent.spellTrap = [];
+
+    player.lp = 8000;
+    opponent.lp = 8000;
+
+    player.normalSummoned = false;
+    opponent.normalSummoned = false;
+
+    player.attackedThisTurn = [];
+    opponent.attackedThisTurn = [];
+
+    player.effectUsed = {};
+    opponent.effectUsed = {};
+
+    selectedCard = null;
+    selectedFieldCard = null;
+    selectedSpellTrap = null;
+    selectedAttackTarget = null;
+
+    pendingSummonMode = "attack";
+
+    tributeSelection = [];
+
+    playerTurn = true;
+    duelOver = false;
+    turnNumber = 1;
+
+
+    for (let i = 0; i < 5; i++) {
+
+        drawFromDeck(player);
+        drawFromDeck(opponent);
+
+    }
+
+
+    document
+        .getElementById("deckSelectScreen")
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById("duelScreen")
+        .style
+        .display = "block";
+
+
+    clearLog();
+
+
+    log(`
+        <strong>System:</strong>
+        ${escapeHTML(currentDeckName)}
+        loaded.
+    `);
+
+
+    log(`
+        <strong>System:</strong>
+        Both players drew 5 cards.
+    `);
+
+
+    log(`
+        <strong>System:</strong>
+        Your turn.
+    `);
+
+
+    renderAll();
+
+}
+
+
+/* =====================================================
+   DRAW
+===================================================== */
+
+function drawFromDeck(owner) {
+
+    if (owner.deck.length === 0) {
+
+        owner.lp = 0;
+
+        return null;
+
+    }
+
+
+    const card =
+        owner.deck.pop();
+
+    owner.hand.push(card);
+
+    return card;
+
+}
+
+
+function drawCard() {
+
+    if (!playerTurn || duelOver) {
+
+        log(`
+            <strong>System:</strong>
+            It is not your turn.
+        `);
+
+        return;
+
+    }
+
+
+    const card =
+        drawFromDeck(player);
+
+
+    if (!card) {
+
+        log(`
+            <strong>System:</strong>
+            Your deck is empty!
+        `);
+
+        checkWin();
+
+        return;
+
+    }
+
+
+    log(`
+        <strong>You:</strong>
+        Drew ${escapeHTML(card.name)}.
+    `);
+
+
+    renderAll();
+
+}
+
+
+/* =====================================================
+   RENDER
+===================================================== */
+
+function renderAll() {
+
+    renderHand();
+
+    renderField();
+
+    renderSpellTrapZones();
+
+    updateCounters();
+
+    updateStatus();
+
+}
+
+
+/* =====================================================
+   RENDER HAND
+===================================================== */
+
+function renderHand() {
+
+    const hand =
+        document.getElementById(
+            "playerHand"
+        );
+
+    hand.innerHTML = "";
+
+
+    player.hand.forEach(
+        (card, index) => {
+
+            const element =
+                createCardElement(card);
+
+
+            if (
+                selectedCard === index
+            ) {
+
+                element.classList
+                    .add("selected");
+
+            }
+
+
+            element.onclick =
+                function() {
+
+                    if (
+                        tributeSelection.length > 0
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    selectedCard =
+                        index;
+
+                    selectedFieldCard =
+                        null;
+
+                    selectedSpellTrap =
+                        null;
+
+                    renderAll();
+
+                };
+
+
+            hand.appendChild(element);
+
+        }
+    );
+
+
+    const opponentHand =
+        document.getElementById(
+            "opponentHand"
+        );
+
+    opponentHand.innerHTML = "";
+
+
+    opponent.hand.forEach(() => {
+
+        const back =
+            document.createElement("div");
+
+        back.className =
+            "card-back";
+
+        opponentHand.appendChild(back);
+
+    });
+
+}
+
+
+/* =====================================================
+   CARD ELEMENT
+===================================================== */
+
+function createCardElement(card) {
+
+    const element =
+        document.createElement("div");
+
+    element.className =
+        "card " + card.type;
+
+
+    const art =
+        card.monsterType ||
+        card.type.toUpperCase();
+
+
+    const stars =
+        card.level
+            ? "★".repeat(
+                Math.min(card.level, 8)
+              )
+            : "";
+
+
+    let typeText;
+
+
+    if (
+        card.type === "monster" ||
+        card.type === "fusion"
+    ) {
+
+        typeText =
+            card.monsterType ||
+            "Monster";
+
+    } else {
+
+        typeText =
+            card.spellType ||
+            card.trapType ||
+            card.type;
+
+    }
+
+
+    element.innerHTML = `
+
+        <div class="card-name">
+            ${escapeHTML(card.name)}
+        </div>
+
+        <div class="card-art">
+            ${escapeHTML(art)}
+        </div>
+
+        ${
+            card.level
+            ? `
+                <div class="card-level">
+                    ${stars}
+                </div>
+            `
+            : ""
+        }
+
+        <div class="card-type">
+            [${escapeHTML(typeText)}]
+        </div>
+
+        <div class="card-effect">
+            ${escapeHTML(card.effect)}
+        </div>
+
+        ${
+            card.atk !== undefined
+            ? `
+                <div class="card-stats">
+                    ATK ${card.atk}
+                    &nbsp; / &nbsp;
+                    DEF ${card.def}
+                </div>
+            `
+            : ""
+        }
+
+    `;
+
+
+    return element;
+
+}
+
+
+/* =====================================================
+   FIELD
+===================================================== */
+
+function createFieldMonsterVisual(monster, revealFaceDown) {
+
+    /*
+       revealFaceDown = true for the player's own
+       monsters (they know what they Set), false for
+       the opponent's (kept hidden, like a real duel).
+    */
+
+    let element;
+
+
+    if (monster.faceUp) {
+
+        element =
+            createCardElement(monster);
+
+    } else {
+
+        element =
+            document.createElement("div");
+
+        element.className =
+            "card-back";
+
+
+        if (revealFaceDown) {
+
+            const label =
+                document.createElement("div");
+
+            label.textContent =
+                monster.name;
+
+            label.style.cssText =
+                "position:absolute;bottom:2px;left:2px;right:2px;" +
+                "color:#ffcf6b;font-size:7px;text-align:center;" +
+                "background:rgba(0,0,0,.65);padding:1px;border-radius:3px;";
+
+            element.style.position =
+                "relative";
+
+            element.appendChild(label);
+
+        }
+
+    }
+
+
+    element.style.width =
+        "92px";
+
+    element.style.height =
+        "132px";
+
+
+    return element;
+
+}
+
+
+function createPositionBadge(monster) {
+
+    const badge =
+        document.createElement("div");
+
+
+    badge.textContent =
+        !monster.faceUp
+            ? "SET"
+            : (
+                monster.position === "defense"
+                ? "DEF"
+                : "ATK"
+              );
+
+
+    badge.style.cssText =
+        "position:absolute;bottom:3px;right:3px;" +
+        "background:#000;color:#e8c45a;font-size:8px;" +
+        "font-weight:bold;padding:1px 5px;border-radius:5px;" +
+        "border:1px solid #b98b28;";
+
+
+    return badge;
+
+}
+
+
+function renderField() {
+
+    const playerField =
+        document.getElementById(
+            "playerField"
+        );
+
+    const opponentField =
+        document.getElementById(
+            "opponentField"
+        );
+
+
+    playerField.innerHTML = "";
+
+    opponentField.innerHTML = "";
+
+
+    for (let i = 0; i < 5; i++) {
+
+        const zone =
+            document.createElement("div");
+
+        zone.className =
+            "zone";
+
+        zone.style.position =
+            "relative";
+
+
+        if (player.field[i]) {
+
+            const monster =
+                player.field[i];
+
+
+            zone.classList
+                .add("occupied");
+
+
+            if (
+                tributeSelection.length > 0
+            ) {
+
+                zone.classList
+                    .add("tribute-target");
+
+            }
+
+
+            const cardElement =
+                createFieldMonsterVisual(
+                    monster,
+                    true
+                );
+
+
+            if (
+                selectedFieldCard === i
+            ) {
+
+                cardElement.classList
+                    .add("selected");
+
+            }
+
+
+            if (
+                tributeSelection.includes(i)
+            ) {
+
+                cardElement.classList
+                    .add("tribute-selected");
+
+            }
+
+
+            cardElement.onclick =
+                function() {
+
+                    if (
+                        tributeSelection.length > 0
+                    ) {
+
+                        toggleTribute(i);
+
+                        return;
+
+                    }
+
+
+                    selectedFieldCard =
+                        i;
+
+                    selectedCard =
+                        null;
+
+                    selectedSpellTrap =
+                        null;
+
+                    selectedAttackTarget =
+                        null;
+
+                    renderAll();
+
+                };
+
+
+            zone.appendChild(
+                cardElement
+            );
+
+            zone.appendChild(
+                createPositionBadge(monster)
+            );
+
+        } else {
+
+            zone.textContent =
+                "Monster Zone";
+
+        }
+
+
+        playerField.appendChild(zone);
+
+    }
+
+
+    for (let i = 0; i < 5; i++) {
+
+        const zone =
+            document.createElement("div");
+
+        zone.className =
+            "zone";
+
+        zone.style.position =
+            "relative";
+
+
+        if (opponent.field[i]) {
+
+            const monster =
+                opponent.field[i];
+
+
+            zone.classList
+                .add("occupied");
+
+
+            const cardElement =
+                createFieldMonsterVisual(
+                    monster,
+                    false
+                );
+
+
+            if (
+                selectedAttackTarget === i
+            ) {
+
+                cardElement.classList
+                    .add("attack-target");
+
+            }
+
+
+            cardElement.onclick =
+                function() {
+
+                    if (!playerTurn || duelOver) {
+                        return;
+                    }
+
+                    if (selectedFieldCard === null) {
+                        return;
+                    }
+
+                    const attacker =
+                        player.field[selectedFieldCard];
+
+                    if (
+                        !attacker ||
+                        !attacker.faceUp ||
+                        attacker.position !== "attack"
+                    ) {
+
+                        log(`
+                            <strong>System:</strong>
+                            Only a face-up Attack Position
+                            monster can declare an attack.
+                        `);
+
+                        return;
+
+                    }
+
+                    if (
+                        player.attackedThisTurn.includes(
+                            selectedFieldCard
+                        )
+                    ) {
+
+                        log(`
+                            <strong>System:</strong>
+                            That monster already attacked.
+                        `);
+
+                        return;
+
+                    }
+
+                    selectedAttackTarget =
+                        (selectedAttackTarget === i)
+                            ? null
+                            : i;
+
+                    renderAll();
+
+                };
+
+
+            zone.appendChild(
+                cardElement
+            );
+
+            if (monster.faceUp) {
+
+                zone.appendChild(
+                    createPositionBadge(monster)
+                );
+
+            }
+
+        } else {
+
+            zone.textContent =
+                "Monster Zone";
+
+        }
+
+
+        opponentField.appendChild(zone);
+
+    }
+
+}
+
+
+/* =====================================================
+   SPELL/TRAP ZONES
+===================================================== */
+
+function renderSpellTrapZones() {
+
+    const playerZone =
+        document.getElementById(
+            "playerSpellTrap"
+        );
+
+    const opponentZone =
+        document.getElementById(
+            "opponentSpellTrap"
+        );
+
+
+    playerZone.innerHTML = "";
+
+    opponentZone.innerHTML = "";
+
+
+    for (let i = 0; i < 5; i++) {
+
+        const zone =
+            document.createElement("div");
+
+        zone.className =
+            "zone";
+
+
+        if (player.spellTrap[i]) {
+
+            zone.classList
+                .add("occupied");
+
+
+            const card =
+                createCardElement(
+                    player.spellTrap[i]
+                );
+
+
+            card.style.width =
+                "82px";
+
+            card.style.height =
+                "112px";
+
+
+            if (
+                selectedSpellTrap === i
+            ) {
+
+                card.classList
+                    .add("selected");
+
+            }
+
+
+            card.onclick =
+                function() {
+
+                    selectedSpellTrap =
+                        i;
+
+                    selectedCard =
+                        null;
+
+                    selectedFieldCard =
+                        null;
+
+                    renderAll();
+
+                };
+
+
+            zone.appendChild(card);
+
+        } else {
+
+            zone.textContent =
+                "Spell / Trap";
+
+        }
+
+
+        playerZone.appendChild(zone);
+
+    }
+
+
+    for (let i = 0; i < 5; i++) {
+
+        const zone =
+            document.createElement("div");
+
+        zone.className =
+            "zone";
+
+
+        if (opponent.spellTrap[i]) {
+
+            zone.classList
+                .add("occupied");
+
+
+            const back =
+                document.createElement(
+                    "div"
+                );
+
+            back.className =
+                "card-back";
+
+            back.style.width =
+                "65px";
+
+            back.style.height =
+                "90px";
+
+            zone.appendChild(back);
+
+        } else {
+
+            zone.textContent =
+                "Spell / Trap";
+
+        }
+
+
+        opponentZone.appendChild(zone);
+
+    }
+
+}
+
+
+/* =====================================================
+   COUNTERS
+===================================================== */
+
+function updateCounters() {
+
+    document.getElementById(
+        "playerDeckCount"
+    ).textContent =
+        player.deck.length;
+
+
+    document.getElementById(
+        "opponentDeckCount"
+    ).textContent =
+        opponent.deck.length;
+
+
+    document.getElementById(
+        "playerExtraDeckCount"
+    ).textContent =
+        player.extraDeck.length;
+
+
+    const playerLP =
+        document.getElementById(
+            "playerLP"
+        );
+
+    const opponentLP =
+        document.getElementById(
+            "opponentLP"
+        );
+
+
+    playerLP.textContent =
+        Math.max(0, player.lp);
+
+    opponentLP.textContent =
+        Math.max(0, opponent.lp);
+
+
+    playerLP.classList.toggle(
+        "low",
+        player.lp <= 2000
+    );
+
+
+    opponentLP.classList.toggle(
+        "low",
+        opponent.lp <= 2000
+    );
+
+
+    document.getElementById(
+        "turnDisplay"
+    ).textContent =
+        playerTurn
+            ? "YOUR TURN"
+            : "OPPONENT TURN";
+
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function updateStatus() {
+
+    const status =
+        document.getElementById(
+            "statusBox"
+        );
+
+
+    if (duelOver) {
+
+        status.textContent =
+            "Duel Over";
+
+        return;
+
+    }
+
+
+    if (
+        tributeSelection.length > 0
+    ) {
+
+        const required =
+            getRequiredTributes(
+                player.hand[selectedCard]
+            );
+
+        status.textContent =
+            `Select ${required} monster(s) on your field to tribute.`;
+
+        return;
+
+    }
+
+
+    if (
+        selectedCard !== null
+    ) {
+
+        const card =
+            player.hand[selectedCard];
+
+        if (card) {
+
+            status.textContent =
+                "Selected: " +
+                card.name;
+
+            return;
+
+        }
+
+    }
+
+
+    if (
+        selectedFieldCard !== null
+    ) {
+
+        const card =
+            player.field[
+                selectedFieldCard
+            ];
+
+        if (card) {
+
+            if (
+                card.faceUp &&
+                card.position === "attack" &&
+                !player.attackedThisTurn.includes(
+                    selectedFieldCard
+                )
+            ) {
+
+                if (
+                    selectedAttackTarget !== null &&
+                    opponent.field[selectedAttackTarget]
+                ) {
+
+                    status.textContent =
+                        card.name +
+                        " will attack " +
+                        opponent.field[selectedAttackTarget].name +
+                        " — click Attack to confirm.";
+
+                } else if (opponent.field.length > 0) {
+
+                    status.textContent =
+                        "Selected: " +
+                        card.name +
+                        ". Click an opponent monster to choose your target, then Attack.";
+
+                } else {
+
+                    status.textContent =
+                        "Selected: " +
+                        card.name +
+                        ". The opponent's field is empty — Attack will hit them directly.";
+
+                }
+
+            } else {
+
+                status.textContent =
+                    "Selected: " +
+                    card.name;
+
+            }
+
+            return;
+
+        }
+
+    }
+
+
+    if (
+        selectedSpellTrap !== null
+    ) {
+
+        const card =
+            player.spellTrap[
+                selectedSpellTrap
+            ];
+
+        if (card) {
+
+            status.textContent =
+                "Selected: " +
+                card.name;
+
+            return;
+
+        }
+
+    }
+
+
+    if (!playerTurn) {
+
+        status.textContent =
+            "Opponent is taking their turn...";
+
+        return;
+
+    }
+
+
+    status.textContent =
+        "Select a card.";
+
+}
+
+
+/* =====================================================
+   TRIBUTES
+===================================================== */
+
+function getRequiredTributes(card) {
+
+    if (!card || !card.level) {
+        return 0;
+    }
+
+    if (card.level >= 7) {
+        return 2;
+    }
+
+    if (card.level >= 5) {
+        return 1;
+    }
+
+    return 0;
+
+}
+
+
+function summonSelected() {
+
+    beginNormalSummon("attack");
+
+}
+
+
+function setSelected() {
+
+    beginNormalSummon("defense");
+
+}
+
+
+function beginNormalSummon(mode) {
+
+    if (!playerTurn || duelOver) {
+        return;
+    }
+
+
+    if (player.normalSummoned) {
+
+        log(`
+            <strong>System:</strong>
+            You already Normal Summoned or Set a monster this turn.
+        `);
+
+        return;
+
+    }
+
+
+    if (selectedCard === null) {
+
+        log(`
+            <strong>System:</strong>
+            Select a monster in your hand first.
+        `);
+
+        return;
+
+    }
+
+
+    const card =
+        player.hand[selectedCard];
+
+
+    if (
+        !card ||
+        (
+            card.type !== "monster" &&
+            card.type !== "fusion"
+        )
+    ) {
+
+        log(`
+            <strong>System:</strong>
+            Select a monster.
+        `);
+
+        return;
+
+    }
+
+
+    if (card.type === "fusion") {
+
+        log(`
+            <strong>System:</strong>
+            Fusion Monsters cannot be Normal Summoned or Set from your hand. Use the Fusion button instead.
+        `);
+
+        return;
+
+    }
+
+
+    if (player.field.length >= 5) {
+
+        log(`
+            <strong>System:</strong>
+            Your Monster Zones are full.
+        `);
+
+        return;
+
+    }
+
+
+    const required =
+        getRequiredTributes(card);
+
+
+    pendingSummonMode = mode;
+
+
+    if (required === 0) {
+
+        completeNormalSummon([]);
+
+        return;
+
+    }
+
+
+    if (player.field.length < required) {
+
+        log(`
+            <strong>System:</strong>
+            ${escapeHTML(card.name)}
+            requires ${required}
+            tribute(s).
+        `);
+
+        return;
+
+    }
+
+
+    /*
+       IMPORTANT:
+       Keep the card selected in the hand.
+       The player now clicks actual monsters
+       on the field.
+    */
+
+    tributeSelection = [];
+
+    log(`
+        <strong>System:</strong>
+        Select ${required}
+        monster(s) on your field
+        to tribute.
+    `);
+
+    renderAll();
+
+}
+
+
+function toggleTribute(index) {
+
+    if (!player.field[index]) {
+        return;
+    }
+
+
+    if (selectedCard === null) {
+        return;
+    }
+
+
+    const card =
+        player.hand[selectedCard];
+
+
+    if (!card) {
+        return;
+    }
+
+
+    const required =
+        getRequiredTributes(card);
+
+
+    if (
+        tributeSelection.includes(index)
+    ) {
+
+        tributeSelection =
+            tributeSelection.filter(
+                value => value !== index
+            );
+
+    } else {
+
+        if (
+            tributeSelection.length >=
+            required
+        ) {
+
+            return;
+
+        }
+
+        tributeSelection.push(index);
+
+    }
+
+
+    renderAll();
+
+}
+
+
+function confirmTributes() {
+
+    if (!playerTurn || duelOver) {
+        return;
+    }
+
+
+    if (selectedCard === null) {
+
+        log(`
+            <strong>System:</strong>
+            Select a monster in your hand first.
+        `);
+
+        return;
+
+    }
+
+
+    const card =
+        player.hand[selectedCard];
+
+
+    if (
+        !card ||
+        card.type !== "monster"
+    ) {
+
+        log(`
+            <strong>System:</strong>
+            Select a monster.
+        `);
+
+        return;
+
+    }
+
+
+    const required =
+        getRequiredTributes(card);
+
+
+    if (
+        tributeSelection.length !==
+        required
+    ) {
+
+        log(`
+            <strong>System:</strong>
+            You selected
+            ${tributeSelection.length}
+            tribute(s), but need
+            ${required}.
+        `);
+
+        return;
+
+    }
+
+
+    completeNormalSummon(
+        tributeSelection
+    );
+
+}
+
+
+function completeNormalSummon(
+    tributeIndexes
+) {
+
+    const card =
+        player.hand[selectedCard];
+
+
+    if (!card) {
+        return;
+    }
+
+
+    [...tributeIndexes]
+        .sort((a, b) => b - a)
+        .forEach(index => {
+
+            const tribute =
+                player.field.splice(
+                    index,
+                    1
+                )[0];
+
+
+            if (tribute) {
+
+                log(`
+                    <strong>You:</strong>
+                    Tributed
+                    ${escapeHTML(
+                        tribute.name
+                    )}.
+                `);
+
+            }
+
+        });
+
+
+    player.hand.splice(
+        selectedCard,
+        1
+    );
+
+
+    const faceUp =
+        pendingSummonMode !== "defense";
+
+    const position =
+        pendingSummonMode === "defense"
+            ? "defense"
+            : "attack";
+
+    const fieldCard = {
+        ...card,
+        faceUp,
+        position
+    };
+
+
+    player.field.push(fieldCard);
+
+
+    player.normalSummoned =
+        true;
+
+
+    if (faceUp) {
+
+        log(`
+            <strong>You:</strong>
+            Normal Summoned
+            ${escapeHTML(card.name)}
+            in Attack Position!
+        `);
+
+    } else {
+
+        log(`
+            <strong>You:</strong>
+            Set a monster face-down
+            in Defense Position.
+        `);
+
+    }
+
+
+    /*
+       MONSTER EFFECTS
+    */
+
+    useMonsterSummonEffect(
+        player,
+        fieldCard
+    );
+
+
+    selectedCard = null;
+
+    selectedFieldCard = null;
+
+    selectedSpellTrap = null;
+
+    selectedAttackTarget = null;
+
+    tributeSelection = [];
+
+
+    checkWin();
+
+    renderAll();
+
+}
+
+
+/* =====================================================
+   MONSTER EFFECTS
+===================================================== */
+
+function useMonsterSummonEffect(
+    owner,
+    card
+) {
+
+    if (card.id === "babyDragon") {
+
+        if (
+            owner.deck.length > 0
+        ) {
+
+            const drawn =
+                drawFromDeck(owner);
+
+            log(`
+                <strong>
+                ${owner === player
+                    ? "You"
+                    : "Opponent"}:
+                </strong>
+                Baby Dragon's effect
+                drew
+                ${escapeHTML(
+                    drawn.name
+                )}.
+            `);
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   SPELLS / TRAPS
+===================================================== */
+
+function activateSelected() {
+
+    if (!playerTurn || duelOver) {
+        return;
+    }
+
+
+    if (
+        selectedSpellTrap !== null
+    ) {
+
+        activateSetCard(
+            selectedSpellTrap
+        );
+
+        return;
+
+    }
+
+
+    if (selectedCard === null) {
+
+        log(`
+            <strong>System:</strong>
+            Select a Spell or Trap.
+        `);
+
+        return;
+
+    }
+
+
+    const card =
+        player.hand[selectedCard];
+
+
+    if (!card) {
+        return;
+    }
+
+
+    if (card.type === "trap") {
+
+        if (
+            player.spellTrap.length >= 5
+        ) {
+
+            log(`
+                <strong>System:</strong>
+                Your Spell/Trap Zones
+                are full.
+            `);
+
+            return;
+
+        }
+
+
+        player.hand.splice(
+            selectedCard,
+            1
+        );
+
+
+        player.spellTrap.push(card);
+
+
+        log(`
+            <strong>You:</strong>
+            Set
+            ${escapeHTML(card.name)}.
+        `);
+
+
+        selectedCard = null;
+
+        renderAll();
+
+        return;
+
+    }
+
+
+    if (card.type !== "spell") {
+
+        log(`
+            <strong>System:</strong>
+            Select a Spell or Trap.
+        `);
+
+        return;
+
+    }
+
+
+    activateSpell(
+        player,
+        card
+    );
+
+
+    player.hand.splice(
+        selectedCard,
+        1
+    );
+
+
+    selectedCard = null;
+
+    checkWin();
+
+    renderAll();
+
+}
+
+
+function activateSpell(
+    owner,
+    card
+) {
+
+    const who =
+        owner === player
+            ? "You"
+            : "Opponent";
+
+
+    if (card.id === "healingLight") {
+
+        owner.lp += 1000;
+
+        log(`
+            <strong>${who}:</strong>
+            Healing Light restored
+            1000 LP.
+        `);
+
+    }
+
+
+    else if (
+        card.id === "summonDragon"
+    ) {
+
+        let count = 0;
+
+        if (drawFromDeck(owner)) {
+            count++;
+        }
+
+        if (drawFromDeck(owner)) {
+            count++;
+        }
+
+
+        log(`
+            <strong>${who}:</strong>
+            Dragon's Call drew
+            ${count} card(s).
+        `);
+
+    }
+
+
+    else if (
+        card.id === "powerBoost"
+    ) {
+
+        owner.field.forEach(
+            monster => {
+
+                monster.atk += 500;
+
+            }
+        );
+
+
+        owner.powerBoostTurn = true;
+
+
+        log(`
+            <strong>${who}:</strong>
+            Power Boost increased
+            all current monsters by
+            500 ATK.
+        `);
+
+    }
+
+
+    else if (
+        card.id === "darkHole"
+    ) {
+
+        const count =
+            player.field.length +
+            opponent.field.length;
+
+
+        player.field = [];
+
+        opponent.field = [];
+
+
+        log(`
+            <strong>${who}:</strong>
+            Dark Hole destroyed
+            ${count} monster(s).
+        `);
+
+    }
+
+
+    checkWin();
+
+}
+
+
+/* =====================================================
+   SET CARD ACTIVATION
+===================================================== */
+
+function activateSetCard(index) {
+
+    const card =
+        player.spellTrap[index];
+
+
+    if (!card) {
+        return;
+    }
+
+
+    if (
+        card.id === "magicCylinder"
+    ) {
+
+        /*
+           Since this simple duel system lets
+           the player activate it manually,
+           target the opponent's strongest monster.
+        */
+
+        const attacker =
+            opponent.field.length
+                ? opponent.field[
+                    findStrongestMonster(
+                        opponent.field
+                    )
+                  ]
+                : null;
+
+
+        if (!attacker) {
+
+            log(`
+                <strong>System:</strong>
+                Magic Cylinder needs an
+                attacking monster.
+            `);
+
+            return;
+
+        }
+
+
+        opponent.lp -=
+            attacker.atk;
+
+
+        log(`
+            <strong>You:</strong>
+            Magic Cylinder dealt
+            ${attacker.atk}
+            damage!
+        `);
+
+
+        player.spellTrap.splice(
+            index,
+            1
+        );
+
+    }
+
+
+    else if (
+        card.id === "mirrorForce"
+    ) {
+
+        const destroyed =
+            opponent.field.length;
+
+
+        opponent.field = [];
+
+
+        log(`
+            <strong>You:</strong>
+            Mirror Force destroyed
+            ${destroyed}
+            opponent monster(s)!
+        `);
+
+
+        player.spellTrap.splice(
+            index,
+            1
+        );
+
+    }
+
+
+    selectedSpellTrap = null;
+
+    checkWin();
+
+    renderAll();
+
+}
+
+
+/* =====================================================
+   FUSION
+===================================================== */
+
+function fusionSummon() {
+
+    if (!playerTurn || duelOver) {
+        return;
+    }
+
+
+    if (player.field.length >= 5) {
+
+        log(`
+            <strong>System:</strong>
+            Your Monster Zones are full.
+        `);
+
+        return;
+
+    }
+
+
+    const fusion =
+        player.extraDeck.find(
+            card =>
+                card.id ===
+                "flameSwordsman"
+        );
+
+
+    if (!fusion) {
+
+        log(`
+            <strong>System:</strong>
+            No Fusion Monster available.
+        `);
+
+        return;
+
+    }
+
+
+    const darkBladeIndex =
+        player.hand.findIndex(
+            card =>
+                card.id ===
+                "darkBlade"
+        );
+
+
+    const skullIndex =
+        player.hand.findIndex(
+            card =>
+                card.id ===
+                "summonedSkull"
+        );
+
+
+    if (
+        darkBladeIndex === -1 ||
+        skullIndex === -1
+    ) {
+
+        log(`
+            <strong>System:</strong>
+            Fusion requires
+            Dark Blade and
+            Summoned Skull
+            in your hand.
+        `);
+
+        return;
+
+    }
+
+
+    const indexes = [
+        darkBladeIndex,
+        skullIndex
+    ].sort(
+        (a, b) => b - a
+    );
+
+
+    indexes.forEach(index => {
+
+        const material =
+            player.hand.splice(
+                index,
+                1
+            )[0];
+
+
+        log(`
+            <strong>You:</strong>
+            Used
+            ${escapeHTML(
+                material.name
+            )}
+            as Fusion material.
+        `);
+
+    });
+
+
+    player.field.push({
+        ...fusion
+    });
+
+
+    log(`
+        <strong>You:</strong>
+        🔥 Fusion Summoned
+        Flame Swordsman!
+    `);
+
+
+    renderAll();
+
+}
+
+
+/* =====================================================
+   ATTACK
+===================================================== */
+
+function attackSelected() {
+
+    if (!playerTurn || duelOver) {
+        return;
+    }
+
+
+    if (
+        selectedFieldCard === null
+    ) {
+
+        log(`
+            <strong>System:</strong>
+            Select one of your monsters first.
+        `);
+
+        return;
+
+    }
+
+
+    if (
+        player.attackedThisTurn
+            .includes(
+                selectedFieldCard
+            )
+    ) {
+
+        log(`
+            <strong>System:</strong>
+            That monster already attacked.
+        `);
+
+        return;
+
+    }
+
+
+    const attacker =
+        player.field[
+            selectedFieldCard
+        ];
+
+
+    if (!attacker) {
+        return;
+    }
+
+
+    if (
+        !attacker.faceUp ||
+        attacker.position !== "attack"
+    ) {
+
+        log(`
+            <strong>System:</strong>
+            Only a face-up Attack Position
+            monster can declare an attack.
+            Monsters that are Set cannot
+            attack the turn they are Set.
+        `);
+
+        return;
+
+    }
+
+
+    let targetIndex = -1;
+
+
+    if (opponent.field.length > 0) {
+
+        if (selectedAttackTarget === null) {
+
+            log(`
+                <strong>System:</strong>
+                Click one of the opponent's
+                monsters to choose your
+                attack target first.
+            `);
+
+            return;
+
+        }
+
+        targetIndex =
+            selectedAttackTarget;
+
+    }
+
+
+    resolveAttack(
+        player,
+        opponent,
+        selectedFieldCard,
+        targetIndex
+    );
+
+
+    selectedFieldCard = null;
+
+    selectedAttackTarget = null;
+
+
+    renderAll();
+
+}
+
+
+/* =====================================================
+   COMBAT RESOLUTION
+   (shared by the player's manual attacks and the
+   opponent's AI attacks)
+===================================================== */
+
+function getAttackModifiers(
+    attackerOwner,
+    attacker
+) {
+
+    let bonus = 0;
+
+
+    if (attacker.id === "flameSwordsman") {
+
+        bonus += 300;
+
+    }
+
+
+    if (
+        attacker.id === "curseDragon" &&
+        !attackerOwner.effectUsed["curseDragon"]
+    ) {
+
+        bonus += 300;
+
+        attackerOwner.effectUsed["curseDragon"] = true;
+
+        log(`
+            <strong>${nameFor(attackerOwner)}:</strong>
+            Curse of Dragon gained 300 ATK!
+        `);
+
+    }
+
+
+    return bonus;
+
+}
+
+
+function nameFor(owner) {
+
+    return owner === player
+        ? "You"
+        : "Opponent";
+
+}
+
+
+function resolveAttack(
+    attackerOwner,
+    defenderOwner,
+    attackerIndex,
+    defenderIndex
+) {
+
+    const attacker =
+        attackerOwner.field[attackerIndex];
+
+    if (!attacker) {
+        return;
+    }
+
+
+    const who =
+        nameFor(attackerOwner);
+
+
+    /*
+       DIRECT ATTACK
+       (opponent has no monsters, or no target
+       was supplied)
+    */
+
+    if (
+        defenderIndex === null ||
+        defenderIndex === -1 ||
+        !defenderOwner.field[defenderIndex]
+    ) {
+
+        const atk =
+            attacker.atk +
+            getAttackModifiers(attackerOwner, attacker);
+
+
+        defenderOwner.lp -= atk;
+
+
+        log(`
+            <strong>${who}:</strong>
+            ${escapeHTML(attacker.name)}
+            attacked directly for
+            ${atk}
+            damage!
+        `);
+
+
+        attackerOwner.attackedThisTurn.push(attackerIndex);
+
+        checkWin();
+
+        return;
+
+    }
+
+
+    const defender =
+        defenderOwner.field[defenderIndex];
+
+
+    if (!defender.faceUp) {
+
+        defender.faceUp = true;
+
+        log(`
+            <strong>System:</strong>
+            The face-down monster is revealed:
+            ${escapeHTML(defender.name)}!
+        `);
+
+    }
+
+
+    const attackATK =
+        attacker.atk +
+        getAttackModifiers(attackerOwner, attacker);
+
+
+    if (defender.position === "defense") {
+
+        let defenderDEF =
+            defender.def;
+
+        if (defender.id === "giantSoldier") {
+
+            defenderDEF += 300;
+
+        }
+
+
+        if (attackATK > defenderDEF) {
+
+            defenderOwner.field.splice(defenderIndex, 1);
+
+            log(`
+                <strong>${who}:</strong>
+                ${escapeHTML(attacker.name)}
+                destroyed
+                ${escapeHTML(defender.name)}
+                (Defense Position)! No damage
+                was dealt.
+            `);
+
+            if (attacker.id === "summonedSkull") {
+
+                defenderOwner.lp -= 500;
+
+                log(`
+                    <strong>${who}:</strong>
+                    Summoned Skull's effect dealt
+                    an additional 500 damage!
+                `);
+
+            }
+
+        }
+
+        else if (attackATK < defenderDEF) {
+
+            const damage =
+                defenderDEF - attackATK;
+
+            attackerOwner.lp -= damage;
+
+            log(`
+                <strong>${who}:</strong>
+                ${escapeHTML(attacker.name)}
+                bounced off
+                ${escapeHTML(defender.name)}!
+                ${nameFor(attackerOwner)}
+                took ${damage} damage.
+            `);
+
+        }
+
+        else {
+
+            log(`
+                <strong>System:</strong>
+                Both stats were equal.
+                No monster was destroyed.
+            `);
+
+        }
+
+
+        if (
+            defender.id === "mysticalElf" &&
+            !defenderOwner.effectUsed["mysticalElf"]
+        ) {
+
+            defenderOwner.lp += 300;
+
+            defenderOwner.effectUsed["mysticalElf"] = true;
+
+            log(`
+                <strong>${nameFor(defenderOwner)}:</strong>
+                Mystical Elf's effect gained 300 LP!
+            `);
+
+        }
+
+    }
+
+    else {
+
+        if (
+            defender.id === "mysticalElf" &&
+            !defenderOwner.effectUsed["mysticalElf"]
+        ) {
+
+            defenderOwner.lp += 300;
+
+            defenderOwner.effectUsed["mysticalElf"] = true;
+
+            log(`
+                <strong>${nameFor(defenderOwner)}:</strong>
+                Mystical Elf's effect gained 300 LP!
+            `);
+
+        }
+
+
+        if (attackATK > defender.atk) {
+
+            const damage =
+                attackATK - defender.atk;
+
+            defenderOwner.lp -= damage;
+
+            defenderOwner.field.splice(defenderIndex, 1);
+
+            log(`
+                <strong>${who}:</strong>
+                ${escapeHTML(attacker.name)}
+                destroyed
+                ${escapeHTML(defender.name)}
+                and dealt
+                ${damage}
+                damage!
+            `);
+
+            if (attacker.id === "summonedSkull") {
+
+                defenderOwner.lp -= 500;
+
+                log(`
+                    <strong>${who}:</strong>
+                    Summoned Skull's effect dealt
+                    an additional 500 damage!
+                `);
+
+            }
+
+        }
+
+        else if (attackATK < defender.atk) {
+
+            const damage =
+                defender.atk - attackATK;
+
+            attackerOwner.lp -= damage;
+
+            attackerOwner.field.splice(attackerIndex, 1);
+
+            log(`
+                <strong>${who}:</strong>
+                ${escapeHTML(attacker.name)}
+                was destroyed.
+                ${nameFor(attackerOwner)}
+                took ${damage} damage!
+            `);
+
+        }
+
+        else {
+
+            attackerOwner.field.splice(attackerIndex, 1);
+
+            defenderOwner.field.splice(defenderIndex, 1);
+
+            log(`
+                <strong>System:</strong>
+                Both monsters were destroyed!
+            `);
+
+        }
+
+    }
+
+
+    attackerOwner.attackedThisTurn.push(attackerIndex);
+
+    checkWin();
+
+}
+
+
+function findWeakestMonster(
+    monsters
+) {
+
+    if (!monsters.length) {
+        return -1;
+    }
+
+
+    let weakest = 0;
+
+
+    for (
+        let i = 1;
+        i < monsters.length;
+        i++
+    ) {
+
+        if (
+            monsters[i].atk <
+            monsters[weakest].atk
+        ) {
+
+            weakest = i;
+
+        }
+
+    }
+
+
+    return weakest;
+
+}
+
+
+function findStrongestMonster(
+    monsters
+) {
+
+    if (!monsters.length) {
+        return -1;
+    }
+
+
+    let strongest = 0;
+
+
+    for (
+        let i = 1;
+        i < monsters.length;
+        i++
+    ) {
+
+        if (
+            monsters[i].atk >
+            monsters[strongest].atk
+        ) {
+
+            strongest = i;
+
+        }
+
+    }
+
+
+    return strongest;
+
+}
+
+
+/* =====================================================
+   TURN SYSTEM
+===================================================== */
+
+function endTurn() {
+
+    if (!playerTurn || duelOver) {
+        return;
+    }
+
+
+    tributeSelection = [];
+
+    selectedCard = null;
+
+    selectedFieldCard = null;
+
+    selectedSpellTrap = null;
+
+    selectedAttackTarget = null;
+
+    pendingSummonMode = "attack";
+
+
+    player.attackedThisTurn = [];
+
+    player.normalSummoned = false;
+
+
+    log(`
+        <strong>You:</strong>
+        Ended your turn.
+    `);
+
+
+    playerTurn = false;
+
+    renderAll();
+
+
+    setTimeout(
+        opponentTurn,
+        700
+    );
+
+}
+
+
+/* =====================================================
+   OPPONENT TURN (AI)
+===================================================== */
+
+function opponentTurn() {
+
+    if (duelOver) {
+        return;
+    }
+
+
+    const drawn =
+        drawFromDeck(opponent);
+
+
+    if (!drawn) {
+
+        log(`
+            <strong>System:</strong>
+            Opponent's deck is empty!
+        `);
+
+        checkWin();
+
+        renderAll();
+
+        return;
+
+    }
+
+
+    log(`
+        <strong>Opponent:</strong>
+        Drew a card.
+    `);
+
+
+    opponentSummonPhase();
+
+
+    if (!duelOver) {
+
+        opponentAttackPhase();
+
+    }
+
+
+    if (!duelOver) {
+
+        endOpponentTurn();
+
+    } else {
+
+        renderAll();
+
+    }
+
+}
+
+
+function opponentSummonPhase() {
+
+    if (opponent.normalSummoned) {
+        return;
+    }
+
+    if (opponent.field.length >= 5) {
+        return;
+    }
+
+
+    const candidates =
+        opponent.hand
+            .map((card, index) => ({ card, index }))
+            .filter(
+                entry =>
+                    entry.card.type === "monster"
+            );
+
+
+    if (candidates.length === 0) {
+        return;
+    }
+
+
+    candidates.sort(
+        (a, b) =>
+            (b.card.atk || 0) -
+            (a.card.atk || 0)
+    );
+
+
+    for (const entry of candidates) {
+
+        const required =
+            getRequiredTributes(entry.card);
+
+
+        if (opponent.field.length < required) {
+            continue;
+        }
+
+
+        const tributeIndexes = [];
+
+
+        if (required > 0) {
+
+            const sortedField =
+                opponent.field
+                    .map((c, i) => ({ c, i }))
+                    .sort(
+                        (a, b) =>
+                            (a.c.atk || 0) -
+                            (b.c.atk || 0)
+                    );
+
+
+            for (
+                let n = 0;
+                n < required;
+                n++
+            ) {
+
+                tributeIndexes.push(
+                    sortedField[n].i
+                );
+
+            }
+
+        }
+
+
+        tributeIndexes
+            .sort((a, b) => b - a)
+            .forEach(index => {
+
+                const tribute =
+                    opponent.field.splice(
+                        index,
+                        1
+                    )[0];
+
+                if (tribute) {
+
+                    log(`
+                        <strong>Opponent:</strong>
+                        Tributed
+                        ${escapeHTML(
+                            tribute.name
+                        )}.
+                    `);
+
+                }
+
+            });
+
+
+        const card =
+            opponent.hand.splice(
+                entry.index,
+                1
+            )[0];
+
+
+        /*
+           Simple AI heuristic: if this monster
+           defends better than it attacks, Set it
+           face-down in Defense Position instead
+           of Normal Summoning it face-up.
+        */
+
+        const faceUp =
+            (card.def || 0) <= (card.atk || 0);
+
+        const position =
+            faceUp ? "attack" : "defense";
+
+        const fieldCard = {
+            ...card,
+            faceUp,
+            position
+        };
+
+
+        opponent.field.push(fieldCard);
+
+        opponent.normalSummoned = true;
+
+
+        if (faceUp) {
+
+            log(`
+                <strong>Opponent:</strong>
+                Normal Summoned
+                ${escapeHTML(card.name)}
+                in Attack Position!
+            `);
+
+        } else {
+
+            log(`
+                <strong>Opponent:</strong>
+                Set a monster face-down
+                in Defense Position.
+            `);
+
+        }
+
+
+        useMonsterSummonEffect(
+            opponent,
+            fieldCard
+        );
+
+
+        break;
+
+    }
+
+}
+
+
+function opponentAttackPhase() {
+
+    const attackers =
+        opponent.field.filter(
+            monster =>
+                monster.faceUp &&
+                monster.position === "attack"
+        );
+
+
+    attackers.forEach(attacker => {
+
+        if (duelOver) {
+            return;
+        }
+
+
+        const attackerIndex =
+            opponent.field.indexOf(attacker);
+
+        if (attackerIndex === -1) {
+
+            /*
+               This monster was already
+               destroyed earlier in the
+               Battle Phase.
+            */
+
+            return;
+
+        }
+
+
+        let targetIndex = -1;
+
+        if (player.field.length > 0) {
+
+            targetIndex =
+                findWeakestMonster(
+                    player.field
+                );
+
+        }
+
+
+        resolveAttack(
+            opponent,
+            player,
+            attackerIndex,
+            targetIndex
+        );
+
+    });
+
+}
+
+
+function endOpponentTurn() {
+
+    opponent.attackedThisTurn = [];
+
+    opponent.normalSummoned = false;
+
+
+    playerTurn = true;
+
+    turnNumber++;
+
+
+    log(`
+        <strong>System:</strong>
+        Your turn.
+    `);
+
+
+    renderAll();
+
+}
+
+
+/* =====================================================
+   WIN / LOSS CHECK
+===================================================== */
+
+function checkWin() {
+
+    if (duelOver) {
+        return;
+    }
+
+
+    if (player.lp <= 0) {
+
+        player.lp = 0;
+
+        duelOver = true;
+
+
+        log(`
+            <strong>System:</strong>
+            You have lost the duel!
+        `);
+
+
+        openModal(
+            "Defeat",
+            `
+                <p>
+                    Your Life Points reached zero.
+                    Better luck next duel!
+                </p>
+            `
+        );
+
+    }
+
+    else if (opponent.lp <= 0) {
+
+        opponent.lp = 0;
+
+        duelOver = true;
+
+
+        log(`
+            <strong>System:</strong>
+            You win the duel!
+        `);
+
+
+        openModal(
+            "Victory!",
+            `
+                <p>
+                    You reduced your opponent's
+                    Life Points to zero.
+                    Well played!
+                </p>
+            `
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+function openModal(title, contentHTML) {
+
+    document.getElementById(
+        "modalTitle"
+    ).textContent = title;
+
+
+    document.getElementById(
+        "modalContent"
+    ).innerHTML = contentHTML;
+
+
+    document.getElementById(
+        "modal"
+    ).classList.remove("hidden");
+
+}
+
+
+function closeModal() {
+
+    document.getElementById(
+        "modal"
+    ).classList.add("hidden");
+
+}
+
+
+/* =====================================================
+   DECK INFO
+===================================================== */
+
+function showDeckInfo() {
+
+    const counts = {};
+
+
+    player.deck.forEach(card => {
+
+        counts[card.name] =
+            (counts[card.name] || 0) + 1;
+
+    });
+
+
+    const entries =
+        Object.entries(counts)
+            .sort(
+                (a, b) =>
+                    a[0].localeCompare(b[0])
+            );
+
+
+    const rows =
+        entries.length
+            ? entries.map(
+                ([name, count]) => `
+                    <div class="card-detail">
+                        <strong>
+                            ${escapeHTML(name)}
+                        </strong>
+                        &nbsp;x${count}
+                    </div>
+                `
+              ).join("")
+            : "<p>Your deck is empty.</p>";
+
+
+    openModal(
+        `Remaining Deck (${player.deck.length} cards)`,
+        rows
+    );
+
+}
+
+
+/* =====================================================
+   LIFE POINT DEBUG CONTROLS
+===================================================== */
+
+function gainLP() {
+
+    if (duelOver) {
+        return;
+    }
+
+
+    player.lp += 1000;
+
+
+    log(`
+        <strong>You:</strong>
+        Gained 1000 LP.
+    `);
+
+
+    renderAll();
+
+}
+
+
+function loseLP() {
+
+    if (duelOver) {
+        return;
+    }
+
+
+    player.lp -= 1000;
+
+
+    log(`
+        <strong>You:</strong>
+        Lost 1000 LP.
+    `);
+
+
+    checkWin();
+
+    renderAll();
+
+}
+
+
+/* =====================================================
+   SURRENDER
+===================================================== */
+
+function surrender() {
+
+    if (duelOver) {
+        return;
+    }
+
+
+    if (
+        !confirm(
+            "Are you sure you want to surrender?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    player.lp = 0;
+
+
+    log(`
+        <strong>You:</strong>
+        Surrendered the duel.
+    `);
+
+
+    checkWin();
+
+    renderAll();
+
+}
+
+
+/* =====================================================
+   INITIAL SCREEN
+===================================================== */
+
+renderDeckSelection();
+
+</script>
+
+</body>
+</html>
