@@ -1,0 +1,32 @@
+{
+  "name": "yugioh-custom-duel",
+  "version": "1.0.0",
+  "description": "Installable Yu-Gi-Oh! custom duel game",
+  "main": "service-worker.js",
+  "scripts": {
+    "cap:init": "cap init \"Yu-Gi-Oh! Custom Duel\" com.spaceturismo.customduel --web-dir .",
+    "cap:add:android": "cap add android",
+    "cap:add:ios": "cap add ios",
+    "cap:sync": "cap sync",
+    "cap:open:android": "cap open android",
+    "cap:open:ios": "cap open ios",
+    "test": "node --check service-worker.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spaceturismo/Yugioh-Custom-duel.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/spaceturismo/Yugioh-Custom-duel/issues"
+  },
+  "homepage": "https://github.com/spaceturismo/Yugioh-Custom-duel#readme"
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Yu-Gi-Oh! Custom Duel",
+  "short_name": "Custom Duel",
+  "description": "Build custom cards and play a local Yu-Gi-Oh! duel.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#090909",
+  "theme_color": "#151515",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

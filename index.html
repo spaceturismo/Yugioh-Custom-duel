@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Custom Yu-Gi-Oh! Duel Engine</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#151515">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Custom Duel">
 
 <style>
 
@@ -234,7 +239,7 @@ footer {
             </p>
         </a>
 
-        <a class="portal builder" href="eckbuiler.html">
+        <a class="portal builder" href="builder.html">
             <div class="tag">CREATE</div>
             <h2>Card Creator</h2>
             <p>
@@ -267,4 +272,11 @@ footer {
 </div>
 
 </body>
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js");
+    });
+}
+</script>
 </html>
