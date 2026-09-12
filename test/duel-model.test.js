@@ -8,6 +8,7 @@ const {
     shuffle
 } = require("../client/duel-model.js");
 const { createCardCatalog, normalizeCustomCard } = require("../client/card-catalog.js");
+const { createJsonStorage } = require("../client/storage.js");
 
 test("creates an empty player with independent game collections", () => {
     const player = createEmptyPlayer();
@@ -130,4 +131,27 @@ test("normalizes spell and trap cards and rejects unsupported creator cards", ()
     assert.equal(normalizeCustomCard({ id: "trap", name: "Wall", type: "trap", trapType: "Counter Trap" }).trapType, "Counter Trap");
     assert.equal(normalizeCustomCard({ id: "bad", name: "", type: "monster" }), null);
     assert.equal(normalizeCustomCard({ id: "bad", name: "Bad", type: "ritual" }), null);
+});
+
+test("reads JSON storage with a fallback for missing or malformed values", () => {
+    const values = { good: JSON.stringify({ cards: ["mage"] }), bad: "not json" };
+    const storage = createJsonStorage({
+        getItem: (key) => values[key] || null,
+        setItem: () => {}
+    });
+
+    assert.deepEqual(storage.read("good", {}), { cards: ["mage"] });
+    assert.deepEqual(storage.read("missing", { cards: [] }), { cards: [] });
+    assert.deepEqual(storage.read("bad", { cards: [] }), { cards: [] });
+});
+
+test("writes JSON storage through the adapter", () => {
+    let saved;
+    const storage = createJsonStorage({
+        getItem: () => null,
+        setItem: (key, value) => { saved = { key, value }; }
+    });
+
+    storage.write("custom", ["mage"]);
+    assert.deepEqual(saved, { key: "custom", value: '["mage"]' });
 });

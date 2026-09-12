@@ -1995,6 +1995,7 @@ body[data-duelbg="bloodmoon"] #duelScreen {
 
 <script src="./client/duel-model.js"></script>
 <script src="./client/card-catalog.js"></script>
+<script src="./client/storage.js"></script>
 <script>
 
 /* =====================================================
@@ -12995,6 +12996,7 @@ let importedCustomCardIds = [];
 function importEckbuilerCards() {
 
     const normalizeCustomCard = window.cardCatalog.normalizeCustomCard;
+    const storage = window.duelStorage.createJsonStorage(window.localStorage);
 
     importedCustomCardIds.forEach(function(id) {
         cardCatalog.removeCustom(id);
@@ -13003,21 +13005,7 @@ function importEckbuilerCards() {
     importedCustomCardIds = [];
 
 
-    let raw;
-
-    try {
-
-        raw = JSON.parse(
-            localStorage.getItem("customYuGiOhCards") || "[]"
-        );
-
-    } catch (error) {
-
-        raw = [];
-
-    }
-
-
+    const raw = storage.read("customYuGiOhCards", []);
     if (!Array.isArray(raw)) {
         return;
     }

@@ -6,6 +6,7 @@ const APP_SHELL = [
     "./duel.html",
     "./client/duel-model.js",
     "./client/card-catalog.js",
+    "./client/storage.js",
     "./manifest.webmanifest",
     "./icons/icon.svg"
 ];
