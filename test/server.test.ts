@@ -3,16 +3,19 @@ import { once } from "node:events";
 import { strict as assert } from "node:assert";
 import { after, before, test } from "node:test";
 import { WebSocket } from "ws";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const port = 8788;
 const baseUrl = `http://localhost:${port}`;
 let server: ChildProcessWithoutNullStreams;
+const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const messageQueues = new WeakMap<WebSocket, Record<string, any>[]>();
 const messageWaiters = new WeakMap<WebSocket, ((message: Record<string, any>) => void)[]>();
 
 before(async () => {
     server = spawn(process.execPath, ["node_modules/tsx/dist/cli.mjs", "server/src/server.ts"], {
-        cwd: process.cwd(),
+        cwd: repositoryRoot,
         env: { ...process.env, PORT: String(port) }
     });
     await new Promise<void>((resolve, reject) => {
