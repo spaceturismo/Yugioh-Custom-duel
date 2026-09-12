@@ -93,6 +93,8 @@ test("serves the app and reports health", async () => {
     assert.match(duelHtml, /client\/lobby\.js/);
     assert.match(duelHtml, /client\/duel-view\.js/);
     assert.match(duelHtml, /renderServerDuelState/);
+    assert.match(duelHtml, /Both players joined\. Choose a deck, ready up, then start the match\./);
+    assert.match(duelHtml, /duelScreen\.style\.display = "block"/);
     assert.match(duelHtml, /multiplayerDuelSync\.draw/);
     assert.match(duelHtml, /multiplayerDuelSync\.endTurn/);
     assert.match(duelHtml, /multiplayerDuelSync\.playCard/);
@@ -213,7 +215,11 @@ test("does not broadcast an opponent's private deck or hand", async () => {
     const card = { id: "secret", name: "Secret Card", type: "monster" };
     first.send(JSON.stringify({ type: "select_deck", mainDeck: [card], extraDeck: [] }));
     second.send(JSON.stringify({ type: "select_deck", mainDeck: [{ ...card, id: "opponent-secret" }], extraDeck: [] }));
-    const visibleToFirst = await receiveUntil(first, "room_state", (message) => message.state.deckCounts["player-2"] === 1);
+    const visibleToFirst = await receiveUntil(
+        first,
+        "room_state",
+        (message) => message.state.deckCounts["player-1"] === 1 && message.state.deckCounts["player-2"] === 1
+    );
 
     assert.equal(visibleToFirst.state.decks["player-1"][0].id, "secret");
     assert.deepEqual(visibleToFirst.state.decks["player-2"], []);

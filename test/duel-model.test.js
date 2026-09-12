@@ -300,14 +300,16 @@ test("lobby controller creates and joins rooms while reflecting server state", (
     lobby.createRoom();
     lobby.joinRoom(" abc123 ");
     client.listener({ type: "joined", playerId: "player-1", roomId: "ABC123" });
+    client.listener({ type: "room_state", state: { phase: "waiting", players: ["player-1", "player-2"], ready: { "player-1": false, "player-2": false } } });
     client.listener({ type: "error", message: "Room was not found." });
 
     assert.deepEqual(actions, ["create", "join:ABC123"]);
     assert.deepEqual(views, [
-        { status: "joining", roomId: null, playerId: null, error: null },
-        { status: "joining", roomId: null, playerId: null, error: null },
-        { status: "joined", roomId: "ABC123", playerId: "player-1", error: null },
-        { status: "error", roomId: "ABC123", playerId: "player-1", error: "Room was not found." }
+        { status: "joining", roomId: null, playerId: null, players: [], ready: {}, error: null },
+        { status: "joining", roomId: null, playerId: null, players: [], ready: {}, error: null },
+        { status: "joined", roomId: "ABC123", playerId: "player-1", players: [], ready: {}, error: null },
+        { status: "waiting", roomId: "ABC123", playerId: "player-1", players: ["player-1", "player-2"], ready: { "player-1": false, "player-2": false }, error: null },
+        { status: "error", roomId: "ABC123", playerId: "player-1", players: ["player-1", "player-2"], ready: { "player-1": false, "player-2": false }, error: "Room was not found." }
     ]);
 });
 

@@ -13009,7 +13009,12 @@ function renderServerDuelState(state) {
     duelOver = view.phase === "finished";
     player.deck = Array.from({ length: view.player.deckCount });
     opponent.deck = Array.from({ length: view.opponent.deckCount });
-    if (document.getElementById("duelScreen").style.display === "block") renderAll();
+    const duelScreen = document.getElementById("duelScreen");
+    if (view.phase === "active" && duelScreen.style.display !== "block") {
+        document.getElementById("deckSelectScreen").classList.add("hidden");
+        duelScreen.style.display = "block";
+    }
+    if (duelScreen.style.display === "block") renderAll();
     document.getElementById("playerLP").textContent = view.player.lifePoints;
     document.getElementById("opponentLP").textContent = view.opponent.lifePoints;
     document.getElementById("playerDeckCount").textContent = view.player.deckCount;
@@ -13030,6 +13035,12 @@ function renderMultiplayerLobby(state) {
     const status = document.getElementById("multiplayerStatus");
     if (!status) return;
     if (state.status === "joined") status.textContent = `Room ${state.roomId} - ${state.playerId}`;
+    else if (state.status === "waiting") {
+        const playerCount = state.players ? state.players.length : 0;
+        status.textContent = playerCount >= 2
+            ? "Both players joined. Choose a deck, ready up, then start the match."
+            : `Waiting for opponent (${playerCount}/2 players joined).`;
+    }
     else if (state.status === "ready") status.textContent = `Room ${state.roomId || ""} - deck ready`;
     else if (state.status === "error") status.textContent = state.error;
     else if (state.status === "joining") status.textContent = "Joining room...";
