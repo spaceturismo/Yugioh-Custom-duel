@@ -1993,6 +1993,7 @@ body[data-duelbg="bloodmoon"] #duelScreen {
 </div>
 
 
+<script src="./client/duel-model.js"></script>
 <script>
 
 /* =====================================================
@@ -12828,33 +12829,7 @@ let currentDeckId = "";
    PLAYER
 ===================================================== */
 
-function createEmptyPlayer() {
-
-    return {
-
-        deck: [],
-
-        hand: [],
-
-        field: [],
-
-        spellTrap: [],
-
-        extraDeck: [],
-
-        graveyard: [],
-
-        lp: 8000,
-
-        normalSummoned: false,
-
-        attackedThisTurn: [],
-
-        effectUsed: {}
-
-    };
-
-}
+const createEmptyPlayer = window.duelModel.createEmptyPlayer;
 
 
 /* =====================================================
@@ -12928,67 +12903,16 @@ function getSignatureCardLevel(cardId) {
 
 function cloneCard(id) {
 
-    const source =
-        CARD_DATABASE[id];
-
-    if (!source) {
-        return null;
-    }
-
-
-    if (source.isSignatureCard) {
-
-        const level =
-            getSignatureCardLevel(id);
-
-        const bonus =
-            (level - 1) * 150;
-
-        return {
-            ...source,
-            atk: source.atk + bonus,
-            def: source.def + Math.floor(bonus * 0.7),
-            signatureLevel: level
-        };
-
-    }
-
-
-    return {
-        ...source,
-        atk: source.atk,
-        def: source.def
-    };
+    return window.duelModel.cloneCard(
+        CARD_DATABASE,
+        id,
+        getSignatureCardLevel
+    );
 
 }
 
 
-function shuffle(deck) {
-
-    for (
-        let i = deck.length - 1;
-        i > 0;
-        i--
-    ) {
-
-        const j =
-            Math.floor(
-                Math.random() * (i + 1)
-            );
-
-        [
-            deck[i],
-            deck[j]
-        ] = [
-            deck[j],
-            deck[i]
-        ];
-
-    }
-
-    return deck;
-
-}
+const shuffle = window.duelModel.shuffle;
 
 
 function log(message) {

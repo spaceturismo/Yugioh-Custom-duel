@@ -64,6 +64,10 @@ test("serves the app and reports health", async () => {
     const homepage = await fetch(`${baseUrl}/`);
     assert.equal(homepage.status, 200);
     assert.match(await homepage.text(), /Custom Yu-Gi-Oh! Duel Engine/);
+
+    const duelPage = await fetch(`${baseUrl}/duel.html`);
+    assert.equal(duelPage.status, 200);
+    assert.match(await duelPage.text(), /client\/duel-model\.js/);
 });
 
 test("authoritatively controls a two-player room", async () => {

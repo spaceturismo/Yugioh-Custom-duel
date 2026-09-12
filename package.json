@@ -14,7 +14,7 @@
     "cap:sync": "cap sync",
     "cap:open:android": "cap open android",
     "cap:open:ios": "cap open ios",
-    "test": "node --check service-worker.js && node --test --import tsx test/server.test.ts"
+    "test": "node --check service-worker.js && node --check client/duel-model.js && node --test --import tsx test/domain.test.ts test/server.test.ts"
   },
   "repository": {
     "type": "git",
