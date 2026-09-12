@@ -11,6 +11,7 @@ const APP_SHELL = [
     "./client/multiplayer.js",
     "./client/deck-storage.js",
     "./client/card-data.js",
+    "./client/lobby.js",
     "./manifest.webmanifest",
     "./icons/icon.svg"
 ];

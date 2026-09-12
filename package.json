@@ -14,7 +14,7 @@
     "cap:sync": "cap sync",
     "cap:open:android": "cap open android",
     "cap:open:ios": "cap open ios",
-    "test": "node --check service-worker.js && node --check client/duel-model.js && node --check client/card-catalog.js && node --check client/storage.js && node --check client/duel-state.js && node --check client/multiplayer.js && node --check client/deck-storage.js && node --check client/card-data.js && node --test --import tsx test/domain.test.ts test/duel-model.test.js test/server.test.ts"
+    "test": "node --check service-worker.js && node --check client/duel-model.js && node --check client/card-catalog.js && node --check client/storage.js && node --check client/duel-state.js && node --check client/multiplayer.js && node --check client/deck-storage.js && node --check client/card-data.js && node --check client/lobby.js && node --test --import tsx test/domain.test.ts test/duel-model.test.js test/server.test.ts"
   },
   "repository": {
     "type": "git",

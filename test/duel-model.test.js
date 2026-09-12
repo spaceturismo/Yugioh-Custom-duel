@@ -12,6 +12,7 @@ const { createJsonStorage } = require("../client/storage.js");
 const { createDuelState } = require("../client/duel-state.js");
 const { createMultiplayerClient } = require("../client/multiplayer.js");
 const { createDeckStore } = require("../client/deck-storage.js");
+const { createLobbyController } = require("../client/lobby.js");
 const { VERSION_HISTORY, createCardDatabase } = require("../client/card-data.js");
 
 test("creates an empty player with independent game collections", () => {
@@ -267,4 +268,28 @@ test("notifies multiplayer listeners of room state and connection errors", () =>
     client.receive({ type: "error", message: "Room was not found." });
 
     assert.deepEqual(received, [state, { type: "error", message: "Room was not found." }]);
+});
+
+test("lobby controller creates and joins rooms while reflecting server state", () => {
+    const actions = [];
+    const views = [];
+    const client = {
+        createRoom: () => actions.push("create"),
+        joinRoom: (roomId) => actions.push(`join:${roomId}`),
+        onMessage: (listener) => { client.listener = listener; return () => {}; }
+    };
+    const lobby = createLobbyController(client, (view) => views.push(view));
+
+    lobby.createRoom();
+    lobby.joinRoom(" abc123 ");
+    client.listener({ type: "joined", playerId: "player-1", roomId: "ABC123" });
+    client.listener({ type: "error", message: "Room was not found." });
+
+    assert.deepEqual(actions, ["create", "join:ABC123"]);
+    assert.deepEqual(views, [
+        { status: "joining", roomId: null, playerId: null, error: null },
+        { status: "joining", roomId: null, playerId: null, error: null },
+        { status: "joined", roomId: "ABC123", playerId: "player-1", error: null },
+        { status: "error", roomId: "ABC123", playerId: "player-1", error: "Room was not found." }
+    ]);
 });
