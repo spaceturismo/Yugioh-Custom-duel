@@ -12996,6 +12996,17 @@ let multiplayerPlayerId = null;
 function renderServerDuelState(state) {
     if (!multiplayerPlayerId) return;
     const view = window.duelView.projectDuelView(state, multiplayerPlayerId);
+    player.hand = view.player.hand;
+    player.field = view.player.field;
+    player.graveyard = view.player.graveyard;
+    opponent.hand = view.opponent.hand;
+    opponent.field = view.opponent.field;
+    opponent.graveyard = view.opponent.graveyard;
+    player.lp = view.player.lifePoints;
+    opponent.lp = view.opponent.lifePoints;
+    player.deck = Array.from({ length: view.player.deckCount });
+    opponent.deck = Array.from({ length: view.opponent.deckCount });
+    if (document.getElementById("duelScreen").style.display === "block") renderAll();
     document.getElementById("playerLP").textContent = view.player.lifePoints;
     document.getElementById("opponentLP").textContent = view.opponent.lifePoints;
     document.getElementById("playerDeckCount").textContent = view.player.deckCount;
@@ -19406,6 +19417,12 @@ function tributeModeActive() {
 
 function summonSelected() {
 
+    if (multiplayerPlayerId && multiplayerDuelSync && selectedCard !== null) {
+        multiplayerDuelSync.playCard(selectedCard);
+        selectedCard = null;
+        return;
+    }
+
     if (!playerTurn || duelOver) {
         return;
     }
@@ -24217,6 +24234,13 @@ function changePosition() {
 ===================================================== */
 
 function attackSelected() {
+
+    if (multiplayerPlayerId && multiplayerDuelSync && selectedFieldCard !== null && selectedAttackTarget !== null) {
+        multiplayerDuelSync.attack(selectedFieldCard, selectedAttackTarget);
+        selectedFieldCard = null;
+        selectedAttackTarget = null;
+        return;
+    }
 
     if (!playerTurn || duelOver) {
         return;

@@ -95,6 +95,8 @@ test("serves the app and reports health", async () => {
     assert.match(duelHtml, /renderServerDuelState/);
     assert.match(duelHtml, /multiplayerDuelSync\.draw/);
     assert.match(duelHtml, /multiplayerDuelSync\.endTurn/);
+    assert.match(duelHtml, /multiplayerDuelSync\.playCard/);
+    assert.match(duelHtml, /multiplayerDuelSync\.attack/);
 });
 
 test("authoritatively controls a two-player room", async () => {
