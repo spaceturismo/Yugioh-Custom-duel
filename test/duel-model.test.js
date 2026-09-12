@@ -10,6 +10,7 @@ const {
 const { createCardCatalog, normalizeCustomCard } = require("../client/card-catalog.js");
 const { createJsonStorage } = require("../client/storage.js");
 const { createDuelState } = require("../client/duel-state.js");
+const { createMultiplayerClient } = require("../client/multiplayer.js");
 
 test("creates an empty player with independent game collections", () => {
     const player = createEmptyPlayer();
@@ -168,4 +169,22 @@ test("creates a fresh duel session with isolated player state", () => {
     assert.equal(state.currentPhase, "draw");
     assert.notEqual(state.player, state.opponent);
     assert.notEqual(state.player.deck, state.opponent.deck);
+});
+
+test("sends deck validation requests through the multiplayer client", async () => {
+    const sent = [];
+    const client = createMultiplayerClient({ send: (message) => sent.push(message) });
+    const validation = client.validateDeck([{ id: "mage" }], [{ id: "fusion" }]);
+
+    assert.deepEqual(sent, [{ type: "validate_deck", mainDeck: [{ id: "mage" }], extraDeck: [{ id: "fusion" }] }]);
+    client.receive({ type: "deck_validation", valid: true, errors: [] });
+    assert.deepEqual(await validation, { valid: true, errors: [] });
+});
+
+test("rejects a multiplayer request when the server reports an error", async () => {
+    const client = createMultiplayerClient({ send: () => {} });
+    const validation = client.validateDeck([], []);
+    client.receive({ type: "error", message: "Server unavailable." });
+
+    await assert.rejects(validation, /Server unavailable/);
 });
