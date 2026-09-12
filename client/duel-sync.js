@@ -8,6 +8,7 @@
             if (message.type === "room_state") renderState(message.state);
         });
         return {
+            draw() { client.draw(); },
             playCard(handIndex) { client.playCard(handIndex); },
             attack(attackerIndex, defenderIndex) { client.attack(attackerIndex, defenderIndex); },
             endTurn() { client.endTurn(); }

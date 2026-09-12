@@ -326,16 +326,17 @@ test("sends an attack action through the multiplayer client", () => {
 test("duel sync forwards server actions and publishes room state", () => {
     const sent = [];
     const states = [];
-    const client = { playCard: (index) => sent.push(["play", index]), attack: (a, d) => sent.push(["attack", a, d]), endTurn: () => sent.push(["end"]), onMessage: (listener) => { client.listener = listener; return () => {}; } };
+    const client = { draw: () => sent.push(["draw"]), playCard: (index) => sent.push(["play", index]), attack: (a, d) => sent.push(["attack", a, d]), endTurn: () => sent.push(["end"]), onMessage: (listener) => { client.listener = listener; return () => {}; } };
     const sync = createDuelSync(client, (state) => states.push(state));
     const roomState = { phase: "active", currentTurn: "player-1" };
 
+    sync.draw();
     sync.playCard(0);
     sync.attack(0, 1);
     sync.endTurn();
     client.listener({ type: "room_state", state: roomState });
 
-    assert.deepEqual(sent, [["play", 0], ["attack", 0, 1], ["end"]]);
+    assert.deepEqual(sent, [["draw"], ["play", 0], ["attack", 0, 1], ["end"]]);
     assert.deepEqual(states, [roomState]);
 });
 

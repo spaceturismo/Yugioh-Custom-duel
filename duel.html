@@ -12990,6 +12990,7 @@ function newDuel() {
 
 let multiplayerClient = null;
 let multiplayerLobby = null;
+let multiplayerDuelSync = null;
 let multiplayerPlayerId = null;
 
 function renderServerDuelState(state) {
@@ -13027,7 +13028,7 @@ function initializeMultiplayerLobby() {
             if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
         }
     });
-    window.duelSync.createDuelSync(multiplayerClient, renderServerDuelState);
+    multiplayerDuelSync = window.duelSync.createDuelSync(multiplayerClient, renderServerDuelState);
     multiplayerLobby = window.duelLobby.createLobbyController(multiplayerClient, renderMultiplayerLobby);
     socket.addEventListener("open", () => renderMultiplayerLobby({ status: "idle" }));
     socket.addEventListener("message", (event) => {
@@ -18073,6 +18074,11 @@ function drawFromDeck(owner) {
 
 
 function drawCard() {
+
+    if (multiplayerPlayerId && multiplayerDuelSync) {
+        multiplayerDuelSync.draw();
+        return;
+    }
 
     if (!playerTurn || duelOver) {
 
@@ -27429,6 +27435,11 @@ function enterMainPhase2() {
 
 
 function endTurn() {
+
+    if (multiplayerPlayerId && multiplayerDuelSync) {
+        multiplayerDuelSync.endTurn();
+        return;
+    }
 
     if (!playerTurn || duelOver) {
         return;

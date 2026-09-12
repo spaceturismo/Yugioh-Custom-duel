@@ -93,6 +93,8 @@ test("serves the app and reports health", async () => {
     assert.match(duelHtml, /client\/lobby\.js/);
     assert.match(duelHtml, /client\/duel-view\.js/);
     assert.match(duelHtml, /renderServerDuelState/);
+    assert.match(duelHtml, /multiplayerDuelSync\.draw/);
+    assert.match(duelHtml, /multiplayerDuelSync\.endTurn/);
 });
 
 test("authoritatively controls a two-player room", async () => {
