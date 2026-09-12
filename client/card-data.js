@@ -3,6 +3,14 @@
     if (typeof module === "object" && module.exports) module.exports = data;
     if (root) root.duelCardData = data;
 })(typeof globalThis === "undefined" ? this : globalThis, function () {
+    function cloneCards(cards) {
+        return JSON.parse(JSON.stringify(cards || {}));
+    }
+
+    function createCardDatabase(builtIns = {}, customCards = {}) {
+        return { ...cloneCards(builtIns), ...cloneCards(customCards) };
+    }
+
     const VERSION_HISTORY = Object.freeze({
         "1.0": "Original Release",
         "1.1": "Graveyard System",
@@ -18,5 +26,5 @@
         Custom: "Your Custom Cards"
     });
 
-    return { VERSION_HISTORY };
+    return { VERSION_HISTORY, createCardDatabase };
 });

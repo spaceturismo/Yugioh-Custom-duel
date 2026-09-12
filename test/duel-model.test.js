@@ -12,7 +12,7 @@ const { createJsonStorage } = require("../client/storage.js");
 const { createDuelState } = require("../client/duel-state.js");
 const { createMultiplayerClient } = require("../client/multiplayer.js");
 const { createDeckStore } = require("../client/deck-storage.js");
-const { VERSION_HISTORY } = require("../client/card-data.js");
+const { VERSION_HISTORY, createCardDatabase } = require("../client/card-data.js");
 
 test("creates an empty player with independent game collections", () => {
     const player = createEmptyPlayer();
@@ -216,4 +216,24 @@ test("provides stable version metadata for built-in and custom cards", () => {
     assert.equal(VERSION_HISTORY["1.0"], "Original Release");
     assert.equal(VERSION_HISTORY["2.2"], "Boss Fights");
     assert.equal(VERSION_HISTORY.Custom, "Your Custom Cards");
+});
+
+test("creates an isolated runtime database from built-ins and custom overlays", () => {
+    const builtIns = { mage: { id: "mage", name: "Mage", type: "monster" } };
+    const custom = { custom_1: { id: "custom_1", name: "Custom", type: "spell" } };
+    const database = createCardDatabase(builtIns, custom);
+
+    assert.deepEqual(Object.keys(database).sort(), ["custom_1", "mage"]);
+    database.mage.name = "Changed";
+    assert.equal(builtIns.mage.name, "Mage");
+    assert.equal(custom.custom_1.name, "Custom");
+});
+
+test("custom records replace built-in IDs only when explicitly supplied", () => {
+    const database = createCardDatabase(
+        { mage: { id: "mage", name: "Mage", type: "monster" } },
+        { mage: { id: "mage", name: "Custom Mage", type: "monster" } }
+    );
+
+    assert.equal(database.mage.name, "Custom Mage");
 });

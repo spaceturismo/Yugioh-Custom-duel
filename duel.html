@@ -11750,7 +11750,8 @@ const BUILTIN_CARD_DATABASE = {
 
 };
 
-const cardCatalog = window.cardCatalog.createCardCatalog(BUILTIN_CARD_DATABASE);
+const cardDatabase = window.duelCardData.createCardDatabase(BUILTIN_CARD_DATABASE);
+const cardCatalog = window.cardCatalog.createCardCatalog(cardDatabase);
 const CARD_DATABASE = cardCatalog.cards;
 
 
