@@ -12,6 +12,7 @@ const { createJsonStorage } = require("../client/storage.js");
 const { createDuelState } = require("../client/duel-state.js");
 const { createMultiplayerClient } = require("../client/multiplayer.js");
 const { createDeckStore } = require("../client/deck-storage.js");
+const { VERSION_HISTORY } = require("../client/card-data.js");
 
 test("creates an empty player with independent game collections", () => {
     const player = createEmptyPlayer();
@@ -209,4 +210,10 @@ test("loads, saves, and deletes profile-scoped custom decks", () => {
 test("falls back to an empty custom-deck collection", () => {
     const store = createDeckStore({ read: () => "not an object", write: () => {} }, "decks");
     assert.deepEqual(store.list(), {});
+});
+
+test("provides stable version metadata for built-in and custom cards", () => {
+    assert.equal(VERSION_HISTORY["1.0"], "Original Release");
+    assert.equal(VERSION_HISTORY["2.2"], "Boss Fights");
+    assert.equal(VERSION_HISTORY.Custom, "Your Custom Cards");
 });

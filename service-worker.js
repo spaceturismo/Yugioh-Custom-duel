@@ -10,6 +10,7 @@ const APP_SHELL = [
     "./client/duel-state.js",
     "./client/multiplayer.js",
     "./client/deck-storage.js",
+    "./client/card-data.js",
     "./manifest.webmanifest",
     "./icons/icon.svg"
 ];
