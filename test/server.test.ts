@@ -158,3 +158,33 @@ test("validates submitted decks using the server rules", async () => {
     assert.deepEqual(result.errors, ["Main Deck cannot exceed 60 cards."]);
     socket.close();
 });
+
+test("broadcasts an authoritative play-card action to both clients", async () => {
+    const first = await connect();
+    await receiveUntil(first, "connected");
+    first.send(JSON.stringify({ type: "create_room" }));
+    const firstJoined = await receiveUntil(first, "joined");
+
+    const second = await connect();
+    await receiveUntil(second, "connected");
+    second.send(JSON.stringify({ type: "join_room", roomId: firstJoined.roomId }));
+    await receiveUntil(second, "joined");
+
+    const card = { id: "mage", name: "Mage", type: "monster" };
+    const deck = Array.from({ length: 6 }, () => card);
+    first.send(JSON.stringify({ type: "select_deck", mainDeck: deck, extraDeck: [] }));
+    second.send(JSON.stringify({ type: "select_deck", mainDeck: deck, extraDeck: [] }));
+    await receiveUntil(first, "room_state", (message) => message.state.deckCounts["player-2"] === 6);
+    first.send(JSON.stringify({ type: "set_ready", ready: true }));
+    second.send(JSON.stringify({ type: "set_ready", ready: true }));
+    await receiveUntil(first, "room_state", (message) => message.state.ready["player-2"] === true);
+    first.send(JSON.stringify({ type: "start_game" }));
+    await receiveUntil(first, "room_state", (message) => message.state.phase === "active");
+
+    first.send(JSON.stringify({ type: "play_card", handIndex: 0 }));
+    const played = await receiveUntil(second, "room_state", (message) => message.state.fields["player-1"].length === 1);
+    assert.equal(played.state.hands["player-1"].length, 4);
+    assert.equal(played.state.fields["player-1"][0].name, "Mage");
+    first.close();
+    second.close();
+});
