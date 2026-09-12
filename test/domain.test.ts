@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
-import { createRoomState, drawCard, endTurn, startGame } from "../server/src/domain";
+import { advancePhase, createRoomState, drawCard, endTurn, startGame } from "../server/src/domain";
 import { parseClientMessage } from "../server/src/protocol";
 import {
     DEFAULT_DECK_RULES,
@@ -10,6 +10,7 @@ import {
 } from "../server/src/card-model";
 import { loadDeckRules } from "../server/src/config";
 import { attack, playCard, selectDeck, setPlayerReady } from "../server/src/domain";
+import { RoomManager } from "../server/src/rooms";
 
 test("creates a fresh room with standard starting values", () => {
     const state = createRoomState("ABC123");
@@ -18,6 +19,7 @@ test("creates a fresh room with standard starting values", () => {
     assert.equal(state.phase, "waiting");
     assert.deepEqual(state.players, []);
     assert.equal(state.currentTurn, null);
+    assert.equal(state.winner, null);
     assert.deepEqual(state.lifePoints, { "player-1": 8000, "player-2": 8000 });
     assert.deepEqual(state.deckCounts, { "player-1": 40, "player-2": 40 });
     assert.deepEqual(state.handCounts, { "player-1": 5, "player-2": 5 });
@@ -35,6 +37,7 @@ test("requires two players before starting and gives player one the first turn",
     assert.equal(startGame(state), null);
     assert.equal(state.phase, "active");
     assert.equal(state.currentTurn, "player-1");
+    assert.equal(state.currentPhase, "draw");
 });
 
 test("draw changes only the active player's deck and hand", () => {
@@ -58,9 +61,35 @@ test("end turn transfers authority to the other player", () => {
     setPlayerReady(state, "player-2", true);
     startGame(state);
 
+    assert.equal(drawCard(state, "player-1"), null);
+    assert.equal(advancePhase(state, "player-1"), null);
+    assert.equal(advancePhase(state, "player-1"), null);
+    assert.equal(advancePhase(state, "player-1"), null);
     assert.equal(endTurn(state, "player-1"), null);
     assert.equal(state.currentTurn, "player-2");
+    assert.equal(state.currentPhase, "draw");
     assert.equal(endTurn(state, "player-1"), "It is not your turn.");
+});
+
+test("enforces the phase transition order and turn ownership", () => {
+    const state = createRoomState("ABC123");
+    state.players.push("player-1", "player-2");
+    setPlayerReady(state, "player-1", true);
+    setPlayerReady(state, "player-2", true);
+    startGame(state);
+
+    assert.equal(advancePhase(state, "player-1"), null);
+    assert.equal(state.currentPhase, "main1");
+    assert.equal(advancePhase(state, "player-1"), null);
+    assert.equal(state.currentPhase, "battle");
+    assert.equal(advancePhase(state, "player-1"), null);
+    assert.equal(state.currentPhase, "main2");
+    assert.equal(advancePhase(state, "player-1"), null);
+    assert.equal(state.currentPhase, "end");
+    assert.equal(advancePhase(state, "player-1"), null);
+    assert.equal(state.currentPhase, "draw");
+    assert.equal(state.currentTurn, "player-2");
+    assert.equal(advancePhase(state, "player-1"), "It is not your turn.");
 });
 
 test("accepts protocol messages with only supported fields", () => {
@@ -70,6 +99,9 @@ test("accepts protocol messages with only supported fields", () => {
     });
     assert.deepEqual(parseClientMessage('{"type":"draw","extra":"ignored"}'), {
         type: "draw"
+    });
+    assert.deepEqual(parseClientMessage('{"type":"advance_phase"}'), {
+        type: "advance_phase"
     });
 });
 
@@ -250,8 +282,9 @@ test("plays a card from the active player's hand onto their field", () => {
     setPlayerReady(state, "player-2", true);
     startGame(state);
 
+    assert.equal(drawCard(state, "player-1"), null);
     assert.equal(playCard(state, "player-1", 0), null);
-    assert.equal(state.hands["player-1"].length, 4);
+    assert.equal(state.hands["player-1"].length, 5);
     assert.equal(state.fields["player-1"].length, 1);
     assert.equal(state.fields["player-1"][0].id, "mage-0");
     assert.equal(playCard(state, "player-2", 0), "It is not your turn.");
@@ -267,12 +300,54 @@ test("resolves a field attack with server-owned life points", () => {
     state.decks["player-2"] = [defender];
     state.players.forEach((playerId) => setPlayerReady(state, playerId, true));
     startGame(state);
+    drawCard(state, "player-1");
+    advancePhase(state, "player-1");
     state.fields["player-1"].push(state.hands["player-1"].pop());
     state.fields["player-2"].push(state.hands["player-2"].pop());
 
+    advancePhase(state, "player-1");
     assert.equal(attack(state, "player-1", 0, "player-2", 0), null);
     assert.equal(state.lifePoints["player-2"], 7600);
     assert.equal(state.fields["player-2"].length, 0);
     assert.equal(state.graveyards["player-2"].length, 1);
     assert.equal(attack(state, "player-2", 0, "player-1", 0), "It is not your turn.");
+});
+
+test("finishes the duel and records the winner when an attack reaches zero life points", () => {
+    const state = createRoomState("ABC123");
+    state.players.push("player-1", "player-2");
+    const attacker = { id: "attacker", name: "Attacker", type: "monster" as const, atk: 1800 };
+    const defender = { id: "defender", name: "Defender", type: "monster" as const, atk: 1000 };
+    state.decks["player-1"] = [attacker];
+    state.decks["player-2"] = [defender];
+    state.players.forEach((playerId) => setPlayerReady(state, playerId, true));
+    startGame(state);
+    drawCard(state, "player-1");
+    advancePhase(state, "player-1");
+    state.fields["player-1"].push(state.hands["player-1"].pop());
+    state.fields["player-2"].push(state.hands["player-2"].pop());
+    state.lifePoints["player-2"] = 800;
+
+    advancePhase(state, "player-1");
+    assert.equal(attack(state, "player-1", 0, "player-2", 0), null);
+    assert.equal(state.lifePoints["player-2"], 0);
+    assert.equal(state.phase, "finished");
+    assert.equal(state.winner, "player-1");
+    assert.equal(attack(state, "player-1", 0, "player-2", 0), "The game has not started.");
+});
+
+test("reuses the available player slot when a waiting player leaves", () => {
+    const manager = new RoomManager();
+    const room = manager.create();
+    const firstSocket = {} as import("ws").WebSocket;
+    const secondSocket = {} as import("ws").WebSocket;
+    const replacementSocket = {} as import("ws").WebSocket;
+
+    assert.equal(manager.join(room, firstSocket), "player-1");
+    assert.equal(manager.join(room, secondSocket), "player-2");
+    assert.equal(manager.leave(firstSocket), room);
+    assert.deepEqual(room.state.players, ["player-2"]);
+    assert.equal(manager.join(room, replacementSocket), "player-1");
+    assert.equal(room.sockets.get("player-1"), replacementSocket);
+    assert.equal(manager.count(), 1);
 });

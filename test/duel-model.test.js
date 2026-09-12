@@ -249,6 +249,7 @@ test("sends room and turn actions through the multiplayer client", () => {
     client.joinRoom("ABC123");
     client.startGame();
     client.draw();
+    client.advancePhase();
     client.endTurn();
 
     assert.deepEqual(sent, [
@@ -256,6 +257,7 @@ test("sends room and turn actions through the multiplayer client", () => {
         { type: "join_room", roomId: "ABC123" },
         { type: "start_game" },
         { type: "draw" },
+        { type: "advance_phase" },
         { type: "end_turn" }
     ]);
 });
@@ -326,17 +328,18 @@ test("sends an attack action through the multiplayer client", () => {
 test("duel sync forwards server actions and publishes room state", () => {
     const sent = [];
     const states = [];
-    const client = { draw: () => sent.push(["draw"]), playCard: (index) => sent.push(["play", index]), attack: (a, d) => sent.push(["attack", a, d]), endTurn: () => sent.push(["end"]), onMessage: (listener) => { client.listener = listener; return () => {}; } };
+    const client = { draw: () => sent.push(["draw"]), advancePhase: () => sent.push(["phase"]), playCard: (index) => sent.push(["play", index]), attack: (a, d) => sent.push(["attack", a, d]), endTurn: () => sent.push(["end"]), onMessage: (listener) => { client.listener = listener; return () => {}; } };
     const sync = createDuelSync(client, (state) => states.push(state));
     const roomState = { phase: "active", currentTurn: "player-1" };
 
     sync.draw();
+    sync.advancePhase();
     sync.playCard(0);
     sync.attack(0, 1);
     sync.endTurn();
     client.listener({ type: "room_state", state: roomState });
 
-    assert.deepEqual(sent, [["draw"], ["play", 0], ["attack", 0, 1], ["end"]]);
+    assert.deepEqual(sent, [["draw"], ["phase"], ["play", 0], ["attack", 0, 1], ["end"]]);
     assert.deepEqual(states, [roomState]);
 });
 
@@ -344,6 +347,7 @@ test("projects authoritative room state into a private player view", () => {
     const state = {
         phase: "active",
         currentTurn: "player-1",
+        currentPhase: "main1",
         lifePoints: { "player-1": 8000, "player-2": 7200 },
         deckCounts: { "player-1": 30, "player-2": 28 },
         handCounts: { "player-1": 6, "player-2": 4 },
@@ -358,6 +362,8 @@ test("projects authoritative room state into a private player view", () => {
     assert.deepEqual(projectDuelView(state, "player-1"), {
         phase: "active",
         currentTurn: "player-1",
+        currentPhase: "main1",
+        winner: null,
         player: { lifePoints: 8000, deckCount: 30, handCount: 6, extraDeckCount: 3, hand: [{ id: "hand" }], field: [{ id: "field" }], graveyard: [] },
         opponent: { lifePoints: 7200, deckCount: 28, handCount: 4, extraDeckCount: 2, hand: [], field: [{ id: "enemy" }], graveyard: [{ id: "grave" }] }
     });

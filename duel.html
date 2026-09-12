@@ -12996,6 +12996,8 @@ let multiplayerPlayerId = null;
 function renderServerDuelState(state) {
     if (!multiplayerPlayerId) return;
     const view = window.duelView.projectDuelView(state, multiplayerPlayerId);
+    currentPhase = view.currentPhase || currentPhase;
+    playerTurn = view.currentTurn === multiplayerPlayerId;
     player.hand = view.player.hand;
     player.field = view.player.field;
     player.graveyard = view.player.graveyard;
@@ -13004,6 +13006,7 @@ function renderServerDuelState(state) {
     opponent.graveyard = view.opponent.graveyard;
     player.lp = view.player.lifePoints;
     opponent.lp = view.opponent.lifePoints;
+    duelOver = view.phase === "finished";
     player.deck = Array.from({ length: view.player.deckCount });
     opponent.deck = Array.from({ length: view.opponent.deckCount });
     if (document.getElementById("duelScreen").style.display === "block") renderAll();
@@ -13012,7 +13015,9 @@ function renderServerDuelState(state) {
     document.getElementById("playerDeckCount").textContent = view.player.deckCount;
     document.getElementById("opponentDeckCount").textContent = view.opponent.deckCount;
     document.getElementById("playerExtraDeckCount").textContent = view.player.extraDeckCount;
-    document.getElementById("turnDisplay").textContent = view.currentTurn === multiplayerPlayerId ? "YOUR TURN" : "OPPONENT TURN";
+    document.getElementById("turnDisplay").textContent = view.phase === "finished"
+        ? (view.winner === multiplayerPlayerId ? "YOU WIN" : view.winner ? "YOU LOSE" : "DRAW")
+        : (view.currentTurn === multiplayerPlayerId ? "YOUR TURN" : "OPPONENT TURN");
 }
 
 function renderMultiplayerLobby(state) {
@@ -27415,6 +27420,11 @@ function enterBattlePhase() {
 
     }
 
+    if (multiplayerPlayerId && multiplayerDuelSync) {
+        multiplayerDuelSync.advancePhase();
+        return;
+    }
+
     currentPhase = "battle";
 
     selectedFieldCard = null;
@@ -27444,6 +27454,11 @@ function enterMainPhase2() {
 
         return;
 
+    }
+
+    if (multiplayerPlayerId && multiplayerDuelSync) {
+        multiplayerDuelSync.advancePhase();
+        return;
     }
 
     currentPhase = "main2";

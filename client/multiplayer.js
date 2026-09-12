@@ -20,6 +20,9 @@
             draw() {
                 transport.send({ type: "draw" });
             },
+            advancePhase() {
+                transport.send({ type: "advance_phase" });
+            },
             endTurn() {
                 transport.send({ type: "end_turn" });
             },

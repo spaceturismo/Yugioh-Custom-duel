@@ -3,6 +3,7 @@ export type ClientMessage =
     | { type: "join_room"; roomId: string }
     | { type: "start_game" }
     | { type: "draw" }
+    | { type: "advance_phase" }
     | { type: "end_turn" }
     | { type: "validate_deck"; mainDeck: unknown[]; extraDeck: unknown[] }
     | { type: "select_deck"; mainDeck: unknown[]; extraDeck: unknown[] }
@@ -15,6 +16,7 @@ const MESSAGE_TYPES = new Set([
     "join_room",
     "start_game",
     "draw",
+    "advance_phase",
     "end_turn",
     "validate_deck",
     "select_deck",

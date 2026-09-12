@@ -1,12 +1,15 @@
 import { validateDeck, type CardRecord, type DeckRules } from "./card-model";
 
 export type PlayerId = "player-1" | "player-2";
+export type DuelPhase = "draw" | "main1" | "battle" | "main2" | "end";
 
 export interface RoomState {
     roomId: string;
     phase: "waiting" | "active" | "finished";
     players: PlayerId[];
     currentTurn: PlayerId | null;
+    currentPhase: DuelPhase | null;
+    winner: PlayerId | null;
     lifePoints: Record<PlayerId, number>;
     deckCounts: Record<PlayerId, number>;
     handCounts: Record<PlayerId, number>;
@@ -30,6 +33,8 @@ export function createRoomState(roomId: string): RoomState {
         phase: "waiting",
         players: [],
         currentTurn: null,
+        currentPhase: null,
+        winner: null,
         lifePoints: { "player-1": 8000, "player-2": 8000 },
         deckCounts: { "player-1": 40, "player-2": 40 },
         handCounts: { "player-1": 5, "player-2": 5 },
@@ -48,6 +53,7 @@ export function startGame(state: RoomState): string | null {
     if (!state.ready["player-1"] || !state.ready["player-2"]) return "Both players must be ready to start.";
     state.phase = "active";
     state.currentTurn = "player-1";
+    state.currentPhase = "draw";
     for (const playerId of state.players) {
         if (state.decks[playerId].length > 0) {
             state.hands[playerId] = state.decks[playerId].splice(0, 5);
@@ -61,6 +67,7 @@ export function startGame(state: RoomState): string | null {
 export function drawCard(state: RoomState, playerId: PlayerId): string | null {
     if (state.phase !== "active") return "The game has not started.";
     if (state.currentTurn !== playerId) return "It is not your turn.";
+    if (state.currentPhase !== "draw") return "You can only draw during the Draw Phase.";
     if (state.deckCounts[playerId] <= 0) return "Your deck is empty.";
     const deck = state.decks[playerId];
     const hand = state.hands[playerId];
@@ -72,14 +79,34 @@ export function drawCard(state: RoomState, playerId: PlayerId): string | null {
         state.deckCounts[playerId] -= 1;
         state.handCounts[playerId] += 1;
     }
+    state.currentPhase = "main1";
+    return null;
+}
+
+export function advancePhase(state: RoomState, playerId: PlayerId): string | null {
+    if (state.phase !== "active") return "The game has not started.";
+    if (state.currentTurn !== playerId) return "It is not your turn.";
+    if (state.currentPhase === null) return "The game phase is not initialized.";
+
+    const nextPhase: Record<DuelPhase, DuelPhase> = {
+        draw: "main1",
+        main1: "battle",
+        battle: "main2",
+        main2: "end",
+        end: "draw"
+    };
+    state.currentPhase = nextPhase[state.currentPhase];
+    if (state.currentPhase === "draw") {
+        state.currentTurn = playerId === "player-1" ? "player-2" : "player-1";
+    }
     return null;
 }
 
 export function endTurn(state: RoomState, playerId: PlayerId): string | null {
     if (state.phase !== "active") return "The game has not started.";
     if (state.currentTurn !== playerId) return "It is not your turn.";
-    state.currentTurn = playerId === "player-1" ? "player-2" : "player-1";
-    return null;
+    if (state.currentPhase !== "end") return "You can only end your turn during the End Phase.";
+    return advancePhase(state, playerId);
 }
 
 export function selectDeck(
@@ -110,6 +137,9 @@ export function setPlayerReady(state: RoomState, playerId: PlayerId, ready: bool
 export function playCard(state: RoomState, playerId: PlayerId, handIndex: number): string | null {
     if (state.phase !== "active") return "The game has not started.";
     if (state.currentTurn !== playerId) return "It is not your turn.";
+    if (state.currentPhase !== "main1" && state.currentPhase !== "main2") {
+        return "You can only play cards during a Main Phase.";
+    }
     const card = state.hands[playerId][handIndex];
     if (!card) return "Card was not found in your hand.";
     state.hands[playerId].splice(handIndex, 1);
@@ -127,6 +157,7 @@ export function attack(
 ): string | null {
     if (state.phase !== "active") return "The game has not started.";
     if (state.currentTurn !== attackerId) return "It is not your turn.";
+    if (state.currentPhase !== "battle") return "You can only attack during the Battle Phase.";
     const attacker = state.fields[attackerId][attackerIndex];
     const defender = state.fields[defenderId][defenderIndex];
     if (!attacker || !defender) return "Attack target was not found.";
@@ -144,6 +175,13 @@ export function attack(
         state.fields[attackerId].splice(attackerIndex, 1);
         state.graveyards[defenderId].push(defender);
         state.graveyards[attackerId].push(attacker);
+    }
+    if (state.lifePoints[defenderId] <= 0) {
+        state.phase = "finished";
+        state.winner = attackerId;
+    } else if (state.lifePoints[attackerId] <= 0) {
+        state.phase = "finished";
+        state.winner = defenderId;
     }
     return null;
 }

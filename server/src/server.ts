@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { WebSocket, WebSocketServer } from "ws";
-import { attack, drawCard, endTurn, playCard, selectDeck, setPlayerReady, startGame } from "./domain";
+import { advancePhase, attack, drawCard, endTurn, playCard, selectDeck, setPlayerReady, startGame } from "./domain";
 import { loadDeckRules } from "./config";
 import { validateDeck } from "./card-model";
 import { ClientMessage, parseClientMessage } from "./protocol";
@@ -64,6 +64,7 @@ function handleAction(socket: WebSocket, message: ClientMessage): void {
     else if (message.type === "attack") messageError = attack(room.state, playerId, message.attackerIndex, playerId === "player-1" ? "player-2" : "player-1", message.defenderIndex);
     else if (message.type === "start_game") messageError = startGame(room.state);
     else if (message.type === "draw") messageError = drawCard(room.state, playerId);
+    else if (message.type === "advance_phase") messageError = advancePhase(room.state, playerId);
     else if (message.type === "end_turn") messageError = endTurn(room.state, playerId);
     else messageError = "Unknown action.";
 

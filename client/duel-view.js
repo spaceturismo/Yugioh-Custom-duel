@@ -8,6 +8,8 @@
         return {
             phase: state.phase,
             currentTurn: state.currentTurn,
+            currentPhase: state.currentPhase || null,
+            winner: state.winner || null,
             player: {
                 lifePoints: state.lifePoints[playerId],
                 deckCount: state.deckCounts[playerId],

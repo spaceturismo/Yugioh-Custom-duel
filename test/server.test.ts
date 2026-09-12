@@ -132,6 +132,7 @@ test("authoritatively controls a two-player room", async () => {
     );
     assert.equal(active.state.phase, "active");
     assert.equal(active.state.currentTurn, "player-1");
+    assert.equal(active.state.currentPhase, "draw");
 
     first.send(JSON.stringify({ type: "draw" }));
     const drawn = await receiveUntil(
@@ -141,6 +142,7 @@ test("authoritatively controls a two-player room", async () => {
     );
     assert.equal(drawn.state.deckCounts["player-1"], 0);
     assert.equal(drawn.state.handCounts["player-1"], 6);
+    assert.equal(drawn.state.currentPhase, "main1");
 
     second.send(JSON.stringify({ type: "draw" }));
     const rejected = await receiveUntil(second, "error");
@@ -187,10 +189,12 @@ test("broadcasts an authoritative play-card action to both clients", async () =>
     first.send(JSON.stringify({ type: "start_game" }));
     await receiveUntil(first, "room_state", (message) => message.state.phase === "active");
 
+    first.send(JSON.stringify({ type: "draw" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "main1");
     first.send(JSON.stringify({ type: "play_card", handIndex: 0 }));
     const played = await receiveUntil(second, "room_state", (message) => message.state.fields["player-1"].length === 1);
     assert.equal(played.state.hands["player-1"].length, 0);
-    assert.equal(played.state.handCounts["player-1"], 4);
+    assert.equal(played.state.handCounts["player-1"], 5);
     assert.equal(played.state.fields["player-1"][0].name, "Mage");
     first.close();
     second.close();
@@ -214,7 +218,125 @@ test("does not broadcast an opponent's private deck or hand", async () => {
     assert.equal(visibleToFirst.state.decks["player-1"][0].id, "secret");
     assert.deepEqual(visibleToFirst.state.decks["player-2"], []);
     assert.deepEqual(visibleToFirst.state.hands["player-2"], []);
+    assert.deepEqual(visibleToFirst.state.extraDecks["player-2"], []);
     assert.equal(visibleToFirst.state.handCounts["player-2"], 5);
+    first.close();
+    second.close();
+});
+
+test("broadcasts a finished state and winner when an attack reaches zero life points", async () => {
+    const first = await connect();
+    await receiveUntil(first, "connected");
+    first.send(JSON.stringify({ type: "create_room" }));
+    const firstJoined = await receiveUntil(first, "joined");
+    const second = await connect();
+    await receiveUntil(second, "connected");
+    second.send(JSON.stringify({ type: "join_room", roomId: firstJoined.roomId }));
+    await receiveUntil(second, "joined");
+
+    const attacker = { id: "attacker", name: "Attacker", type: "monster", atk: 9000 };
+    const defender = { id: "defender", name: "Defender", type: "monster", atk: 1000 };
+    first.send(JSON.stringify({ type: "select_deck", mainDeck: Array.from({ length: 7 }, () => attacker), extraDeck: [] }));
+    second.send(JSON.stringify({ type: "select_deck", mainDeck: Array.from({ length: 7 }, () => defender), extraDeck: [] }));
+    await receiveUntil(first, "room_state", (message) => message.state.ready["player-2"] === false && message.state.deckCounts["player-2"] === 7);
+    first.send(JSON.stringify({ type: "set_ready", ready: true }));
+    second.send(JSON.stringify({ type: "set_ready", ready: true }));
+    await receiveUntil(first, "room_state", (message) => message.state.ready["player-2"] === true);
+    first.send(JSON.stringify({ type: "start_game" }));
+    await receiveUntil(first, "room_state", (message) => message.state.phase === "active");
+    first.send(JSON.stringify({ type: "draw" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "main1");
+    first.send(JSON.stringify({ type: "play_card", handIndex: 0 }));
+    await receiveUntil(first, "room_state", (message) => message.state.fields["player-1"].length === 1);
+    first.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "battle");
+    first.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "main2");
+    first.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "end");
+    first.send(JSON.stringify({ type: "end_turn" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentTurn === "player-2" && message.state.currentPhase === "draw");
+    second.send(JSON.stringify({ type: "draw" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "main1");
+    second.send(JSON.stringify({ type: "play_card", handIndex: 0 }));
+    await receiveUntil(first, "room_state", (message) => message.state.fields["player-2"].length === 1);
+    second.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "battle");
+    second.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "main2");
+    second.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "end");
+    second.send(JSON.stringify({ type: "end_turn" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentTurn === "player-1" && message.state.currentPhase === "draw");
+    first.send(JSON.stringify({ type: "draw" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "main1");
+    first.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "battle");
+    first.send(JSON.stringify({ type: "attack", attackerIndex: 0, defenderIndex: 0 }));
+
+    const finished = await receiveUntil(second, "room_state", (message) => message.state.phase === "finished");
+    assert.equal(finished.state.winner, "player-1");
+    assert.equal(finished.state.lifePoints["player-2"], 0);
+
+    first.close();
+    second.close();
+});
+
+test("broadcasts an authoritative attack resolution to both clients", async () => {
+    const first = await connect();
+    await receiveUntil(first, "connected");
+    first.send(JSON.stringify({ type: "create_room" }));
+    const firstJoined = await receiveUntil(first, "joined");
+
+    const second = await connect();
+    await receiveUntil(second, "connected");
+    second.send(JSON.stringify({ type: "join_room", roomId: firstJoined.roomId }));
+    await receiveUntil(second, "joined");
+
+    const attacker = { id: "attacker", name: "Attacker", type: "monster", atk: 1800, def: 1200 };
+    const defender = { id: "defender", name: "Defender", type: "monster", atk: 1400, def: 1000 };
+    first.send(JSON.stringify({ type: "select_deck", mainDeck: Array.from({ length: 7 }, () => attacker), extraDeck: [] }));
+    second.send(JSON.stringify({ type: "select_deck", mainDeck: Array.from({ length: 7 }, () => defender), extraDeck: [] }));
+    await receiveUntil(first, "room_state", (message) => message.state.deckCounts["player-2"] === 7);
+    first.send(JSON.stringify({ type: "set_ready", ready: true }));
+    second.send(JSON.stringify({ type: "set_ready", ready: true }));
+    await receiveUntil(first, "room_state", (message) => message.state.ready["player-2"] === true);
+    first.send(JSON.stringify({ type: "start_game" }));
+    await receiveUntil(first, "room_state", (message) => message.state.phase === "active");
+    first.send(JSON.stringify({ type: "draw" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "main1");
+    first.send(JSON.stringify({ type: "play_card", handIndex: 0 }));
+    await receiveUntil(first, "room_state", (message) => message.state.fields["player-1"].length === 1);
+    first.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "battle");
+    first.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "main2");
+    first.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "end");
+    first.send(JSON.stringify({ type: "end_turn" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentTurn === "player-2" && message.state.currentPhase === "draw");
+    second.send(JSON.stringify({ type: "draw" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "main1");
+    second.send(JSON.stringify({ type: "play_card", handIndex: 0 }));
+    await receiveUntil(first, "room_state", (message) => message.state.fields["player-2"].length === 1);
+    second.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "battle");
+    second.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "main2");
+    second.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "end");
+    second.send(JSON.stringify({ type: "end_turn" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentTurn === "player-1" && message.state.currentPhase === "draw");
+    first.send(JSON.stringify({ type: "draw" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "main1");
+    first.send(JSON.stringify({ type: "advance_phase" }));
+    await receiveUntil(first, "room_state", (message) => message.state.currentPhase === "battle");
+    first.send(JSON.stringify({ type: "attack", attackerIndex: 0, defenderIndex: 0 }));
+    const resolved = await receiveUntil(second, "room_state", (message) => message.state.graveyards["player-2"].length === 1);
+    assert.equal(resolved.state.lifePoints["player-2"], 7600);
+    assert.deepEqual(resolved.state.fields["player-2"], []);
+    assert.equal(resolved.state.graveyards["player-2"][0].id, "defender");
+
     first.close();
     second.close();
 });

@@ -9,6 +9,7 @@
         });
         return {
             draw() { client.draw(); },
+            advancePhase() { client.advancePhase(); },
             playCard(handIndex) { client.playCard(handIndex); },
             attack(attackerIndex, defenderIndex) { client.attack(attackerIndex, defenderIndex); },
             endTurn() { client.endTurn(); }

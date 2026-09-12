@@ -36,7 +36,7 @@ export class RoomManager {
 
     join(room: Room, socket: WebSocket): PlayerId | null {
         if (room.state.players.length >= 2) return null;
-        const playerId = room.state.players.length === 0 ? "player-1" : "player-2";
+        const playerId = !room.state.players.includes("player-1") ? "player-1" : "player-2";
         room.state.players.push(playerId);
         room.sockets.set(playerId, socket);
         return playerId;
