@@ -2,7 +2,7 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { createRoomState, drawCard, endTurn, startGame } from "../server/src/domain";
 import { parseClientMessage } from "../server/src/protocol";
-import { isValidCardRecord } from "../server/src/card-model";
+import { isValidCardRecord, validateDeckCards } from "../server/src/card-model";
 
 test("creates a fresh room with standard starting values", () => {
     const state = createRoomState("ABC123");
@@ -77,4 +77,18 @@ test("rejects card records that could not be safely played", () => {
     assert.equal(isValidCardRecord({ id: "mage", name: "", type: "monster" }), false);
     assert.equal(isValidCardRecord({ id: "mage", name: "Mage", type: "ritual" }), false);
     assert.equal(isValidCardRecord({ id: "mage", name: "Mage", type: "monster", atk: "1000" }), false);
+});
+
+test("validates a deck as a collection of card records", () => {
+    const cards = [
+        { id: "mage", name: "Mage", type: "monster", atk: 1000, def: 800 },
+        { id: "boost", name: "Boost", type: "spell" }
+    ];
+
+    assert.deepEqual(validateDeckCards(cards), { valid: true, invalidIndexes: [] });
+    assert.deepEqual(validateDeckCards([...cards, { id: "bad", name: "", type: "monster" }]), {
+        valid: false,
+        invalidIndexes: [2]
+    });
+    assert.deepEqual(validateDeckCards("not a deck"), { valid: false, invalidIndexes: [] });
 });
