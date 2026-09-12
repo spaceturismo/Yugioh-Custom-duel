@@ -1,12 +1,15 @@
 import { createServer } from "node:http";
 import { WebSocket, WebSocketServer } from "ws";
 import { drawCard, endTurn, startGame } from "./domain";
+import { loadDeckRules } from "./config";
+import { validateDeck } from "./card-model";
 import { ClientMessage, parseClientMessage } from "./protocol";
 import { Room, RoomManager } from "./rooms";
 import { serveStatic } from "./static-server";
 
 const port = Number(process.env.PORT || 8787);
 const rooms = new RoomManager();
+const deckRules = loadDeckRules();
 
 function send(socket: WebSocket, message: unknown): void {
     if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
@@ -35,6 +38,11 @@ function joinRoom(socket: WebSocket, room: Room): void {
 }
 
 function handleAction(socket: WebSocket, message: ClientMessage): void {
+    if (message.type === "validate_deck") {
+        send(socket, { type: "deck_validation", ...validateDeck(message.mainDeck, message.extraDeck, deckRules) });
+        return;
+    }
+
     const membership = rooms.membership(socket);
     if (!membership) {
         sendError(socket, "Join a room before sending actions.");

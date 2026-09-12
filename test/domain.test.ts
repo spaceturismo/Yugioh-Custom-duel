@@ -72,6 +72,15 @@ test("rejects malformed or unsupported protocol messages", () => {
     assert.equal(parseClientMessage('{"type":"unknown"}'), null);
 });
 
+test("parses deck validation requests with both deck sections", () => {
+    assert.deepEqual(parseClientMessage('{"type":"validate_deck","mainDeck":[],"extraDeck":[]}'), {
+        type: "validate_deck",
+        mainDeck: [],
+        extraDeck: []
+    });
+    assert.equal(parseClientMessage('{"type":"validate_deck","mainDeck":[]}'), null);
+});
+
 test("accepts the common card contract for built-in and custom cards", () => {
     assert.equal(isValidCardRecord({ id: "mage", name: "Mage", type: "monster", atk: 1000, def: 800 }), true);
     assert.equal(isValidCardRecord({ id: "custom_1", name: "Boost", type: "spell" }), true);

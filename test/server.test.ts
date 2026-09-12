@@ -121,3 +121,18 @@ test("authoritatively controls a two-player room", async () => {
     first.close();
     second.close();
 });
+
+test("validates submitted decks using the server rules", async () => {
+    const socket = await connect();
+    await receiveUntil(socket, "connected");
+    socket.send(JSON.stringify({
+        type: "validate_deck",
+        mainDeck: Array.from({ length: 61 }, () => ({ id: "mage", name: "Mage", type: "monster" })),
+        extraDeck: []
+    }));
+
+    const result = await receiveUntil(socket, "deck_validation");
+    assert.equal(result.valid, false);
+    assert.deepEqual(result.errors, ["Main Deck cannot exceed 60 cards."]);
+    socket.close();
+});

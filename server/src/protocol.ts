@@ -3,14 +3,16 @@ export type ClientMessage =
     | { type: "join_room"; roomId: string }
     | { type: "start_game" }
     | { type: "draw" }
-    | { type: "end_turn" };
+    | { type: "end_turn" }
+    | { type: "validate_deck"; mainDeck: unknown[]; extraDeck: unknown[] };
 
 const MESSAGE_TYPES = new Set([
     "create_room",
     "join_room",
     "start_game",
     "draw",
-    "end_turn"
+    "end_turn",
+    "validate_deck"
 ]);
 
 export function parseClientMessage(raw: string): ClientMessage | null {
@@ -31,5 +33,11 @@ export function parseClientMessage(raw: string): ClientMessage | null {
             : null;
     }
 
-    return { type: message.type as Exclude<ClientMessage["type"], "join_room"> };
+    if (message.type === "validate_deck") {
+        return Array.isArray(message.mainDeck) && Array.isArray(message.extraDeck)
+            ? { type: "validate_deck", mainDeck: message.mainDeck, extraDeck: message.extraDeck }
+            : null;
+    }
+
+    return { type: message.type as Exclude<ClientMessage["type"], "join_room" | "validate_deck"> };
 }
