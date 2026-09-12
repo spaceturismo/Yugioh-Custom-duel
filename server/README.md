@@ -28,6 +28,15 @@ The initial protocol is intentionally small:
 
 The server owns room membership, turn order, deck counts, hand counts, and life points. Matches are currently held in memory and are discarded when every client disconnects. The existing duel UI is not connected to this protocol yet; that is the next integration slice.
 
+Deck limits default to a 60-card Main Deck and a 15-card Extra Deck. Tournament deployments can override them with positive integer environment variables:
+
+```powershell
+$env:MAIN_DECK_MAX = "45"
+$env:EXTRA_DECK_MAX = "8"
+```
+
+Custom cards use the same card-record and deck-limit validation as built-in cards.
+
 ## Source layout
 
 - `src/domain.ts` contains the shared room state shape and server-validated game actions.

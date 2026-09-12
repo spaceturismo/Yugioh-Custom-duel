@@ -33,3 +33,53 @@ export function validateDeckCards(cards: unknown): DeckValidationResult {
     }, []);
     return { valid: invalidIndexes.length === 0, invalidIndexes };
 }
+
+export interface DeckRules {
+    maxMainDeckSize: number;
+    maxExtraDeckSize: number;
+}
+
+export const DEFAULT_DECK_RULES: DeckRules = {
+    maxMainDeckSize: 60,
+    maxExtraDeckSize: 15
+};
+
+export interface FullDeckValidationResult {
+    valid: boolean;
+    errors: string[];
+}
+
+export function validateDeck(
+    mainDeck: unknown,
+    extraDeck: unknown,
+    rules: Partial<DeckRules> = {}
+): FullDeckValidationResult {
+    const configuredRules = { ...DEFAULT_DECK_RULES, ...rules };
+    const errors: string[] = [];
+    const mainResult = validateDeckCards(mainDeck);
+    const extraResult = validateDeckCards(extraDeck);
+
+    if (!Array.isArray(mainDeck)) {
+        errors.push("Main Deck must be an array of cards.");
+    } else {
+        if (mainDeck.length > configuredRules.maxMainDeckSize) {
+            errors.push(`Main Deck cannot exceed ${configuredRules.maxMainDeckSize} cards.`);
+        }
+        if (!mainResult.valid) {
+            errors.push(`Main Deck contains invalid card records at indexes: ${mainResult.invalidIndexes.join(", ")}.`);
+        }
+    }
+
+    if (!Array.isArray(extraDeck)) {
+        errors.push("Extra Deck must be an array of cards.");
+    } else {
+        if (extraDeck.length > configuredRules.maxExtraDeckSize) {
+            errors.push(`Extra Deck cannot exceed ${configuredRules.maxExtraDeckSize} cards.`);
+        }
+        if (!extraResult.valid) {
+            errors.push(`Extra Deck contains invalid card records at indexes: ${extraResult.invalidIndexes.join(", ")}.`);
+        }
+    }
+
+    return { valid: errors.length === 0, errors };
+}

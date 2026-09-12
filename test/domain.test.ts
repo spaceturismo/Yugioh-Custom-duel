@@ -2,7 +2,13 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { createRoomState, drawCard, endTurn, startGame } from "../server/src/domain";
 import { parseClientMessage } from "../server/src/protocol";
-import { isValidCardRecord, validateDeckCards } from "../server/src/card-model";
+import {
+    DEFAULT_DECK_RULES,
+    isValidCardRecord,
+    validateDeck,
+    validateDeckCards
+} from "../server/src/card-model";
+import { loadDeckRules } from "../server/src/config";
 
 test("creates a fresh room with standard starting values", () => {
     const state = createRoomState("ABC123");
@@ -91,4 +97,48 @@ test("validates a deck as a collection of card records", () => {
         invalidIndexes: [2]
     });
     assert.deepEqual(validateDeckCards("not a deck"), { valid: false, invalidIndexes: [] });
+});
+
+test("accepts configured main and Extra Deck boundary sizes", () => {
+    const card = { id: "mage", name: "Mage", type: "monster", atk: 1000, def: 800 } as const;
+    const deck = Array.from({ length: DEFAULT_DECK_RULES.maxMainDeckSize }, () => card);
+    const extraDeck = Array.from({ length: DEFAULT_DECK_RULES.maxExtraDeckSize }, () => card);
+
+    assert.deepEqual(validateDeck(deck, extraDeck), { valid: true, errors: [] });
+});
+
+test("rejects decks over configured limits and reports the affected section", () => {
+    const card = { id: "mage", name: "Mage", type: "monster" };
+    const result = validateDeck(
+        Array.from({ length: 61 }, () => card),
+        Array.from({ length: 16 }, () => card)
+    );
+
+    assert.deepEqual(result, {
+        valid: false,
+        errors: ["Main Deck cannot exceed 60 cards.", "Extra Deck cannot exceed 15 cards."]
+    });
+});
+
+test("applies the same card validation to custom cards and tournament rule overrides", () => {
+    const customCard = { id: "custom_1", name: "Custom Mage", type: "monster", atk: 500, def: 400 };
+    const rules = { maxMainDeckSize: 2, maxExtraDeckSize: 1 };
+
+    assert.deepEqual(validateDeck([customCard, customCard], [], rules), { valid: true, errors: [] });
+    assert.deepEqual(validateDeck([customCard, { id: "custom_bad", name: "", type: "monster" }], [], rules), {
+        valid: false,
+        errors: ["Main Deck contains invalid card records at indexes: 1."]
+    });
+});
+
+test("loads default deck rules when environment settings are absent", () => {
+    assert.deepEqual(loadDeckRules({}), DEFAULT_DECK_RULES);
+});
+
+test("loads positive tournament deck limits and ignores invalid settings", () => {
+    assert.deepEqual(loadDeckRules({ MAIN_DECK_MAX: "45", EXTRA_DECK_MAX: "8" }), {
+        maxMainDeckSize: 45,
+        maxExtraDeckSize: 8
+    });
+    assert.deepEqual(loadDeckRules({ MAIN_DECK_MAX: "-1", EXTRA_DECK_MAX: "nope" }), DEFAULT_DECK_RULES);
 });
