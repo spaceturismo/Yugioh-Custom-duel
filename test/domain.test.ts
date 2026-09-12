@@ -1,6 +1,7 @@
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { createRoomState, drawCard, endTurn, startGame } from "../server/src/domain";
+import { parseClientMessage } from "../server/src/protocol";
 
 test("creates a fresh room with standard starting values", () => {
     const state = createRoomState("ABC123");
@@ -44,4 +45,22 @@ test("end turn transfers authority to the other player", () => {
     assert.equal(endTurn(state, "player-1"), null);
     assert.equal(state.currentTurn, "player-2");
     assert.equal(endTurn(state, "player-1"), "It is not your turn.");
+});
+
+test("accepts protocol messages with only supported fields", () => {
+    assert.deepEqual(parseClientMessage('{"type":"join_room","roomId":"abc123"}'), {
+        type: "join_room",
+        roomId: "abc123"
+    });
+    assert.deepEqual(parseClientMessage('{"type":"draw","extra":"ignored"}'), {
+        type: "draw"
+    });
+});
+
+test("rejects malformed or unsupported protocol messages", () => {
+    assert.equal(parseClientMessage("not json"), null);
+    assert.equal(parseClientMessage("null"), null);
+    assert.equal(parseClientMessage('{"type":42}'), null);
+    assert.equal(parseClientMessage('{"type":"join_room"}'), null);
+    assert.equal(parseClientMessage('{"type":"unknown"}'), null);
 });

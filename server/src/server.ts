@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import { WebSocket, WebSocketServer } from "ws";
-import { ClientMessage, drawCard, endTurn, startGame } from "./domain";
+import { drawCard, endTurn, startGame } from "./domain";
+import { ClientMessage, parseClientMessage } from "./protocol";
 import { Room, RoomManager } from "./rooms";
 import { serveStatic } from "./static-server";
 
@@ -21,17 +22,6 @@ function sendState(room: Room): void {
 
 function sendError(socket: WebSocket, message: string): void {
     send(socket, { type: "error", message });
-}
-
-function parseMessage(raw: string): ClientMessage | null {
-    try {
-        const message: unknown = JSON.parse(raw);
-        return typeof message === "object" && message !== null
-            ? message as ClientMessage
-            : null;
-    } catch {
-        return null;
-    }
 }
 
 function joinRoom(socket: WebSocket, room: Room): void {
@@ -75,7 +65,7 @@ const webSocketServer = new WebSocketServer({ server: httpServer, path: "/ws" })
 webSocketServer.on("connection", (socket) => {
     send(socket, { type: "connected", message: "Create or join a room." });
     socket.on("message", (raw) => {
-        const message = parseMessage(raw.toString());
+        const message = parseClientMessage(raw.toString());
         if (!message || !message.type) {
             sendError(socket, "Messages must be valid JSON with a type.");
             return;
