@@ -420,6 +420,31 @@ body[data-panel="vignette_forest"] .deck-select-box, body[data-panel="vignette_f
     justify-content: center;
 }
 
+#pvpRoomScreen {
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.pvp-room-box {
+    width: 100%;
+    max-width: 620px;
+    padding: 34px;
+    text-align: center;
+    background: #191919;
+    border: 2px solid var(--theme-primary-dark);
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.7);
+}
+
+.pvp-room-code {
+    margin: 22px 0;
+    color: var(--theme-primary-light);
+    font-size: 36px;
+    font-weight: bold;
+    letter-spacing: 6px;
+}
+
 .deck-select-box {
     width: 100%;
     max-width: 1150px;
@@ -1515,6 +1540,16 @@ body[data-duelbg="bloodmoon"] #duelScreen {
 <!-- =====================================================
      DECK SELECT
 ===================================================== -->
+
+<div id="pvpRoomScreen" class="screen">
+    <div class="pvp-room-box">
+        <h1>⚔️ PvP Room Ready</h1>
+        <p>Both players are here. Choose your deck before starting the match.</p>
+        <div class="pvp-room-code" id="pvpRoomCode"></div>
+        <div id="pvpRoomPlayers" role="status" aria-live="polite">2 players connected</div>
+        <button type="button" onclick="openPvpDeckSelection()">Choose Your Deck</button>
+    </div>
+</div>
 
 <div id="deckSelectScreen" class="screen">
 
@@ -13049,6 +13084,7 @@ function renderMultiplayerLobby(state) {
     if (state.status === "joined") status.textContent = `Room ${state.roomId} - ${state.playerId}`;
     else if (state.status === "waiting") {
         const playerCount = state.players ? state.players.length : 0;
+        if (playerCount >= 2) showPvpRoomScreen(state.roomId);
         status.textContent = playerCount >= 2
             ? "Both players joined. Choose a deck, ready up, then start the match."
             : `Waiting for opponent (${playerCount}/2 players joined).`;
@@ -13056,6 +13092,22 @@ function renderMultiplayerLobby(state) {
     else if (state.status === "ready") status.textContent = `Room ${state.roomId || ""} - deck ready`;
     else if (state.status === "error") status.textContent = state.error;
     else if (state.status === "joining") status.textContent = "Joining room...";
+}
+
+function showPvpRoomScreen(roomId) {
+    const roomScreen = document.getElementById("pvpRoomScreen");
+    const deckScreen = document.getElementById("deckSelectScreen");
+    const roomCode = document.getElementById("pvpRoomCode");
+    if (!roomScreen || !deckScreen) return;
+    if (roomCode) roomCode.textContent = roomId || "";
+    deckScreen.classList.add("hidden");
+    roomScreen.style.display = "flex";
+}
+
+function openPvpDeckSelection() {
+    document.getElementById("pvpRoomScreen").style.display = "none";
+    document.getElementById("deckSelectScreen").classList.remove("hidden");
+    renderDeckSelection();
 }
 
 function copyMultiplayerRoomCode() {
