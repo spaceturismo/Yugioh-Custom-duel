@@ -1554,6 +1554,11 @@ body[data-duelbg="bloodmoon"] #duelScreen {
                 <button id="readyDeckButton" type="button" onclick="readySelectedMultiplayerDeck()">Ready Selected Deck</button>
                 <button id="startMatchButton" type="button" onclick="startMultiplayerMatch()">Start Match</button>
             </div>
+            <div id="roomCodeDisplay" style="display:none;margin-top:12px;padding:10px 12px;border:1px solid #d6a928;border-radius:6px;background:rgba(214,169,40,.12);">
+                <strong>Share this room code:</strong>
+                <span id="roomCodeValue" style="font-size:20px;font-weight:bold;letter-spacing:2px;margin:0 8px;"></span>
+                <button id="copyRoomCodeButton" type="button" onclick="copyMultiplayerRoomCode()">Copy Code</button>
+            </div>
             <div id="multiplayerStatus" role="status" aria-live="polite" style="margin-top:8px;color:#aaa;">Connecting...</div>
         </div>
 
@@ -13034,6 +13039,13 @@ function renderServerDuelState(state) {
 function renderMultiplayerLobby(state) {
     const status = document.getElementById("multiplayerStatus");
     if (!status) return;
+    const roomId = state.roomId || "";
+    const roomCodeDisplay = document.getElementById("roomCodeDisplay");
+    const roomCodeValue = document.getElementById("roomCodeValue");
+    if (roomCodeDisplay && roomCodeValue && roomId) {
+        roomCodeValue.textContent = roomId;
+        roomCodeDisplay.style.display = "block";
+    }
     if (state.status === "joined") status.textContent = `Room ${state.roomId} - ${state.playerId}`;
     else if (state.status === "waiting") {
         const playerCount = state.players ? state.players.length : 0;
@@ -13044,6 +13056,15 @@ function renderMultiplayerLobby(state) {
     else if (state.status === "ready") status.textContent = `Room ${state.roomId || ""} - deck ready`;
     else if (state.status === "error") status.textContent = state.error;
     else if (state.status === "joining") status.textContent = "Joining room...";
+}
+
+function copyMultiplayerRoomCode() {
+    const roomCode = document.getElementById("roomCodeValue").textContent;
+    if (!roomCode) return;
+    navigator.clipboard.writeText(roomCode).then(() => {
+        const status = document.getElementById("multiplayerStatus");
+        if (status) status.textContent = `Room code ${roomCode} copied. Share it with your opponent.`;
+    });
 }
 
 function initializeMultiplayerLobby() {
