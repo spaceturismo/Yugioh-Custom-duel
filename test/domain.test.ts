@@ -2,6 +2,7 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { createRoomState, drawCard, endTurn, startGame } from "../server/src/domain";
 import { parseClientMessage } from "../server/src/protocol";
+import { isValidCardRecord } from "../server/src/card-model";
 
 test("creates a fresh room with standard starting values", () => {
     const state = createRoomState("ABC123");
@@ -63,4 +64,17 @@ test("rejects malformed or unsupported protocol messages", () => {
     assert.equal(parseClientMessage('{"type":42}'), null);
     assert.equal(parseClientMessage('{"type":"join_room"}'), null);
     assert.equal(parseClientMessage('{"type":"unknown"}'), null);
+});
+
+test("accepts the common card contract for built-in and custom cards", () => {
+    assert.equal(isValidCardRecord({ id: "mage", name: "Mage", type: "monster", atk: 1000, def: 800 }), true);
+    assert.equal(isValidCardRecord({ id: "custom_1", name: "Boost", type: "spell" }), true);
+});
+
+test("rejects card records that could not be safely played", () => {
+    assert.equal(isValidCardRecord(null), false);
+    assert.equal(isValidCardRecord({ id: "", name: "Mage", type: "monster" }), false);
+    assert.equal(isValidCardRecord({ id: "mage", name: "", type: "monster" }), false);
+    assert.equal(isValidCardRecord({ id: "mage", name: "Mage", type: "ritual" }), false);
+    assert.equal(isValidCardRecord({ id: "mage", name: "Mage", type: "monster", atk: "1000" }), false);
 });
