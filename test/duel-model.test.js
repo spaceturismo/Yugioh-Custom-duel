@@ -9,6 +9,7 @@ const {
 } = require("../client/duel-model.js");
 const { createCardCatalog, normalizeCustomCard } = require("../client/card-catalog.js");
 const { createJsonStorage } = require("../client/storage.js");
+const { createDuelState } = require("../client/duel-state.js");
 
 test("creates an empty player with independent game collections", () => {
     const player = createEmptyPlayer();
@@ -154,4 +155,17 @@ test("writes JSON storage through the adapter", () => {
 
     storage.write("custom", ["mage"]);
     assert.deepEqual(saved, { key: "custom", value: '["mage"]' });
+});
+
+test("creates a fresh duel session with isolated player state", () => {
+    const state = createDuelState(createEmptyPlayer);
+
+    assert.equal(state.player.lp, 8000);
+    assert.equal(state.opponent.lp, 8000);
+    assert.equal(state.playerTurn, true);
+    assert.equal(state.duelOver, false);
+    assert.equal(state.turnNumber, 1);
+    assert.equal(state.currentPhase, "draw");
+    assert.notEqual(state.player, state.opponent);
+    assert.notEqual(state.player.deck, state.opponent.deck);
 });

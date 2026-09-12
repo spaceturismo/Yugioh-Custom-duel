@@ -1996,6 +1996,7 @@ body[data-duelbg="bloodmoon"] #duelScreen {
 <script src="./client/duel-model.js"></script>
 <script src="./client/card-catalog.js"></script>
 <script src="./client/storage.js"></script>
+<script src="./client/duel-state.js"></script>
 <script>
 
 /* =====================================================
@@ -12789,8 +12790,9 @@ const PREMADE_DECKS = {
    GAME STATE
 ===================================================== */
 
-let player = createEmptyPlayer();
-let opponent = createEmptyPlayer();
+const initialDuelState = window.duelState.createDuelState(window.duelModel.createEmptyPlayer);
+let player = initialDuelState.player;
+let opponent = initialDuelState.opponent;
 
 let selectedCard = null;
 let selectedFieldCard = null;
@@ -12801,9 +12803,9 @@ let pendingSummonMode = "attack";
 
 let tributeSelection = [];
 
-let playerTurn = true;
-let duelOver = false;
-let turnNumber = 1;
+let playerTurn = initialDuelState.playerTurn;
+let duelOver = initialDuelState.duelOver;
+let turnNumber = initialDuelState.turnNumber;
 
 /*
    Player-side phase state. Real Yu-Gi-Oh phase structure:
@@ -12820,7 +12822,7 @@ const PHASE_LABELS = {
     main2: "Main Phase 2",
     end: "End Phase"
 };
-let currentPhase = "draw";
+let currentPhase = initialDuelState.currentPhase;
 
 let aiDifficulty = "normal";
 
