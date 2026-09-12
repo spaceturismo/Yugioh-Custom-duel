@@ -2014,6 +2014,7 @@ body[data-duelbg="bloodmoon"] #duelScreen {
 <script src="./client/card-data.js"></script>
 <script src="./client/lobby.js"></script>
 <script src="./client/duel-sync.js"></script>
+<script src="./client/duel-view.js"></script>
 <script>
 
 /* =====================================================
@@ -12989,6 +12990,18 @@ function newDuel() {
 
 let multiplayerClient = null;
 let multiplayerLobby = null;
+let multiplayerPlayerId = null;
+
+function renderServerDuelState(state) {
+    if (!multiplayerPlayerId) return;
+    const view = window.duelView.projectDuelView(state, multiplayerPlayerId);
+    document.getElementById("playerLP").textContent = view.player.lifePoints;
+    document.getElementById("opponentLP").textContent = view.opponent.lifePoints;
+    document.getElementById("playerDeckCount").textContent = view.player.deckCount;
+    document.getElementById("opponentDeckCount").textContent = view.opponent.deckCount;
+    document.getElementById("playerExtraDeckCount").textContent = view.player.extraDeckCount;
+    document.getElementById("turnDisplay").textContent = view.currentTurn === multiplayerPlayerId ? "YOUR TURN" : "OPPONENT TURN";
+}
 
 function renderMultiplayerLobby(state) {
     const status = document.getElementById("multiplayerStatus");
@@ -13014,10 +13027,15 @@ function initializeMultiplayerLobby() {
             if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
         }
     });
+    window.duelSync.createDuelSync(multiplayerClient, renderServerDuelState);
     multiplayerLobby = window.duelLobby.createLobbyController(multiplayerClient, renderMultiplayerLobby);
     socket.addEventListener("open", () => renderMultiplayerLobby({ status: "idle" }));
     socket.addEventListener("message", (event) => {
-        try { multiplayerClient.receive(JSON.parse(event.data)); }
+        try {
+            const message = JSON.parse(event.data);
+            if (message.type === "joined") multiplayerPlayerId = message.playerId;
+            multiplayerClient.receive(message);
+        }
         catch (error) { renderMultiplayerLobby({ status: "error", error: "Invalid server response." }); }
     });
     socket.addEventListener("error", () => renderMultiplayerLobby({ status: "error", error: "Multiplayer connection failed." }));

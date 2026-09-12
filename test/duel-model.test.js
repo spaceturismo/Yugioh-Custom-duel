@@ -14,6 +14,7 @@ const { createMultiplayerClient } = require("../client/multiplayer.js");
 const { createDeckStore } = require("../client/deck-storage.js");
 const { createLobbyController } = require("../client/lobby.js");
 const { createDuelSync } = require("../client/duel-sync.js");
+const { projectDuelView } = require("../client/duel-view.js");
 const { VERSION_HISTORY, createCardDatabase } = require("../client/card-data.js");
 
 test("creates an empty player with independent game collections", () => {
@@ -336,4 +337,27 @@ test("duel sync forwards server actions and publishes room state", () => {
 
     assert.deepEqual(sent, [["play", 0], ["attack", 0, 1], ["end"]]);
     assert.deepEqual(states, [roomState]);
+});
+
+test("projects authoritative room state into a private player view", () => {
+    const state = {
+        phase: "active",
+        currentTurn: "player-1",
+        lifePoints: { "player-1": 8000, "player-2": 7200 },
+        deckCounts: { "player-1": 30, "player-2": 28 },
+        handCounts: { "player-1": 6, "player-2": 4 },
+        extraDeckCounts: { "player-1": 3, "player-2": 2 },
+        decks: { "player-1": [{ id: "own" }], "player-2": [] },
+        hands: { "player-1": [{ id: "hand" }], "player-2": [] },
+        extraDecks: { "player-1": [{ id: "extra" }], "player-2": [] },
+        fields: { "player-1": [{ id: "field" }], "player-2": [{ id: "enemy" }] },
+        graveyards: { "player-1": [], "player-2": [{ id: "grave" }] }
+    };
+
+    assert.deepEqual(projectDuelView(state, "player-1"), {
+        phase: "active",
+        currentTurn: "player-1",
+        player: { lifePoints: 8000, deckCount: 30, handCount: 6, extraDeckCount: 3, hand: [{ id: "hand" }], field: [{ id: "field" }], graveyard: [] },
+        opponent: { lifePoints: 7200, deckCount: 28, handCount: 4, extraDeckCount: 2, hand: [], field: [{ id: "enemy" }], graveyard: [{ id: "grave" }] }
+    });
 });

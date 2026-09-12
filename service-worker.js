@@ -13,6 +13,7 @@ const APP_SHELL = [
     "./client/card-data.js",
     "./client/lobby.js",
     "./client/duel-sync.js",
+    "./client/duel-view.js",
     "./manifest.webmanifest",
     "./icons/icon.svg"
 ];
