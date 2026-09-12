@@ -237,3 +237,34 @@ test("custom records replace built-in IDs only when explicitly supplied", () => 
 
     assert.equal(database.mage.name, "Custom Mage");
 });
+
+test("sends room and turn actions through the multiplayer client", () => {
+    const sent = [];
+    const client = createMultiplayerClient({ send: (message) => sent.push(message) });
+
+    client.createRoom();
+    client.joinRoom("ABC123");
+    client.startGame();
+    client.draw();
+    client.endTurn();
+
+    assert.deepEqual(sent, [
+        { type: "create_room" },
+        { type: "join_room", roomId: "ABC123" },
+        { type: "start_game" },
+        { type: "draw" },
+        { type: "end_turn" }
+    ]);
+});
+
+test("notifies multiplayer listeners of room state and connection errors", () => {
+    const received = [];
+    const client = createMultiplayerClient({ send: () => {} });
+    client.onMessage((message) => received.push(message));
+
+    const state = { type: "room_state", state: { phase: "waiting" } };
+    client.receive(state);
+    client.receive({ type: "error", message: "Room was not found." });
+
+    assert.deepEqual(received, [state, { type: "error", message: "Room was not found." }]);
+});
