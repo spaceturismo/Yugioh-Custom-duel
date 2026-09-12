@@ -1545,6 +1545,16 @@ body[data-duelbg="bloodmoon"] #duelScreen {
 
         <div id="difficultySelector" class="difficulty-row"></div>
 
+        <div id="multiplayerPanel" style="margin:18px 0;padding:16px;border:1px solid #3a3a3a;border-radius:10px;background:rgba(10,10,10,.45);">
+            <div style="font-weight:bold;margin-bottom:8px;">Multiplayer Room</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                <button id="createRoomButton" type="button" onclick="createMultiplayerRoom()">Create Room</button>
+                <input id="roomCodeInput" type="text" maxlength="6" placeholder="Room code" aria-label="Room code">
+                <button id="joinRoomButton" type="button" onclick="joinMultiplayerRoom()">Join Room</button>
+            </div>
+            <div id="multiplayerStatus" role="status" aria-live="polite" style="margin-top:8px;color:#aaa;">Connecting...</div>
+        </div>
+
         <div id="deckList" class="deck-list"></div>
 
         <h2 class="section-heading">More Ways to Play</h2>
@@ -12972,6 +12982,52 @@ function newDuel() {
 
     renderDeckSelection();
 
+}
+
+let multiplayerClient = null;
+let multiplayerLobby = null;
+
+function renderMultiplayerLobby(state) {
+    const status = document.getElementById("multiplayerStatus");
+    if (!status) return;
+    if (state.status === "joined") status.textContent = `Room ${state.roomId} - ${state.playerId}`;
+    else if (state.status === "error") status.textContent = state.error;
+    else if (state.status === "joining") status.textContent = "Joining room...";
+}
+
+function initializeMultiplayerLobby() {
+    if (multiplayerLobby) return;
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    let socket;
+    try {
+        socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
+    } catch (error) {
+        renderMultiplayerLobby({ status: "error", error: "Multiplayer is unavailable." });
+        return;
+    }
+    multiplayerClient = window.duelMultiplayer.createMultiplayerClient({
+        send(message) {
+            if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
+        }
+    });
+    multiplayerLobby = window.duelLobby.createLobbyController(multiplayerClient, renderMultiplayerLobby);
+    socket.addEventListener("open", () => renderMultiplayerLobby({ status: "idle" }));
+    socket.addEventListener("message", (event) => {
+        try { multiplayerClient.receive(JSON.parse(event.data)); }
+        catch (error) { renderMultiplayerLobby({ status: "error", error: "Invalid server response." }); }
+    });
+    socket.addEventListener("error", () => renderMultiplayerLobby({ status: "error", error: "Multiplayer connection failed." }));
+    socket.addEventListener("close", () => renderMultiplayerLobby({ status: "error", error: "Multiplayer connection closed." }));
+}
+
+function createMultiplayerRoom() {
+    initializeMultiplayerLobby();
+    if (multiplayerLobby) multiplayerLobby.createRoom();
+}
+
+function joinMultiplayerRoom() {
+    initializeMultiplayerLobby();
+    if (multiplayerLobby) multiplayerLobby.joinRoom(document.getElementById("roomCodeInput").value);
 }
 
 
@@ -29934,6 +29990,8 @@ function actuallyInitializeGame() {
     ensureProfileExists();
 
     importEckbuilerCards();
+
+    initializeMultiplayerLobby();
 
     applyTheme(getActiveThemeId());
 

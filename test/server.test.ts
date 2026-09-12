@@ -79,7 +79,13 @@ test("serves the app and reports health", async () => {
 
     const duelPage = await fetch(`${baseUrl}/duel.html`);
     assert.equal(duelPage.status, 200);
-    assert.match(await duelPage.text(), /client\/duel-model\.js/);
+    const duelHtml = await duelPage.text();
+    assert.match(duelHtml, /client\/duel-model\.js/);
+    assert.match(duelHtml, /id="multiplayerPanel"/);
+    assert.match(duelHtml, /id="createRoomButton"/);
+    assert.match(duelHtml, /id="joinRoomButton"/);
+    assert.match(duelHtml, /client\/multiplayer\.js/);
+    assert.match(duelHtml, /client\/lobby\.js/);
 });
 
 test("authoritatively controls a two-player room", async () => {
