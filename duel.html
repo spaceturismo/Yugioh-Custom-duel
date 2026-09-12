@@ -1998,6 +1998,7 @@ body[data-duelbg="bloodmoon"] #duelScreen {
 <script src="./client/storage.js"></script>
 <script src="./client/duel-state.js"></script>
 <script src="./client/multiplayer.js"></script>
+<script src="./client/deck-storage.js"></script>
 <script>
 
 /* =====================================================
@@ -13434,22 +13435,9 @@ function confirmDeleteProfile(id) {
 ===================================================== */
 
 function getCustomDecks() {
-
-    try {
-
-        return JSON.parse(
-            localStorage.getItem(
-                profileKey("customDecks")
-            ) || "{}"
-        );
-
-    } catch (error) {
-
-        console.error(error);
-
-        return {};
-
-    }
+    return window.duelDeckStorage
+        .createDeckStore(window.duelStorage.createJsonStorage(window.localStorage), profileKey("customDecks"))
+        .list();
 
 }
 
@@ -13461,10 +13449,9 @@ function deleteCustomDeck(name) {
 
     delete decks[name];
 
-    localStorage.setItem(
-        profileKey("customDecks"),
-        JSON.stringify(decks)
-    );
+    window.duelDeckStorage
+        .createDeckStore(window.duelStorage.createJsonStorage(window.localStorage), profileKey("customDecks"))
+        .remove(name);
 
     renderDeckSelection();
 
@@ -14175,10 +14162,9 @@ function saveDeckMakerDeck() {
         extraDeck: deckMakerState.extraDeck.slice()
     };
 
-    localStorage.setItem(
-        profileKey("customDecks"),
-        JSON.stringify(decks)
-    );
+    window.duelDeckStorage
+        .createDeckStore(window.duelStorage.createJsonStorage(window.localStorage), profileKey("customDecks"))
+        .save(decks[name]);
 
     alert(
         `${name} saved! You can now select it from the deck list.`

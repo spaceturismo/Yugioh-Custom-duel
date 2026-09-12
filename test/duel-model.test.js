@@ -11,6 +11,7 @@ const { createCardCatalog, normalizeCustomCard } = require("../client/card-catal
 const { createJsonStorage } = require("../client/storage.js");
 const { createDuelState } = require("../client/duel-state.js");
 const { createMultiplayerClient } = require("../client/multiplayer.js");
+const { createDeckStore } = require("../client/deck-storage.js");
 
 test("creates an empty player with independent game collections", () => {
     const player = createEmptyPlayer();
@@ -187,4 +188,25 @@ test("rejects a multiplayer request when the server reports an error", async () 
     client.receive({ type: "error", message: "Server unavailable." });
 
     await assert.rejects(validation, /Server unavailable/);
+});
+
+test("loads, saves, and deletes profile-scoped custom decks", () => {
+    let value = JSON.stringify({ old: { name: "old", cards: ["mage"], extraDeck: [] } });
+    const storage = {
+        read: () => JSON.parse(value),
+        write: (_key, next) => { value = JSON.stringify(next); }
+    };
+    const store = createDeckStore(storage, "profile_customDecks");
+
+    assert.deepEqual(store.list(), { old: { name: "old", cards: ["mage"], extraDeck: [] } });
+    store.save({ name: "new", cards: ["mage"], extraDeck: ["fusion"] });
+    assert.equal(store.list().new.extraDeck[0], "fusion");
+    assert.equal(store.remove("old"), true);
+    assert.equal(store.remove("missing"), false);
+    assert.deepEqual(store.list(), { new: { name: "new", cards: ["mage"], extraDeck: ["fusion"] } });
+});
+
+test("falls back to an empty custom-deck collection", () => {
+    const store = createDeckStore({ read: () => "not an object", write: () => {} }, "decks");
+    assert.deepEqual(store.list(), {});
 });

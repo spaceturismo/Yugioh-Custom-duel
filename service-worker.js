@@ -9,6 +9,7 @@ const APP_SHELL = [
     "./client/storage.js",
     "./client/duel-state.js",
     "./client/multiplayer.js",
+    "./client/deck-storage.js",
     "./manifest.webmanifest",
     "./icons/icon.svg"
 ];
