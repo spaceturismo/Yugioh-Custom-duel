@@ -258,6 +258,19 @@ test("sends room and turn actions through the multiplayer client", () => {
     ]);
 });
 
+test("sends deck selection and ready-state actions through the multiplayer client", () => {
+    const sent = [];
+    const client = createMultiplayerClient({ send: (message) => sent.push(message) });
+
+    client.selectDeck([{ id: "mage" }], []);
+    client.setReady(true);
+
+    assert.deepEqual(sent, [
+        { type: "select_deck", mainDeck: [{ id: "mage" }], extraDeck: [] },
+        { type: "set_ready", ready: true }
+    ]);
+});
+
 test("notifies multiplayer listeners of room state and connection errors", () => {
     const received = [];
     const client = createMultiplayerClient({ send: () => {} });

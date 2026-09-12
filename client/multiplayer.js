@@ -23,6 +23,12 @@
             endTurn() {
                 transport.send({ type: "end_turn" });
             },
+            selectDeck(mainDeck, extraDeck) {
+                transport.send({ type: "select_deck", mainDeck, extraDeck });
+            },
+            setReady(ready) {
+                transport.send({ type: "set_ready", ready });
+            },
             onMessage(listener) {
                 listeners.add(listener);
                 return () => listeners.delete(listener);
