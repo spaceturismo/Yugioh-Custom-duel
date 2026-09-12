@@ -87,6 +87,7 @@ test("serves the app and reports health", async () => {
     assert.match(duelHtml, /id="multiplayerPanel"/);
     assert.match(duelHtml, /id="createRoomButton"/);
     assert.match(duelHtml, /id="joinRoomButton"/);
+    assert.match(duelHtml, /id="readyDeckButton"/);
     assert.match(duelHtml, /client\/multiplayer\.js/);
     assert.match(duelHtml, /client\/lobby\.js/);
 });

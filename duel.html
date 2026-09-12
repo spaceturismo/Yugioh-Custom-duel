@@ -1551,6 +1551,7 @@ body[data-duelbg="bloodmoon"] #duelScreen {
                 <button id="createRoomButton" type="button" onclick="createMultiplayerRoom()">Create Room</button>
                 <input id="roomCodeInput" type="text" maxlength="6" placeholder="Room code" aria-label="Room code">
                 <button id="joinRoomButton" type="button" onclick="joinMultiplayerRoom()">Join Room</button>
+                <button id="readyDeckButton" type="button" onclick="readySelectedMultiplayerDeck()">Ready Selected Deck</button>
             </div>
             <div id="multiplayerStatus" role="status" aria-live="polite" style="margin-top:8px;color:#aaa;">Connecting...</div>
         </div>
@@ -12991,6 +12992,7 @@ function renderMultiplayerLobby(state) {
     const status = document.getElementById("multiplayerStatus");
     if (!status) return;
     if (state.status === "joined") status.textContent = `Room ${state.roomId} - ${state.playerId}`;
+    else if (state.status === "ready") status.textContent = `Room ${state.roomId || ""} - deck ready`;
     else if (state.status === "error") status.textContent = state.error;
     else if (state.status === "joining") status.textContent = "Joining room...";
 }
@@ -13028,6 +13030,27 @@ function createMultiplayerRoom() {
 function joinMultiplayerRoom() {
     initializeMultiplayerLobby();
     if (multiplayerLobby) multiplayerLobby.joinRoom(document.getElementById("roomCodeInput").value);
+}
+
+async function readySelectedMultiplayerDeck() {
+    initializeMultiplayerLobby();
+    if (!multiplayerClient) return;
+    const deckId = currentDeckId || Object.keys(PREMADE_DECKS)[0];
+    const customDeck = getCustomDecks()[deckId];
+    const mainDeck = customDeck ? buildCustomCards(customDeck.cards) : buildDeck(deckId);
+    const extraDeck = customDeck ? buildCustomCards(customDeck.extraDeck) : buildExtraDeck(deckId);
+    try {
+        const result = await multiplayerClient.validateDeck(mainDeck, extraDeck);
+        if (!result.valid) {
+            renderMultiplayerLobby({ status: "error", error: result.errors.join(" ") });
+            return;
+        }
+        multiplayerClient.selectDeck(mainDeck, extraDeck);
+        multiplayerClient.setReady(true);
+        renderMultiplayerLobby({ status: "ready", error: null });
+    } catch (error) {
+        renderMultiplayerLobby({ status: "error", error: error.message });
+    }
 }
 
 
