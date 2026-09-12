@@ -1981,7 +1981,7 @@ body[data-duelbg="bloodmoon"] #duelScreen {
     </button>
 
     <button class="secondary"
-            onclick="openTutorialGuide()">
+            onclick="endTurn()">
 
         ❓ Tutorial
 
@@ -13034,10 +13034,14 @@ let multiplayerLobby = null;
 let multiplayerDuelSync = null;
 let multiplayerPlayerId = null;
 let pvpMode = false;
+let multiplayerLastTurn = null;
+let multiplayerDuelStarted = false;
 
 function renderServerDuelState(state) {
     if (!multiplayerPlayerId) return;
     const view = window.duelView.projectDuelView(state, multiplayerPlayerId);
+    const previousTurn = multiplayerLastTurn;
+    multiplayerLastTurn = view.currentTurn;
     currentPhase = view.currentPhase || currentPhase;
     playerTurn = view.currentTurn === multiplayerPlayerId;
     player.hand = view.player.hand;
@@ -13057,6 +13061,11 @@ function renderServerDuelState(state) {
         duelScreen.style.display = "block";
     }
     if (duelScreen.style.display === "block") renderAll();
+    if (view.phase === "active" && (!multiplayerDuelStarted || previousTurn !== view.currentTurn)) {
+        multiplayerDuelStarted = true;
+        const turnOwner = view.currentTurn === multiplayerPlayerId ? "You" : "Your opponent";
+        log(`<strong>System:</strong> ${turnOwner} go${turnOwner === "You" ? "" : "es"} first. It is ${turnOwner === "You" ? "your" : "your opponent's"} turn.`);
+    }
     document.getElementById("playerLP").textContent = view.player.lifePoints;
     document.getElementById("opponentLP").textContent = view.opponent.lifePoints;
     document.getElementById("playerDeckCount").textContent = view.player.deckCount;
@@ -18403,6 +18412,10 @@ function renderPrimaryControls() {
         buttons.push(primaryControlButton("attackSelected()", "💥 Attack"));
 
         buttons.push(primaryControlButton("enterMainPhase2()", "➡️ Main Phase 2"));
+
+    } else if (currentPhase === "end") {
+
+        buttons.push(primaryControlButton("endTurn()", "⏭ End Turn"));
 
     }
 

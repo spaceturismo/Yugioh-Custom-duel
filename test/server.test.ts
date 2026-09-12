@@ -104,6 +104,9 @@ test("serves the app and reports health", async () => {
     assert.match(duelHtml, /duelScreen\.style\.display = "block"/);
     assert.match(duelHtml, /multiplayerDuelSync\.draw/);
     assert.match(duelHtml, /multiplayerDuelSync\.endTurn/);
+    assert.match(duelHtml, /onclick="endTurn\(\)"/);
+    assert.match(duelHtml, /multiplayerDuelStarted/);
+    assert.match(duelHtml, /turnOwner === "You"/);
     assert.match(duelHtml, /multiplayerDuelSync\.playCard/);
     assert.match(duelHtml, /multiplayerDuelSync\.attack/);
 });
