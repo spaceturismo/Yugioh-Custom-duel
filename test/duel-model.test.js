@@ -1,6 +1,12 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
-const { cloneCard, createEmptyPlayer, shuffle } = require("../client/duel-model.js");
+const {
+    buildDeck,
+    buildExtraDeck,
+    cloneCard,
+    createEmptyPlayer,
+    shuffle
+} = require("../client/duel-model.js");
 
 test("creates an empty player with independent game collections", () => {
     const player = createEmptyPlayer();
@@ -39,5 +45,28 @@ test("applies signature growth only to signature cards", () => {
 test("shuffles in place and supports deterministic randomness", () => {
     const deck = ["a", "b", "c"];
     assert.equal(shuffle(deck, () => 0.5), deck);
-    assert.deepEqual(deck, ["b", "c", "a"]);
+    assert.deepEqual(deck, ["a", "c", "b"]);
+});
+
+test("builds a premade main deck from cloned cards", () => {
+    const decks = { starter: { cards: ["mage", "missing", "mage"] } };
+    const database = { mage: { id: "mage", atk: 1000, def: 800 } };
+    const result = buildDeck(decks, "starter", (id) => cloneCard(database, id, () => 1));
+
+    assert.deepEqual(result.map((card) => card.id), ["mage", "mage"]);
+    assert.notEqual(result[0], result[1]);
+});
+
+test("builds a premade Extra Deck independently from the main deck", () => {
+    const decks = { starter: { cards: ["mage"], extraDeck: ["fusion"] } };
+    const database = {
+        mage: { id: "mage", atk: 1000, def: 800 },
+        fusion: { id: "fusion", atk: 2000, def: 1500 }
+    };
+    const clone = (id) => cloneCard(database, id, () => 1);
+
+    assert.deepEqual(buildDeck(decks, "starter", clone).map((card) => card.id), ["mage"]);
+    assert.deepEqual(buildExtraDeck(decks, "starter", clone).map((card) => card.id), ["fusion"]);
+    assert.deepEqual(buildDeck(decks, "unknown", clone), []);
+    assert.deepEqual(buildExtraDeck(decks, "unknown", clone), []);
 });

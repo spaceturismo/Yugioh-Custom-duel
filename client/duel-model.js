@@ -44,5 +44,17 @@
         return deck;
     }
 
-    return { createEmptyPlayer, cloneCard, shuffle };
+    function buildDeck(premadeDecks, deckId, cloneCard) {
+        const data = premadeDecks[deckId];
+        if (!data) return [];
+        return data.cards.map(cloneCard).filter(Boolean);
+    }
+
+    function buildExtraDeck(premadeDecks, deckId, cloneCard) {
+        const data = premadeDecks[deckId];
+        if (!data) return [];
+        return data.extraDeck.map(cloneCard).filter(Boolean);
+    }
+
+    return { buildDeck, buildExtraDeck, createEmptyPlayer, cloneCard, shuffle };
 });

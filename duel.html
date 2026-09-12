@@ -15206,32 +15206,14 @@ function renderDeckSelection() {
 
 function buildDeck(deckId) {
 
-    const data =
-        PREMADE_DECKS[deckId];
-
-    if (!data) {
-        return [];
-    }
-
-    return data.cards
-        .map(cloneCard)
-        .filter(Boolean);
+    return window.duelModel.buildDeck(PREMADE_DECKS, deckId, cloneCard);
 
 }
 
 
 function buildExtraDeck(deckId) {
 
-    const data =
-        PREMADE_DECKS[deckId];
-
-    if (!data) {
-        return [];
-    }
-
-    return data.extraDeck
-        .map(cloneCard)
-        .filter(Boolean);
+    return window.duelModel.buildExtraDeck(PREMADE_DECKS, deckId, cloneCard);
 
 }
 
