@@ -14,6 +14,8 @@
         client.onMessage((message) => {
             if (message.type === "joined") {
                 update({ status: "joined", roomId: message.roomId, playerId: message.playerId, error: null });
+            } else if (message.type === "room_state") {
+                update({ status: message.state.phase, error: null });
             } else if (message.type === "error") {
                 update({ status: "error", error: message.message });
             }

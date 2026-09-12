@@ -1552,6 +1552,7 @@ body[data-duelbg="bloodmoon"] #duelScreen {
                 <input id="roomCodeInput" type="text" maxlength="6" placeholder="Room code" aria-label="Room code">
                 <button id="joinRoomButton" type="button" onclick="joinMultiplayerRoom()">Join Room</button>
                 <button id="readyDeckButton" type="button" onclick="readySelectedMultiplayerDeck()">Ready Selected Deck</button>
+                <button id="startMatchButton" type="button" onclick="startMultiplayerMatch()">Start Match</button>
             </div>
             <div id="multiplayerStatus" role="status" aria-live="polite" style="margin-top:8px;color:#aaa;">Connecting...</div>
         </div>
@@ -13030,6 +13031,11 @@ function createMultiplayerRoom() {
 function joinMultiplayerRoom() {
     initializeMultiplayerLobby();
     if (multiplayerLobby) multiplayerLobby.joinRoom(document.getElementById("roomCodeInput").value);
+}
+
+function startMultiplayerMatch() {
+    initializeMultiplayerLobby();
+    if (multiplayerClient) multiplayerClient.startGame();
 }
 
 async function readySelectedMultiplayerDeck() {
