@@ -10,6 +10,9 @@ import { serveStatic } from "./static-server";
 const port = Number(process.env.PORT || 8787);
 const rooms = new RoomManager();
 const deckRules = loadDeckRules();
+const chooseFirstPlayer = () => process.env.NODE_ENV === "test"
+    ? "player-1" as const
+    : Math.random() < 0.5 ? "player-1" as const : "player-2" as const;
 
 function send(socket: WebSocket, message: unknown): void {
     if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
@@ -62,7 +65,7 @@ function handleAction(socket: WebSocket, message: ClientMessage): void {
     else if (message.type === "set_ready") messageError = setPlayerReady(room.state, playerId, message.ready);
     else if (message.type === "play_card") messageError = playCard(room.state, playerId, message.handIndex);
     else if (message.type === "attack") messageError = attack(room.state, playerId, message.attackerIndex, playerId === "player-1" ? "player-2" : "player-1", message.defenderIndex);
-    else if (message.type === "start_game") messageError = startGame(room.state);
+    else if (message.type === "start_game") messageError = startGame(room.state, chooseFirstPlayer);
     else if (message.type === "draw") messageError = drawCard(room.state, playerId);
     else if (message.type === "advance_phase") messageError = advancePhase(room.state, playerId);
     else if (message.type === "end_turn") messageError = endTurn(room.state, playerId);

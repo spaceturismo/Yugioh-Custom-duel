@@ -16,7 +16,7 @@ const messageWaiters = new WeakMap<WebSocket, ((message: Record<string, any>) =>
 before(async () => {
     server = spawn(process.execPath, ["node_modules/tsx/dist/cli.mjs", "server/src/server.ts"], {
         cwd: repositoryRoot,
-        env: { ...process.env, PORT: String(port) }
+        env: { ...process.env, NODE_ENV: "test", PORT: String(port) }
     });
     await new Promise<void>((resolve, reject) => {
         const onData = (data: Buffer) => {

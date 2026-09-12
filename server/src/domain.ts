@@ -48,11 +48,14 @@ export function createRoomState(roomId: string): RoomState {
     };
 }
 
-export function startGame(state: RoomState): string | null {
+export function startGame(
+    state: RoomState,
+    chooseFirstPlayer: () => PlayerId = () => "player-1"
+): string | null {
     if (state.players.length !== 2) return "Two players are required to start.";
     if (!state.ready["player-1"] || !state.ready["player-2"]) return "Both players must be ready to start.";
     state.phase = "active";
-    state.currentTurn = "player-1";
+    state.currentTurn = chooseFirstPlayer();
     state.currentPhase = "draw";
     for (const playerId of state.players) {
         if (state.decks[playerId].length > 0) {

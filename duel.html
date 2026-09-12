@@ -13018,6 +13018,12 @@ function renderServerDuelState(state) {
     document.getElementById("turnDisplay").textContent = view.phase === "finished"
         ? (view.winner === multiplayerPlayerId ? "YOU WIN" : view.winner ? "YOU LOSE" : "DRAW")
         : (view.currentTurn === multiplayerPlayerId ? "YOUR TURN" : "OPPONENT TURN");
+    if (view.phase === "active" && view.currentPhase === "draw") {
+        const status = document.getElementById("multiplayerStatus");
+        if (status) {
+            status.textContent = `Random chooser: ${view.currentTurn === multiplayerPlayerId ? "you" : "your opponent"} go first.`;
+        }
+    }
 }
 
 function renderMultiplayerLobby(state) {

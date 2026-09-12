@@ -200,6 +200,20 @@ test("requires both players to be ready before starting", () => {
     assert.equal(startGame(state), "Both players must be ready to start.");
 });
 
+test("starts with the player chosen by the first-player chooser", () => {
+    const state = createRoomState("ABC123");
+    state.players.push("player-1", "player-2");
+    const card = { id: "mage", name: "Mage", type: "monster" };
+    selectDeck(state, "player-1", Array.from({ length: 6 }, () => card), []);
+    selectDeck(state, "player-2", Array.from({ length: 6 }, () => card), []);
+    setPlayerReady(state, "player-1", true);
+    setPlayerReady(state, "player-2", true);
+
+    assert.equal(startGame(state, () => "player-2"), null);
+    assert.equal(state.currentTurn, "player-2");
+    assert.equal(state.currentPhase, "draw");
+});
+
 test("selects validated decks and synchronizes readiness", () => {
     const state = createRoomState("ABC123");
     state.players.push("player-1", "player-2");
