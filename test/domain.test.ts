@@ -9,7 +9,7 @@ import {
     validateDeckCards
 } from "../server/src/card-model";
 import { loadDeckRules } from "../server/src/config";
-import { selectDeck, setPlayerReady } from "../server/src/domain";
+import { playCard, selectDeck, setPlayerReady } from "../server/src/domain";
 
 test("creates a fresh room with standard starting values", () => {
     const state = createRoomState("ABC123");
@@ -195,6 +195,11 @@ test("parses deck selection and readiness requests", () => {
         ready: true
     });
     assert.equal(parseClientMessage('{"type":"set_ready","ready":"yes"}'), null);
+    assert.deepEqual(parseClientMessage('{"type":"play_card","handIndex":0}'), {
+        type: "play_card",
+        handIndex: 0
+    });
+    assert.equal(parseClientMessage('{"type":"play_card","handIndex":-1}'), null);
 });
 
 test("owns submitted decks and deals an initial hand when the game starts", () => {
@@ -227,4 +232,22 @@ test("draw moves one server-owned card from deck to hand", () => {
     assert.equal(state.hands["player-1"].length, 6);
     assert.equal(state.decks["player-1"].length, 0);
     assert.equal(state.hands["player-1"].at(-1).id, "mage-5");
+});
+
+test("plays a card from the active player's hand onto their field", () => {
+    const state = createRoomState("ABC123");
+    state.players.push("player-1", "player-2");
+    const deck = Array.from({ length: 6 }, (_, index) => ({ id: `mage-${index}`, name: "Mage", type: "monster" as const }));
+    selectDeck(state, "player-1", deck, []);
+    selectDeck(state, "player-2", deck, []);
+    setPlayerReady(state, "player-1", true);
+    setPlayerReady(state, "player-2", true);
+    startGame(state);
+
+    assert.equal(playCard(state, "player-1", 0), null);
+    assert.equal(state.hands["player-1"].length, 4);
+    assert.equal(state.fields["player-1"].length, 1);
+    assert.equal(state.fields["player-1"][0].id, "mage-0");
+    assert.equal(playCard(state, "player-2", 0), "It is not your turn.");
+    assert.equal(playCard(state, "player-1", 9), "Card was not found in your hand.");
 });

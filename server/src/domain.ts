@@ -15,6 +15,7 @@ export interface RoomState {
     decks: Record<PlayerId, CardRecord[]>;
     hands: Record<PlayerId, CardRecord[]>;
     extraDecks: Record<PlayerId, CardRecord[]>;
+    fields: Record<PlayerId, CardRecord[]>;
 }
 
 export interface ClientMessage {
@@ -36,6 +37,7 @@ export function createRoomState(roomId: string): RoomState {
         decks: { "player-1": [], "player-2": [] },
         hands: { "player-1": [], "player-2": [] },
         extraDecks: { "player-1": [], "player-2": [] }
+        ,fields: { "player-1": [], "player-2": [] }
     };
 }
 
@@ -89,6 +91,7 @@ export function selectDeck(
     if (!result.valid) return result.errors[0];
     state.decks[playerId] = (mainDeck as CardRecord[]).map((card) => ({ ...card }));
     state.hands[playerId] = [];
+    state.fields[playerId] = [];
     state.extraDecks[playerId] = (extraDeck as CardRecord[]).map((card) => ({ ...card }));
     state.deckCounts[playerId] = mainDeck.length;
     state.extraDeckCounts[playerId] = extraDeck.length;
@@ -99,5 +102,16 @@ export function selectDeck(
 export function setPlayerReady(state: RoomState, playerId: PlayerId, ready: boolean): string | null {
     if (state.deckCounts[playerId] <= 0) return "Select a deck before readying up.";
     state.ready[playerId] = ready;
+    return null;
+}
+
+export function playCard(state: RoomState, playerId: PlayerId, handIndex: number): string | null {
+    if (state.phase !== "active") return "The game has not started.";
+    if (state.currentTurn !== playerId) return "It is not your turn.";
+    const card = state.hands[playerId][handIndex];
+    if (!card) return "Card was not found in your hand.";
+    state.hands[playerId].splice(handIndex, 1);
+    state.fields[playerId].push(card);
+    state.handCounts[playerId] = state.hands[playerId].length;
     return null;
 }

@@ -306,3 +306,10 @@ test("lobby controller creates and joins rooms while reflecting server state", (
         { status: "error", roomId: "ABC123", playerId: "player-1", error: "Room was not found." }
     ]);
 });
+
+test("sends a play-card action through the multiplayer client", () => {
+    const sent = [];
+    const client = createMultiplayerClient({ send: (message) => sent.push(message) });
+    client.playCard(2);
+    assert.deepEqual(sent, [{ type: "play_card", handIndex: 2 }]);
+});

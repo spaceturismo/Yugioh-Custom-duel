@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { WebSocket, WebSocketServer } from "ws";
-import { drawCard, endTurn, selectDeck, setPlayerReady, startGame } from "./domain";
+import { drawCard, endTurn, playCard, selectDeck, setPlayerReady, startGame } from "./domain";
 import { loadDeckRules } from "./config";
 import { validateDeck } from "./card-model";
 import { ClientMessage, parseClientMessage } from "./protocol";
@@ -53,6 +53,7 @@ function handleAction(socket: WebSocket, message: ClientMessage): void {
     let messageError: string | null = null;
     if (message.type === "select_deck") messageError = selectDeck(room.state, playerId, message.mainDeck, message.extraDeck, deckRules);
     else if (message.type === "set_ready") messageError = setPlayerReady(room.state, playerId, message.ready);
+    else if (message.type === "play_card") messageError = playCard(room.state, playerId, message.handIndex);
     else if (message.type === "start_game") messageError = startGame(room.state);
     else if (message.type === "draw") messageError = drawCard(room.state, playerId);
     else if (message.type === "end_turn") messageError = endTurn(room.state, playerId);

@@ -29,6 +29,9 @@
             setReady(ready) {
                 transport.send({ type: "set_ready", ready });
             },
+            playCard(handIndex) {
+                transport.send({ type: "play_card", handIndex });
+            },
             onMessage(listener) {
                 listeners.add(listener);
                 return () => listeners.delete(listener);

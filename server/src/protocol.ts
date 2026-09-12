@@ -6,7 +6,8 @@ export type ClientMessage =
     | { type: "end_turn" }
     | { type: "validate_deck"; mainDeck: unknown[]; extraDeck: unknown[] }
     | { type: "select_deck"; mainDeck: unknown[]; extraDeck: unknown[] }
-    | { type: "set_ready"; ready: boolean };
+    | { type: "set_ready"; ready: boolean }
+    | { type: "play_card"; handIndex: number };
 
 const MESSAGE_TYPES = new Set([
     "create_room",
@@ -16,7 +17,8 @@ const MESSAGE_TYPES = new Set([
     "end_turn",
     "validate_deck",
     "select_deck",
-    "set_ready"
+    "set_ready",
+    "play_card"
 ]);
 
 export function parseClientMessage(raw: string): ClientMessage | null {
@@ -55,5 +57,11 @@ export function parseClientMessage(raw: string): ClientMessage | null {
             : null;
     }
 
-    return { type: message.type as Exclude<ClientMessage["type"], "join_room" | "validate_deck" | "select_deck" | "set_ready"> };
+    if (message.type === "play_card") {
+        return typeof message.handIndex === "number" && Number.isInteger(message.handIndex) && message.handIndex >= 0
+            ? { type: "play_card", handIndex: message.handIndex }
+            : null;
+    }
+
+    return { type: message.type as Exclude<ClientMessage["type"], "join_room" | "validate_deck" | "select_deck" | "set_ready" | "play_card"> };
 }
