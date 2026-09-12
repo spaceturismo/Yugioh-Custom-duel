@@ -87,6 +87,8 @@ test("serves the app and reports health", async () => {
     assert.match(duelHtml, /id="multiplayerPanel"/);
     assert.match(duelHtml, /id="pvpRoomScreen"/);
     assert.match(duelHtml, /function showPvpRoomScreen/);
+    assert.match(duelHtml, /Choose the deck you will bring to this PvP match/);
+    assert.match(duelHtml, /difficultySelector\.style\.display = pvpMode/);
     assert.match(duelHtml, /Choose Your Deck/);
     assert.match(duelHtml, /id="createRoomButton"/);
     assert.match(duelHtml, /id="joinRoomButton"/);
