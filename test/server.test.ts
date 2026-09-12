@@ -183,8 +183,32 @@ test("broadcasts an authoritative play-card action to both clients", async () =>
 
     first.send(JSON.stringify({ type: "play_card", handIndex: 0 }));
     const played = await receiveUntil(second, "room_state", (message) => message.state.fields["player-1"].length === 1);
-    assert.equal(played.state.hands["player-1"].length, 4);
+    assert.equal(played.state.hands["player-1"].length, 0);
+    assert.equal(played.state.handCounts["player-1"], 4);
     assert.equal(played.state.fields["player-1"][0].name, "Mage");
+    first.close();
+    second.close();
+});
+
+test("does not broadcast an opponent's private deck or hand", async () => {
+    const first = await connect();
+    await receiveUntil(first, "connected");
+    first.send(JSON.stringify({ type: "create_room" }));
+    const firstJoined = await receiveUntil(first, "joined");
+    const second = await connect();
+    await receiveUntil(second, "connected");
+    second.send(JSON.stringify({ type: "join_room", roomId: firstJoined.roomId }));
+    await receiveUntil(second, "joined");
+
+    const card = { id: "secret", name: "Secret Card", type: "monster" };
+    first.send(JSON.stringify({ type: "select_deck", mainDeck: [card], extraDeck: [] }));
+    second.send(JSON.stringify({ type: "select_deck", mainDeck: [{ ...card, id: "opponent-secret" }], extraDeck: [] }));
+    const visibleToFirst = await receiveUntil(first, "room_state", (message) => message.state.deckCounts["player-2"] === 1);
+
+    assert.equal(visibleToFirst.state.decks["player-1"][0].id, "secret");
+    assert.deepEqual(visibleToFirst.state.decks["player-2"], []);
+    assert.deepEqual(visibleToFirst.state.hands["player-2"], []);
+    assert.equal(visibleToFirst.state.handCounts["player-2"], 5);
     first.close();
     second.close();
 });

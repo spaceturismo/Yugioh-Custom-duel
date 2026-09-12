@@ -20,7 +20,14 @@ function broadcast(room: Room, message: unknown): void {
 }
 
 function sendState(room: Room): void {
-    broadcast(room, { type: "room_state", state: room.state });
+    for (const [playerId, socket] of room.sockets) {
+        const state = JSON.parse(JSON.stringify(room.state));
+        const opponentId = playerId === "player-1" ? "player-2" : "player-1";
+        state.decks[opponentId] = [];
+        state.hands[opponentId] = [];
+        state.extraDecks[opponentId] = [];
+        send(socket, { type: "room_state", state });
+    }
 }
 
 function sendError(socket: WebSocket, message: string): void {
