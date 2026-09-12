@@ -1551,6 +1551,20 @@ body[data-duelbg="bloodmoon"] #duelScreen {
     </div>
 </div>
 
+<div id="pvpDeckSelectScreen" class="screen" style="display:none;">
+    <div class="deck-select-box">
+        <h1>⚔️ Choose Your PvP Deck</h1>
+        <p>Select a deck for this match. Choosing a deck does not start a bot duel.</p>
+        <div class="pvp-room-code" id="pvpDeckRoomCode"></div>
+        <div id="pvpDeckList" class="deck-list"></div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+            <button id="pvpReadyDeckButton" type="button" onclick="readySelectedMultiplayerDeck()">Ready Selected Deck</button>
+            <button id="pvpStartMatchButton" type="button" onclick="startMultiplayerMatch()">Start Match</button>
+        </div>
+        <div id="pvpDeckStatus" role="status" aria-live="polite" style="margin-top:12px;color:#aaa;">Select a deck to continue.</div>
+    </div>
+</div>
+
 <div id="deckSelectScreen" class="screen">
 
     <div class="deck-select-box">
@@ -13021,6 +13035,7 @@ function newDuel() {
         .getElementById("deckSelectScreen")
         .classList
         .remove("hidden");
+    document.getElementById("pvpDeckSelectScreen").style.display = "none";
 
     duelOver = false;
     pvpMode = false;
@@ -13058,6 +13073,7 @@ function renderServerDuelState(state) {
     const duelScreen = document.getElementById("duelScreen");
     if (view.phase === "active" && duelScreen.style.display !== "block") {
         document.getElementById("deckSelectScreen").classList.add("hidden");
+        document.getElementById("pvpDeckSelectScreen").style.display = "none";
         duelScreen.style.display = "block";
     }
     if (duelScreen.style.display === "block") renderAll();
@@ -13088,21 +13104,34 @@ function renderMultiplayerLobby(state) {
     const roomId = state.roomId || "";
     const roomCodeDisplay = document.getElementById("roomCodeDisplay");
     const roomCodeValue = document.getElementById("roomCodeValue");
+    const pvpDeckRoomCode = document.getElementById("pvpDeckRoomCode");
     if (roomCodeDisplay && roomCodeValue && roomId) {
         roomCodeValue.textContent = roomId;
         roomCodeDisplay.style.display = "block";
     }
-    if (state.status === "joined") status.textContent = `Room ${state.roomId} - ${state.playerId}`;
-    else if (state.status === "waiting") {
+    if (pvpDeckRoomCode && roomId) pvpDeckRoomCode.textContent = `Room ${roomId}`;
+    const statusText = state.status === "joined"
+        ? `Room ${state.roomId} - ${state.playerId}`
+        : state.status === "waiting"
+            ? (state.players && state.players.length >= 2
+                ? "Both players joined. Choose a deck, ready up, then start the match."
+                : `Waiting for opponent (${state.players ? state.players.length : 0}/2 players joined).`)
+            : state.status === "ready"
+                ? `Room ${state.roomId || ""} - deck ready`
+                : state.status === "error"
+                    ? state.error
+                    : state.status === "joining"
+                        ? "Joining room..."
+                        : null;
+    if (statusText) {
+        status.textContent = statusText;
+        const pvpStatus = document.getElementById("pvpDeckStatus");
+        if (pvpStatus) pvpStatus.textContent = statusText;
+    }
+    if (state.status === "waiting") {
         const playerCount = state.players ? state.players.length : 0;
         if (playerCount >= 2) showPvpRoomScreen(state.roomId);
-        status.textContent = playerCount >= 2
-            ? "Both players joined. Choose a deck, ready up, then start the match."
-            : `Waiting for opponent (${playerCount}/2 players joined).`;
     }
-    else if (state.status === "ready") status.textContent = `Room ${state.roomId || ""} - deck ready`;
-    else if (state.status === "error") status.textContent = state.error;
-    else if (state.status === "joining") status.textContent = "Joining room...";
 }
 
 function showPvpRoomScreen(roomId) {
@@ -13117,9 +13146,35 @@ function showPvpRoomScreen(roomId) {
 
 function openPvpDeckSelection() {
     document.getElementById("pvpRoomScreen").style.display = "none";
-    document.getElementById("deckSelectScreen").classList.remove("hidden");
+    document.getElementById("deckSelectScreen").classList.add("hidden");
+    document.getElementById("pvpDeckSelectScreen").style.display = "flex";
     pvpMode = true;
     renderDeckSelection();
+    renderPvpDeckSelection();
+}
+
+function renderPvpDeckSelection() {
+    const source = document.getElementById("deckList");
+    const target = document.getElementById("pvpDeckList");
+    if (!source || !target) return;
+    target.innerHTML = source.innerHTML
+        .replace(/startDuel\('/g, "selectPvpDeck('")
+        .replace(/startCustomDuel\(/g, "selectPvpCustomDeck(")
+        .replace(/<button class="delete-button"[\s\S]*?<\/button>/g, "");
+}
+
+function selectPvpDeck(deckId) {
+    currentDeckId = deckId;
+    currentDeckName = PREMADE_DECKS[deckId] ? PREMADE_DECKS[deckId].name : deckId;
+    const status = document.getElementById("pvpDeckStatus");
+    if (status) status.textContent = `${currentDeckName} selected. Ready your deck when both players are set.`;
+}
+
+function selectPvpCustomDeck(name) {
+    currentDeckId = `custom:${name}`;
+    currentDeckName = getCustomDecks()[name]?.name || name;
+    const status = document.getElementById("pvpDeckStatus");
+    if (status) status.textContent = `${currentDeckName} selected. Ready your deck when both players are set.`;
 }
 
 function copyMultiplayerRoomCode() {
@@ -13180,7 +13235,8 @@ async function readySelectedMultiplayerDeck() {
     initializeMultiplayerLobby();
     if (!multiplayerClient) return;
     const deckId = currentDeckId || Object.keys(PREMADE_DECKS)[0];
-    const customDeck = getCustomDecks()[deckId];
+    const customName = deckId.startsWith("custom:") ? deckId.slice(7) : null;
+    const customDeck = customName ? getCustomDecks()[customName] : null;
     const mainDeck = customDeck ? buildCustomCards(customDeck.cards) : buildDeck(deckId);
     const extraDeck = customDeck ? buildCustomCards(customDeck.extraDeck) : buildExtraDeck(deckId);
     try {
