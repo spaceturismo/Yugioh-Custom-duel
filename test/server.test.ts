@@ -7,6 +7,8 @@ import { WebSocket } from "ws";
 const port = 8788;
 const baseUrl = `http://localhost:${port}`;
 let server: ChildProcessWithoutNullStreams;
+const messageQueues = new WeakMap<WebSocket, Record<string, any>[]>();
+const messageWaiters = new WeakMap<WebSocket, ((message: Record<string, any>) => void)[]>();
 
 before(async () => {
     server = spawn(process.execPath, ["node_modules/tsx/dist/cli.mjs", "server/src/server.ts"], {
@@ -34,15 +36,25 @@ after(async () => {
 function connect(): Promise<WebSocket> {
     return new Promise((resolve, reject) => {
         const socket = new WebSocket(`ws://localhost:${port}/ws`);
+        socket.on("message", (data) => {
+            const message = JSON.parse(data.toString());
+            const waiters = messageWaiters.get(socket) || [];
+            const waiter = waiters.shift();
+            if (waiter) waiter(message);
+            else messageQueues.get(socket)?.push(message);
+        });
         socket.once("open", () => resolve(socket));
         socket.once("error", reject);
+        messageQueues.set(socket, []);
+        messageWaiters.set(socket, []);
     });
 }
 
 function nextMessage(socket: WebSocket): Promise<Record<string, any>> {
-    return new Promise((resolve) => {
-        socket.once("message", (data) => resolve(JSON.parse(data.toString())));
-    });
+    const queue = messageQueues.get(socket) || [];
+    const message = queue.shift();
+    if (message) return Promise.resolve(message);
+    return new Promise((resolve) => messageWaiters.get(socket)?.push(resolve));
 }
 
 async function receiveUntil(

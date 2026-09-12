@@ -7,6 +7,7 @@ const {
     createEmptyPlayer,
     shuffle
 } = require("../client/duel-model.js");
+const { createCardCatalog } = require("../client/card-catalog.js");
 
 test("creates an empty player with independent game collections", () => {
     const player = createEmptyPlayer();
@@ -69,4 +70,27 @@ test("builds a premade Extra Deck independently from the main deck", () => {
     assert.deepEqual(buildExtraDeck(decks, "starter", clone).map((card) => card.id), ["fusion"]);
     assert.deepEqual(buildDeck(decks, "unknown", clone), []);
     assert.deepEqual(buildExtraDeck(decks, "unknown", clone), []);
+});
+
+test("catalog exposes built-in cards without allowing callers to mutate them", () => {
+    const source = { mage: { id: "mage", name: "Mage", type: "monster", atk: 1000, def: 800 } };
+    const catalog = createCardCatalog(source);
+    const card = catalog.get("mage");
+
+    card.name = "Changed";
+    assert.equal(catalog.get("mage").name, "Mage");
+    assert.deepEqual(catalog.ids(), ["mage"]);
+});
+
+test("catalog supports validated custom cards and replacement", () => {
+    const catalog = createCardCatalog({});
+    const customCard = { id: "custom_1", name: "My Card", type: "monster", atk: 500, def: 400 };
+
+    assert.equal(catalog.registerCustom(customCard), true);
+    assert.deepEqual(catalog.get("custom_1"), customCard);
+    assert.equal(catalog.registerCustom({ ...customCard, name: "Updated" }), true);
+    assert.equal(catalog.get("custom_1").name, "Updated");
+    assert.equal(catalog.registerCustom({ id: "bad", name: "", type: "unknown" }), false);
+    assert.equal(catalog.removeCustom("custom_1"), true);
+    assert.equal(catalog.get("custom_1"), null);
 });
