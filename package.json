@@ -4,6 +4,10 @@
   "description": "Installable Yu-Gi-Oh! custom duel game",
   "main": "service-worker.js",
   "scripts": {
+    "server:dev": "tsx server/src/server.ts",
+    "server:build": "tsc -p server/tsconfig.json",
+    "server:start": "node server/dist/server.js",
+    "server:typecheck": "tsc -p server/tsconfig.json --noEmit",
     "cap:init": "cap init \"Yu-Gi-Oh! Custom Duel\" com.spaceturismo.customduel --web-dir .",
     "cap:add:android": "cap add android",
     "cap:add:ios": "cap add ios",
@@ -22,7 +26,14 @@
   "dependencies": {
     "@capacitor/android": "^7.4.4",
     "@capacitor/cli": "^7.4.4",
-    "@capacitor/core": "^7.4.4"
+    "@capacitor/core": "^7.4.4",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
   },
   "type": "commonjs",
   "bugs": {
