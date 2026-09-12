@@ -200,9 +200,75 @@ button:active {
     transform: scale(.96);
 }
 
+button:hover:not(:disabled) {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
 button:disabled {
     opacity: .45;
     cursor: not-allowed;
+}
+
+.screen {
+    animation: screenFadeIn .25s ease;
+}
+
+@keyframes screenFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.action-card,
+.deck-select-box {
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.action-card:hover,
+.deck-select-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0,0,0,.35);
+}
+
+.zone {
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+.zone:hover {
+    transform: translateY(-2px);
+}
+
+.card {
+    transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 10px 20px rgba(0,0,0,.4);
+    z-index: 5;
+}
+
+.status-pill {
+    animation: pillSettle .2s ease;
+}
+
+@keyframes pillSettle {
+    from { transform: scale(.9); opacity: .5; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.phase-step {
+    transition: background .2s ease, transform .2s ease, color .2s ease;
+}
+
+.phase-step.active {
+    animation: phasePop .3s ease;
+}
+
+@keyframes phasePop {
+    0% { transform: scale(.85); }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 /* ===== BUTTON STYLES =====
@@ -565,6 +631,36 @@ body[data-panel="vignette_forest"] .deck-select-box, body[data-panel="vignette_f
 .status-pill:hover {
     border-color: #777;
     transform: translateY(-1px);
+}
+
+body[data-banner="gold"] #profileIndicator {
+    border: 2px solid #d6a928 !important;
+    box-shadow: 0 0 10px rgba(214,169,40,.4) !important;
+}
+
+body[data-banner="crimson"] #profileIndicator {
+    border: 2px solid #d64444 !important;
+    box-shadow: 0 0 10px rgba(214,68,68,.4) !important;
+}
+
+body[data-banner="azure"] #profileIndicator {
+    border: 2px solid #4499d6 !important;
+    box-shadow: 0 0 10px rgba(68,153,214,.4) !important;
+}
+
+body[data-banner="emerald"] #profileIndicator {
+    border: 2px solid #44c47a !important;
+    box-shadow: 0 0 10px rgba(68,196,122,.4) !important;
+}
+
+body[data-banner="royal"] #profileIndicator {
+    border: 2px solid #a855d6 !important;
+    box-shadow: 0 0 10px rgba(168,85,214,.4) !important;
+}
+
+body[data-banner="obsidian"] #profileIndicator {
+    border: 2px solid #cfcfcf !important;
+    box-shadow: 0 0 10px rgba(207,207,207,.35) !important;
 }
 
 .status-pill-gold {
@@ -1088,6 +1184,39 @@ body[data-duelbg="bloodmoon"] #duelScreen {
         0 4px 10px rgba(0,0,0,.7);
 }
 
+body[data-cardback="void"] .card-back {
+    background:
+        repeating-linear-gradient(0deg, #1a1a2a, #1a1a2a 8px, #26263a 8px, #26263a 16px),
+        repeating-linear-gradient(90deg, rgba(0,0,0,.3) 0px, rgba(0,0,0,.3) 1px, transparent 1px, transparent 16px) !important;
+}
+
+body[data-cardback="golden"] .card-back {
+    background:
+        radial-gradient(circle at 50% 40%, #6b5416, #2e2408 75%) !important;
+}
+
+body[data-cardback="azure"] .card-back {
+    background:
+        repeating-linear-gradient(135deg, #0f2b46, #0f2b46 6px, #164067 6px, #164067 12px) !important;
+}
+
+body[data-cardback="emerald"] .card-back {
+    background:
+        repeating-linear-gradient(0deg, #0f3320, #0f3320 1px, transparent 1px, transparent 10px),
+        repeating-linear-gradient(90deg, #0f3320, #0f3320 1px, transparent 1px, transparent 10px),
+        #163d28 !important;
+}
+
+body[data-cardback="shadow"] .card-back {
+    background:
+        radial-gradient(circle at 50% 60%, #2e1a40, #14091e 75%) !important;
+}
+
+body[data-cardback="molten"] .card-back {
+    background:
+        radial-gradient(circle at 50% 30%, #7a2e0a, #2a0f04 75%) !important;
+}
+
 /* =====================================================
    HAND
 ===================================================== */
@@ -1554,13 +1683,7 @@ body[data-duelbg="bloodmoon"] #duelScreen {
             <div class="action-card action-card-green" onclick="openDeckConfigurer()">
                 <div class="action-card-icon">🔧</div>
                 <div class="action-card-title">Deck Configurer</div>
-                <div class="action-card-desc">Build custom decks, or design your own cards from scratch.</div>
-            </div>
-
-            <div class="action-card action-card-purple" onclick="openDeckGenerator()">
-                <div class="action-card-icon">🎲</div>
-                <div class="action-card-title">Generate a Deck</div>
-                <div class="action-card-desc">Auto-build a deck around Aggro, Trickery, Support, or Burn.</div>
+                <div class="action-card-desc">Build, generate, or create decks and cards from scratch.</div>
             </div>
 
             <div class="action-card action-card-gold" onclick="openStore()">
@@ -1879,6 +2002,14 @@ body[data-duelbg="bloodmoon"] #duelScreen {
          class="field spell-trap-field"></div>
 
 
+    <div class="zone-title" style="font-size:11px;color:#999;">
+        🔮 Pendulum Zones
+    </div>
+
+    <div id="playerPendulumZones"
+         style="display:flex;gap:10px;margin-bottom:10px;"></div>
+
+
     <div class="hand-area">
 
         <div class="hand-title">
@@ -2011,6 +2142,10 @@ const VERSION_HISTORY = {
     "2.0": "Tier Expansion",
     "2.1": "Multiverse",
     "2.2": "Boss Fights",
+    "2.3": "Playstyle Mega Expansion",
+    "2.4": "Franchise Decks",
+    "2.5": "Villain Bosses",
+    "2.6": "Accel",
     "Custom": "Your Custom Cards"
 };
 
@@ -2064,7 +2199,7 @@ const CARD_DATABASE = {
     darkBlade: {
         id: "darkBlade",
         version: "1.0",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "extradeckspam"],
         name: "Dark Blade",
         type: "monster",
         attribute: "DARK",
@@ -2079,7 +2214,7 @@ const CARD_DATABASE = {
     mysticalElf: {
         id: "mysticalElf",
         version: "1.0",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "extradeckspam"],
         name: "Mystical Elf",
         type: "monster",
         attribute: "LIGHT",
@@ -2094,7 +2229,7 @@ const CARD_DATABASE = {
     giantSoldier: {
         id: "giantSoldier",
         version: "1.0",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Giant Soldier of Stone",
         type: "monster",
         attribute: "EARTH",
@@ -2109,7 +2244,7 @@ const CARD_DATABASE = {
     curseDragon: {
         id: "curseDragon",
         version: "1.0",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Curse of Dragon",
         type: "monster",
         attribute: "DARK",
@@ -2229,7 +2364,7 @@ const CARD_DATABASE = {
     battleOx: {
         id: "battleOx",
         version: "1.0",
-        playstyles: ["aggro", "burn"],
+        playstyles: ["aggro", "burn", "extradeckspam"],
         name: "Battle Ox",
         type: "monster",
         attribute: "EARTH",
@@ -2244,7 +2379,7 @@ const CARD_DATABASE = {
     flameSwordsman: {
         id: "flameSwordsman",
         version: "1.0",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Flame Swordsman",
         type: "fusion",
         attribute: "FIRE",
@@ -2282,7 +2417,7 @@ const CARD_DATABASE = {
     kidDragon: {
         id: "kidDragon",
         version: "1.0",
-        playstyles: ["support"],
+        playstyles: ["support", "extradeckspam"],
         name: "Kid Dragon",
         type: "monster",
         attribute: "WIND",
@@ -2298,7 +2433,7 @@ const CARD_DATABASE = {
     warriorCadet: {
         id: "warriorCadet",
         version: "1.0",
-        playstyles: ["support"],
+        playstyles: ["support", "extradeckspam"],
         name: "Warrior Cadet",
         type: "monster",
         attribute: "EARTH",
@@ -2314,7 +2449,7 @@ const CARD_DATABASE = {
     magicalApprentice: {
         id: "magicalApprentice",
         version: "1.0",
-        playstyles: ["support"],
+        playstyles: ["support", "extradeckspam"],
         name: "Magical Apprentice",
         type: "monster",
         attribute: "DARK",
@@ -2375,7 +2510,7 @@ const CARD_DATABASE = {
     chimeraBeast: {
         id: "chimeraBeast",
         version: "1.0",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "extradeckspam"],
         name: "Chimera Beast",
         type: "xyz",
         attribute: "DARK",
@@ -2392,7 +2527,7 @@ const CARD_DATABASE = {
     clockworkSprite: {
         id: "clockworkSprite",
         version: "1.0",
-        playstyles: ["support"],
+        playstyles: ["support", "extradeckspam"],
         name: "Clockwork Sprite",
         type: "monster",
         attribute: "LIGHT",
@@ -2408,7 +2543,7 @@ const CARD_DATABASE = {
     circuitRunner: {
         id: "circuitRunner",
         version: "1.0",
-        playstyles: ["support"],
+        playstyles: ["support", "extradeckspam"],
         name: "Circuit Runner",
         type: "monster",
         attribute: "LIGHT",
@@ -2424,7 +2559,7 @@ const CARD_DATABASE = {
     signalDrone: {
         id: "signalDrone",
         version: "1.0",
-        playstyles: ["support"],
+        playstyles: ["support", "extradeckspam"],
         name: "Signal Drone",
         type: "monster",
         attribute: "LIGHT",
@@ -2440,7 +2575,7 @@ const CARD_DATABASE = {
     ironGolemTrooper: {
         id: "ironGolemTrooper",
         version: "1.0",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Iron Golem Trooper",
         type: "monster",
         attribute: "EARTH",
@@ -2455,7 +2590,7 @@ const CARD_DATABASE = {
     turboCannoneer: {
         id: "turboCannoneer",
         version: "1.0",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "extradeckspam"],
         name: "Turbo Cannoneer",
         type: "monster",
         attribute: "EARTH",
@@ -2470,7 +2605,7 @@ const CARD_DATABASE = {
     voltArmor: {
         id: "voltArmor",
         version: "1.0",
-        playstyles: ["burn", "trickery"],
+        playstyles: ["burn", "trickery", "extradeckspam"],
         name: "Volt Armor",
         type: "monster",
         attribute: "LIGHT",
@@ -2558,7 +2693,7 @@ const CARD_DATABASE = {
     quadBladeSentinel: {
         id: "quadBladeSentinel",
         version: "1.0",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "extradeckspam"],
         name: "Quad Blade Sentinel",
         type: "xyz",
         attribute: "EARTH",
@@ -2592,7 +2727,7 @@ const CARD_DATABASE = {
     twinBladeVanguard: {
         id: "twinBladeVanguard",
         version: "1.0",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "extradeckspam"],
         name: "Twin Blade Vanguard",
         type: "xyz",
         attribute: "EARTH",
@@ -2609,7 +2744,7 @@ const CARD_DATABASE = {
     arcaneGuardian: {
         id: "arcaneGuardian",
         version: "1.0",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Arcane Guardian",
         type: "fusion",
         attribute: "DARK",
@@ -2706,7 +2841,7 @@ const CARD_DATABASE = {
     skyRuinDragon: {
         id: "skyRuinDragon",
         version: "1.0",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "extradeckspam"],
         name: "Sky Ruin Dragon",
         type: "xyz",
         attribute: "WIND",
@@ -2727,7 +2862,7 @@ const CARD_DATABASE = {
     twinDragonColossus: {
         id: "twinDragonColossus",
         version: "1.0",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Twin Dragon Colossus",
         type: "xyz",
         attribute: "LIGHT",
@@ -2809,7 +2944,7 @@ const CARD_DATABASE = {
     spellcasterCrown: {
         id: "spellcasterCrown",
         version: "1.0",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "extradeckspam"],
         name: "Spellcaster Crown",
         type: "xyz",
         attribute: "DARK",
@@ -2830,7 +2965,7 @@ const CARD_DATABASE = {
     arcaneStoneDuelist: {
         id: "arcaneStoneDuelist",
         version: "1.0",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Arcane Stone Duelist",
         type: "fusion",
         attribute: "EARTH",
@@ -2851,7 +2986,7 @@ const CARD_DATABASE = {
     stoneBladeTitan: {
         id: "stoneBladeTitan",
         version: "1.0",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Stone Blade Titan",
         type: "fusion",
         attribute: "EARTH",
@@ -2908,7 +3043,7 @@ const CARD_DATABASE = {
     twinWarriorFortress: {
         id: "twinWarriorFortress",
         version: "1.0",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall", "extradeckspam"],
         name: "Twin Warrior Fortress",
         type: "xyz",
         attribute: "EARTH",
@@ -3027,7 +3162,7 @@ const CARD_DATABASE = {
     machineRankThreeOverlord: {
         id: "machineRankThreeOverlord",
         version: "1.0",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Machine Rank Three Overlord",
         type: "fusion",
         attribute: "LIGHT",
@@ -3048,7 +3183,7 @@ const CARD_DATABASE = {
     graveGhoul: {
         id: "graveGhoul",
         version: "1.2",
-        playstyles: ["support"],
+        playstyles: ["support", "extradeckspam"],
         name: "Grave Ghoul",
         type: "monster",
         attribute: "EARTH",
@@ -3079,7 +3214,7 @@ const CARD_DATABASE = {
     skeletonKnight: {
         id: "skeletonKnight",
         version: "1.2",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "extradeckspam"],
         name: "Skeleton Knight",
         type: "monster",
         attribute: "DARK",
@@ -3094,7 +3229,7 @@ const CARD_DATABASE = {
     boneSoldier: {
         id: "boneSoldier",
         version: "1.2",
-        playstyles: ["burn"],
+        playstyles: ["burn", "extradeckspam"],
         name: "Bone Soldier",
         type: "monster",
         attribute: "DARK",
@@ -3184,7 +3319,7 @@ const CARD_DATABASE = {
     twinGraveFiend: {
         id: "twinGraveFiend",
         version: "1.2",
-        playstyles: ["support"],
+        playstyles: ["support", "extradeckspam"],
         name: "Twin Grave Fiend",
         type: "xyz",
         attribute: "DARK",
@@ -3203,7 +3338,7 @@ const CARD_DATABASE = {
     radiantCherub: {
         id: "radiantCherub",
         version: "1.5",
-        playstyles: ["support"],
+        playstyles: ["support", "extradeckspam"],
         name: "Radiant Cherub",
         type: "monster",
         attribute: "LIGHT",
@@ -3234,7 +3369,7 @@ const CARD_DATABASE = {
     seraphGuardian: {
         id: "seraphGuardian",
         version: "1.5",
-        playstyles: ["support"],
+        playstyles: ["support", "stall", "extradeckspam"],
         name: "Seraph Guardian",
         type: "monster",
         attribute: "LIGHT",
@@ -3249,7 +3384,7 @@ const CARD_DATABASE = {
     holySentinel: {
         id: "holySentinel",
         version: "1.5",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall", "extradeckspam"],
         name: "Holy Sentinel",
         type: "monster",
         attribute: "LIGHT",
@@ -3264,7 +3399,7 @@ const CARD_DATABASE = {
     archonOfLight: {
         id: "archonOfLight",
         version: "1.5",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Archon of Light",
         type: "monster",
         attribute: "LIGHT",
@@ -3279,7 +3414,7 @@ const CARD_DATABASE = {
     empyreanJudge: {
         id: "empyreanJudge",
         version: "1.5",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "swarm"],
         name: "Empyrean Judge",
         type: "monster",
         attribute: "LIGHT",
@@ -3305,7 +3440,7 @@ const CARD_DATABASE = {
     seraphicAvatar: {
         id: "seraphicAvatar",
         version: "1.5",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Seraphic Avatar",
         type: "fusion",
         attribute: "LIGHT",
@@ -3324,7 +3459,7 @@ const CARD_DATABASE = {
     celestialGuardian: {
         id: "celestialGuardian",
         version: "1.5",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Celestial Guardian",
         type: "synchro",
         attribute: "LIGHT",
@@ -3339,7 +3474,7 @@ const CARD_DATABASE = {
     twinHaloSeraph: {
         id: "twinHaloSeraph",
         version: "1.5",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall", "extradeckspam"],
         name: "Twin Halo Seraph",
         type: "xyz",
         attribute: "LIGHT",
@@ -3358,7 +3493,7 @@ const CARD_DATABASE = {
     shadowFiend: {
         id: "shadowFiend",
         version: "1.5",
-        playstyles: ["support"],
+        playstyles: ["support", "extradeckspam"],
         name: "Shadow Fiend",
         type: "monster",
         attribute: "DARK",
@@ -3389,7 +3524,7 @@ const CARD_DATABASE = {
     hellhoundStalker: {
         id: "hellhoundStalker",
         version: "1.5",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "extradeckspam"],
         name: "Hellhound Stalker",
         type: "monster",
         attribute: "DARK",
@@ -3404,7 +3539,7 @@ const CARD_DATABASE = {
     soulReaper: {
         id: "soulReaper",
         version: "1.5",
-        playstyles: ["burn"],
+        playstyles: ["burn", "extradeckspam"],
         name: "Soul Reaper",
         type: "monster",
         attribute: "DARK",
@@ -3479,7 +3614,7 @@ const CARD_DATABASE = {
     nightmareSovereign: {
         id: "nightmareSovereign",
         version: "1.5",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Nightmare Sovereign",
         type: "synchro",
         attribute: "DARK",
@@ -3494,7 +3629,7 @@ const CARD_DATABASE = {
     twinHorrorFiend: {
         id: "twinHorrorFiend",
         version: "1.5",
-        playstyles: ["burn"],
+        playstyles: ["burn", "extradeckspam"],
         name: "Twin Horror Fiend",
         type: "xyz",
         attribute: "DARK",
@@ -3902,6 +4037,7 @@ const CARD_DATABASE = {
         version: "1.5",
         deckMakerOnly: true,
         name: "Twin Fang Overlord",
+        playstyles: ["extradeckspam"],
         type: "xyz",
         attribute: "DARK",
         level: 4,
@@ -3936,6 +4072,7 @@ const CARD_DATABASE = {
         version: "1.5",
         deckMakerOnly: true,
         name: "Void Reaper",
+        playstyles: ["extradeckspam"],
         type: "xyz",
         attribute: "DARK",
         level: 4,
@@ -3963,6 +4100,23 @@ const CARD_DATABASE = {
         def: 2300,
         effect:
             "When this card is Xyz Summoned, gain 700 LP."
+    },
+
+    zenithOfAllCreation: {
+        id: "zenithOfAllCreation",
+        version: "2.7",
+        deckMakerOnly: true,
+        name: "Zenith of All Creation",
+        type: "xyz",
+        attribute: "LIGHT",
+        level: 10,
+        rank: 10,
+        materialCount: 2,
+        monsterType: "Dragon",
+        atk: 3800,
+        def: 3200,
+        effect:
+            "The single strongest card in the game — built from two Level 10 monsters. While attacking, this card's ATK automatically surges to exceed the strongest other monster on the field by 100, no matter how powerful — nothing can ever out-stat it. When this card declares an attack, your opponent cannot activate a Trap Card in response to that attack."
     },
 
     /* ===== REDEEMABLE CODE CARDS =====
@@ -4856,6 +5010,44 @@ const CARD_DATABASE = {
             "This card gains 290 ATK for each monster in your Graveyard."
     },
 
+    /* ===== GENERIC PENDULUM MONSTERS (v2.7) =====
+       Playstyle-tagged so Generate-a-Deck can pull them
+       into any deck, not just Zuzu's or Jaden's. */
+
+    pendulumVanguardWarden: {
+        id: "pendulumVanguardWarden",
+        version: "2.7",
+        playstyles: ["aggro"],
+        name: "Pendulum Vanguard Warden",
+        type: "monster",
+        attribute: "FIRE",
+        level: 4,
+        monsterType: "Warrior",
+        atk: 1700,
+        def: 1200,
+        isPendulum: true,
+        pendulumScale: 3,
+        effect:
+            "Pendulum Scale 3. Can be Set in a Pendulum Zone instead of Summoned normally. While attacking, this card gains 300 ATK."
+    },
+
+    pendulumArchiveSentinel: {
+        id: "pendulumArchiveSentinel",
+        version: "2.7",
+        playstyles: ["support"],
+        name: "Pendulum Archive Sentinel",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 6,
+        monsterType: "Spellcaster",
+        atk: 1800,
+        def: 2000,
+        isPendulum: true,
+        pendulumScale: 7,
+        effect:
+            "Pendulum Scale 7. Can be Set in a Pendulum Zone instead of Summoned normally. While in Defense Position, this card gains 500 DEF."
+    },
+
     /* ===== VILLAIN BOSSES (v2.5) =====
        Main antagonists from across the franchise. Unlike
        the 20 tiered bosses, these don't scale via LP — they
@@ -5009,6 +5201,621 @@ const CARD_DATABASE = {
             "When this card is Normal Summoned, draw 1 card."
     },
 
+    sigInventorsGambit: {
+        id: "sigInventorsGambit",
+        version: "2.8",
+        isSignatureCard: true,
+        bossId: "rushYuga",
+        name: "Inventor's Gambit",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 6,
+        monsterType: "Warrior",
+        atk: 2300,
+        def: 1900,
+        effect:
+            "While attacking, this card gains 400 ATK."
+    },
+
+    sigFeralInstinctBeast: {
+        id: "sigFeralInstinctBeast",
+        version: "2.8",
+        isSignatureCard: true,
+        bossId: "rushLuke",
+        name: "Feral Instinct Beast",
+        type: "monster",
+        attribute: "WIND",
+        level: 6,
+        monsterType: "Beast",
+        atk: 2350,
+        def: 1800,
+        effect:
+            "The first time this card attacks each turn, it gains 450 ATK during damage calculation."
+    },
+
+    sigCorporateEnforcer: {
+        id: "sigCorporateEnforcer",
+        version: "2.8",
+        isSignatureCard: true,
+        bossId: "rushGoha",
+        name: "Corporate Enforcer",
+        type: "monster",
+        attribute: "EARTH",
+        level: 7,
+        monsterType: "Machine",
+        atk: 2500,
+        def: 2200,
+        effect:
+            "Once per turn, this card cannot be destroyed by battle or by a Trap Card that would destroy it. When this effect saves it, gain 500 LP."
+    },
+
+    /* ===== TIER 11 & 12 EXPANSION (v2.7) =====
+       38 new cards (19 per tier), the strongest roll tiers
+       in the game, unlocked via Roll Level 5. ===== */
+
+    sovereignAnnihilator: {
+        id: "sovereignAnnihilator",
+        version: "2.7",
+        redeemCode: "T11M1",
+        rollTier: 11,
+        name: "Sovereign Annihilator",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 9,
+        monsterType: "Spellcaster",
+        atk: 2780,
+        def: 2311,
+        effect:
+            "While attacking, this card gains 565 ATK."
+    },
+
+    zenithTransgressor: {
+        id: "zenithTransgressor",
+        version: "2.7",
+        redeemCode: "T11M2",
+        rollTier: 11,
+        name: "Zenith Transgressor",
+        type: "monster",
+        attribute: "FIRE",
+        level: 9,
+        monsterType: "Machine",
+        atk: 2820,
+        def: 2536,
+        effect:
+            "The first time this card attacks each turn, it gains 615 ATK during damage calculation."
+    },
+
+    zenithOverlord: {
+        id: "zenithOverlord",
+        version: "2.7",
+        redeemCode: "T11M3",
+        rollTier: 11,
+        name: "Zenith Overlord",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 9,
+        monsterType: "Fairy",
+        atk: 2686,
+        def: 2418,
+        effect:
+            "While in Defense Position, this card gains 665 DEF."
+    },
+
+    transcendentDevastator: {
+        id: "transcendentDevastator",
+        version: "2.7",
+        redeemCode: "T11M4",
+        rollTier: 11,
+        name: "Transcendent Devastator",
+        type: "monster",
+        attribute: "WIND",
+        level: 9,
+        monsterType: "Warrior",
+        atk: 2843,
+        def: 2540,
+        effect:
+            "When this card destroys a monster by battle, inflict 615 damage to your opponent."
+    },
+
+    supremeRavager: {
+        id: "supremeRavager",
+        version: "2.7",
+        redeemCode: "T11M5",
+        rollTier: 11,
+        name: "Supreme Ravager",
+        type: "monster",
+        attribute: "DARK",
+        level: 9,
+        monsterType: "Fairy",
+        atk: 2880,
+        def: 2607,
+        effect:
+            "This card gains 133 ATK for each monster in your Graveyard."
+    },
+
+    paramountCataclysm: {
+        id: "paramountCataclysm",
+        version: "2.7",
+        redeemCode: "T11M6",
+        rollTier: 11,
+        name: "Paramount Cataclysm",
+        type: "monster",
+        attribute: "EARTH",
+        level: 9,
+        monsterType: "Fiend",
+        atk: 2659,
+        def: 2211,
+        effect:
+            "When this card is Normal Summoned, draw 1 card."
+    },
+
+    supremeAnnihilator: {
+        id: "supremeAnnihilator",
+        version: "2.7",
+        redeemCode: "T11M7",
+        rollTier: 11,
+        name: "Supreme Annihilator",
+        type: "monster",
+        attribute: "WIND",
+        level: 9,
+        monsterType: "Spellcaster",
+        atk: 2917,
+        def: 2465,
+        effect:
+            "When this card is Normal Summoned, gain 820 LP."
+    },
+
+    eternalTransgressor: {
+        id: "eternalTransgressor",
+        version: "2.7",
+        redeemCode: "T11M8",
+        rollTier: 11,
+        name: "Eternal Transgressor",
+        type: "monster",
+        attribute: "WATER",
+        level: 9,
+        monsterType: "Fiend",
+        atk: 2836,
+        def: 2430,
+        effect:
+            "When this card is Normal Summoned, inflict 665 damage to your opponent."
+    },
+
+    paramountDominion: {
+        id: "paramountDominion",
+        version: "2.7",
+        redeemCode: "T11M9",
+        rollTier: 11,
+        name: "Paramount Dominion",
+        type: "monster",
+        attribute: "WIND",
+        level: 9,
+        monsterType: "Dragon",
+        atk: 2757,
+        def: 2537,
+        effect:
+            "Once per turn, this card cannot be destroyed by battle or by a Trap Card that would destroy it. When this effect saves it, gain 820 LP."
+    },
+
+    transcendentCataclysm: {
+        id: "transcendentCataclysm",
+        version: "2.7",
+        redeemCode: "T11M10",
+        rollTier: 11,
+        name: "Transcendent Cataclysm",
+        type: "monster",
+        attribute: "WIND",
+        level: 9,
+        monsterType: "Fiend",
+        atk: 2823,
+        def: 2487,
+        effect:
+            "This card cannot be destroyed by battle while in Defense Position."
+    },
+
+    paramountBehemoth: {
+        id: "paramountBehemoth",
+        version: "2.7",
+        redeemCode: "T11M11",
+        rollTier: 11,
+        name: "Paramount Behemoth",
+        type: "monster",
+        attribute: "FIRE",
+        level: 9,
+        monsterType: "Fairy",
+        atk: 2702,
+        def: 2347,
+        effect:
+            "When this card is Normal Summoned, destroy 1 Spell/Trap Card your opponent controls."
+    },
+
+    apexConvergence: {
+        id: "apexConvergence",
+        version: "2.7",
+        redeemCode: "T11S1",
+        rollTier: 11,
+        name: "Apex Convergence",
+        type: "spell",
+        spellType: "Normal Spell",
+        effect:
+            "Inflict 1240 damage to your opponent."
+    },
+
+    ultimateConvergence: {
+        id: "ultimateConvergence",
+        version: "2.7",
+        redeemCode: "T11S2",
+        rollTier: 11,
+        name: "Ultimate Convergence",
+        type: "spell",
+        spellType: "Normal Spell",
+        effect:
+            "Gain 1340 LP."
+    },
+
+    absoluteZenith: {
+        id: "absoluteZenith",
+        version: "2.7",
+        redeemCode: "T11S3",
+        rollTier: 11,
+        name: "Absolute Zenith",
+        type: "spell",
+        spellType: "Normal Spell",
+        effect:
+            "Gain 565 LP for each monster in your Graveyard."
+    },
+
+    absoluteApotheosis: {
+        id: "absoluteApotheosis",
+        version: "2.7",
+        redeemCode: "T11S4",
+        rollTier: 11,
+        name: "Absolute Apotheosis",
+        type: "spell",
+        spellType: "Normal Spell",
+        effect:
+            "Destroy the opponent's monster with the lowest ATK on the field."
+    },
+
+    absoluteRetribution: {
+        id: "absoluteRetribution",
+        version: "2.7",
+        redeemCode: "T11R1",
+        rollTier: 11,
+        name: "Absolute Retribution",
+        type: "trap",
+        trapType: "Normal Trap",
+        trigger: "opponentAttack",
+        effect:
+            "When an opponent's monster declares an attack, negate the attack and destroy that monster."
+    },
+
+    paramountJudgment: {
+        id: "paramountJudgment",
+        version: "2.7",
+        redeemCode: "T11R2",
+        rollTier: 11,
+        name: "Paramount Judgment",
+        type: "trap",
+        trapType: "Normal Trap",
+        trigger: "opponentAttack",
+        effect:
+            "When an opponent's monster declares an attack, negate the attack and inflict damage equal to that monster's ATK."
+    },
+
+    supremeFinality: {
+        id: "supremeFinality",
+        version: "2.7",
+        redeemCode: "T11R3",
+        rollTier: 11,
+        name: "Supreme Finality",
+        type: "trap",
+        trapType: "Normal Trap",
+        trigger: "opponentAttack",
+        effect:
+            "When an opponent's monster declares an attack, negate the attack, destroy that monster, and inflict 720 damage to your opponent."
+    },
+
+    transcendentRetribution: {
+        id: "transcendentRetribution",
+        version: "2.7",
+        redeemCode: "T11R4",
+        rollTier: 11,
+        name: "Transcendent Retribution",
+        type: "trap",
+        trapType: "Normal Trap",
+        trigger: "opponentAttack",
+        effect:
+            "When an opponent's monster declares an attack, negate the attack and inflict 1340 damage to your opponent."
+    },
+
+    sovereignTransgressor: {
+        id: "sovereignTransgressor",
+        version: "2.7",
+        redeemCode: "T12M1",
+        rollTier: 12,
+        name: "Sovereign Transgressor",
+        type: "monster",
+        attribute: "WATER",
+        level: 10,
+        monsterType: "Fairy",
+        atk: 3085,
+        def: 2857,
+        noTributeRequired: true,
+        effect:
+            "This card can be Normal Summoned without Tributes. While attacking, this card gains 580 ATK."
+    },
+
+    sovereignColossus: {
+        id: "sovereignColossus",
+        version: "2.7",
+        redeemCode: "T12M2",
+        rollTier: 12,
+        name: "Sovereign Colossus",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 10,
+        monsterType: "Machine",
+        atk: 3088,
+        def: 2866,
+        noTributeRequired: true,
+        effect:
+            "This card can be Normal Summoned without Tributes. The first time this card attacks each turn, it gains 630 ATK during damage calculation."
+    },
+
+    eternalCataclysm: {
+        id: "eternalCataclysm",
+        version: "2.7",
+        redeemCode: "T12M3",
+        rollTier: 12,
+        name: "Eternal Cataclysm",
+        type: "monster",
+        attribute: "DARK",
+        level: 10,
+        monsterType: "Fairy",
+        atk: 3170,
+        def: 2828,
+        noTributeRequired: true,
+        effect:
+            "This card can be Normal Summoned without Tributes. While in Defense Position, this card gains 680 DEF."
+    },
+
+    zenithRavager: {
+        id: "zenithRavager",
+        version: "2.7",
+        redeemCode: "T12M4",
+        rollTier: 12,
+        name: "Zenith Ravager",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 10,
+        monsterType: "Machine",
+        atk: 3056,
+        def: 2576,
+        noTributeRequired: true,
+        effect:
+            "This card can be Normal Summoned without Tributes. When this card destroys a monster by battle, inflict 630 damage to your opponent."
+    },
+
+    sovereignOverlord: {
+        id: "sovereignOverlord",
+        version: "2.7",
+        redeemCode: "T12M5",
+        rollTier: 12,
+        name: "Sovereign Overlord",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 10,
+        monsterType: "Dragon",
+        atk: 3099,
+        def: 2640,
+        noTributeRequired: true,
+        effect:
+            "This card can be Normal Summoned without Tributes. This card gains 136 ATK for each monster in your Graveyard."
+    },
+
+    ultimateOverlord: {
+        id: "ultimateOverlord",
+        version: "2.7",
+        redeemCode: "T12M6",
+        rollTier: 12,
+        name: "Ultimate Overlord",
+        type: "monster",
+        attribute: "EARTH",
+        level: 10,
+        monsterType: "Fairy",
+        atk: 3215,
+        def: 2748,
+        noTributeRequired: true,
+        effect:
+            "This card can be Normal Summoned without Tributes. When this card is Normal Summoned, draw 1 card."
+    },
+
+    supremeColossus: {
+        id: "supremeColossus",
+        version: "2.7",
+        redeemCode: "T12M7",
+        rollTier: 12,
+        name: "Supreme Colossus",
+        type: "monster",
+        attribute: "WATER",
+        level: 10,
+        monsterType: "Fiend",
+        atk: 3218,
+        def: 2875,
+        noTributeRequired: true,
+        effect:
+            "This card can be Normal Summoned without Tributes. When this card is Normal Summoned, gain 840 LP."
+    },
+
+    zenithCataclysm: {
+        id: "zenithCataclysm",
+        version: "2.7",
+        redeemCode: "T12M8",
+        rollTier: 12,
+        name: "Zenith Cataclysm",
+        type: "monster",
+        attribute: "EARTH",
+        level: 10,
+        monsterType: "Spellcaster",
+        atk: 3056,
+        def: 2567,
+        noTributeRequired: true,
+        effect:
+            "This card can be Normal Summoned without Tributes. When this card is Normal Summoned, inflict 680 damage to your opponent."
+    },
+
+    eternalDominion: {
+        id: "eternalDominion",
+        version: "2.7",
+        redeemCode: "T12M9",
+        rollTier: 12,
+        name: "Eternal Dominion",
+        type: "monster",
+        attribute: "EARTH",
+        level: 10,
+        monsterType: "Fiend",
+        atk: 3158,
+        def: 2753,
+        noTributeRequired: true,
+        effect:
+            "This card can be Normal Summoned without Tributes. Once per turn, this card cannot be destroyed by battle or by a Trap Card that would destroy it. When this effect saves it, gain 840 LP."
+    },
+
+    apexBehemoth: {
+        id: "apexBehemoth",
+        version: "2.7",
+        redeemCode: "T12M10",
+        rollTier: 12,
+        name: "Apex Behemoth",
+        type: "monster",
+        attribute: "WATER",
+        level: 10,
+        monsterType: "Dragon",
+        atk: 3155,
+        def: 2932,
+        noTributeRequired: true,
+        effect:
+            "This card can be Normal Summoned without Tributes. This card cannot be destroyed by battle while in Defense Position."
+    },
+
+    paramountHarbinger: {
+        id: "paramountHarbinger",
+        version: "2.7",
+        redeemCode: "T12M11",
+        rollTier: 12,
+        name: "Paramount Harbinger",
+        type: "monster",
+        attribute: "FIRE",
+        level: 10,
+        monsterType: "Fairy",
+        atk: 3019,
+        def: 2769,
+        noTributeRequired: true,
+        effect:
+            "This card can be Normal Summoned without Tributes. When this card is Normal Summoned, destroy 1 Spell/Trap Card your opponent controls."
+    },
+
+    zenithZenith: {
+        id: "zenithZenith",
+        version: "2.7",
+        redeemCode: "T12S1",
+        rollTier: 12,
+        name: "Zenith Zenith",
+        type: "spell",
+        spellType: "Normal Spell",
+        effect:
+            "Inflict 1280 damage to your opponent."
+    },
+
+    zenithDominion: {
+        id: "zenithDominion",
+        version: "2.7",
+        redeemCode: "T12S2",
+        rollTier: 12,
+        name: "Zenith Dominion",
+        type: "spell",
+        spellType: "Normal Spell",
+        effect:
+            "Gain 1380 LP."
+    },
+
+    paramountZenith: {
+        id: "paramountZenith",
+        version: "2.7",
+        redeemCode: "T12S3",
+        rollTier: 12,
+        name: "Paramount Zenith",
+        type: "spell",
+        spellType: "Normal Spell",
+        effect:
+            "Gain 580 LP for each monster in your Graveyard."
+    },
+
+    zenithAscension: {
+        id: "zenithAscension",
+        version: "2.7",
+        redeemCode: "T12S4",
+        rollTier: 12,
+        name: "Zenith Ascension",
+        type: "spell",
+        spellType: "Normal Spell",
+        effect:
+            "Destroy the opponent's monster with the lowest ATK on the field."
+    },
+
+    absoluteJudgment: {
+        id: "absoluteJudgment",
+        version: "2.7",
+        redeemCode: "T12R1",
+        rollTier: 12,
+        name: "Absolute Judgment",
+        type: "trap",
+        trapType: "Normal Trap",
+        trigger: "opponentAttack",
+        effect:
+            "When an opponent's monster declares an attack, negate the attack and destroy that monster."
+    },
+
+    ultimateBulwark: {
+        id: "ultimateBulwark",
+        version: "2.7",
+        redeemCode: "T12R2",
+        rollTier: 12,
+        name: "Ultimate Bulwark",
+        type: "trap",
+        trapType: "Normal Trap",
+        trigger: "opponentAttack",
+        effect:
+            "When an opponent's monster declares an attack, negate the attack and inflict damage equal to that monster's ATK."
+    },
+
+    apexRetribution: {
+        id: "apexRetribution",
+        version: "2.7",
+        redeemCode: "T12R3",
+        rollTier: 12,
+        name: "Apex Retribution",
+        type: "trap",
+        trapType: "Normal Trap",
+        trigger: "opponentAttack",
+        effect:
+            "When an opponent's monster declares an attack, negate the attack, destroy that monster, and inflict 740 damage to your opponent."
+    },
+
+    supremeJudgment: {
+        id: "supremeJudgment",
+        version: "2.7",
+        redeemCode: "T12R4",
+        rollTier: 12,
+        name: "Supreme Judgment",
+        type: "trap",
+        trapType: "Normal Trap",
+        trigger: "opponentAttack",
+        effect:
+            "When an opponent's monster declares an attack, negate the attack and inflict 1380 damage to your opponent."
+    },
+
     /* ===== FRANCHISE DECKS (v2.4) — Exodia =====
        The five Forbidden One pieces. Deliberately weak
        stats — their real power is the alternate win
@@ -5089,6 +5896,7 @@ const CARD_DATABASE = {
         id: "royalMagicalLibrary",
         version: "2.4",
         name: "Royal Magical Library",
+        playstyles: ["extradeckspam"],
         type: "monster",
         attribute: "LIGHT",
         level: 4,
@@ -5103,6 +5911,7 @@ const CARD_DATABASE = {
         id: "hitotsuMeGiant",
         version: "2.4",
         name: "Hitotsu-Me Giant",
+        playstyles: ["extradeckspam"],
         type: "monster",
         attribute: "EARTH",
         level: 4,
@@ -5117,6 +5926,7 @@ const CARD_DATABASE = {
         id: "koumoriDragon",
         version: "2.4",
         name: "Koumori Dragon",
+        playstyles: ["extradeckspam"],
         type: "monster",
         attribute: "WIND",
         level: 4,
@@ -5131,6 +5941,7 @@ const CARD_DATABASE = {
         id: "feralImp",
         version: "2.4",
         name: "Feral Imp",
+        playstyles: ["extradeckspam"],
         type: "monster",
         attribute: "DARK",
         level: 4,
@@ -5199,6 +6010,38 @@ const CARD_DATABASE = {
         def: 1400,
         effect:
             "While attacking, this card gains 400 ATK."
+    },
+
+    elementalHeroPendulumSage: {
+        id: "elementalHeroPendulumSage",
+        version: "2.7",
+        name: "Elemental Hero Pendulum Sage",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 3,
+        monsterType: "Warrior",
+        atk: 1300,
+        def: 1500,
+        isPendulum: true,
+        pendulumScale: 2,
+        effect:
+            "Pendulum Scale 2. Can be Set in a Pendulum Zone instead of Summoned normally. When this card is Normal Summoned, draw 1 card."
+    },
+
+    elementalHeroPendulumVanguard: {
+        id: "elementalHeroPendulumVanguard",
+        version: "2.7",
+        name: "Elemental Hero Pendulum Vanguard",
+        type: "monster",
+        attribute: "EARTH",
+        level: 6,
+        monsterType: "Warrior",
+        atk: 2000,
+        def: 1600,
+        isPendulum: true,
+        pendulumScale: 7,
+        effect:
+            "Pendulum Scale 7. Can be Set in a Pendulum Zone instead of Summoned normally. The first time this card attacks each turn, it gains 400 ATK during damage calculation."
     },
 
     elementalHeroAvian: {
@@ -5282,7 +6125,7 @@ const CARD_DATABASE = {
         atk: 1900,
         def: 1300,
         effect:
-            "A powerful monster from a legendary Duelist's deck."
+            "While attacking, this card gains 400 ATK."
     },
 
     elementalHeroStratos: {
@@ -5303,6 +6146,7 @@ const CARD_DATABASE = {
         id: "blackwingGaleTheWhirlwind",
         version: "2.4",
         name: "Blackwing - Gale the Whirlwind",
+        playstyles: ["extradeckspam"],
         type: "monster",
         attribute: "WIND",
         level: 3,
@@ -5416,6 +6260,7 @@ const CARD_DATABASE = {
         id: "redEyesRetroDragon",
         version: "2.4",
         name: "Red-Eyes Retro Dragon",
+        playstyles: ["extradeckspam"],
         type: "monster",
         attribute: "DARK",
         level: 3,
@@ -5515,6 +6360,7 @@ const CARD_DATABASE = {
         id: "handOfTheSixSamurai",
         version: "2.4",
         name: "Hand of the Six Samurai",
+        playstyles: ["extradeckspam"],
         type: "monster",
         attribute: "FIRE",
         level: 3,
@@ -5544,6 +6390,7 @@ const CARD_DATABASE = {
         id: "junkSynchron",
         version: "2.4",
         name: "Junk Synchron",
+        playstyles: ["extradeckspam"],
         type: "monster",
         attribute: "FIRE",
         level: 3,
@@ -5552,7 +6399,7 @@ const CARD_DATABASE = {
         def: 500,
         isTuner: true,
         effect:
-            "When this card is Normal Summoned, draw 1 card."
+            "When this card is Normal Summoned, Special Summon 1 Level 2 or lower monster from your Graveyard."
     },
 
     speedWarrior: {
@@ -5587,6 +6434,7 @@ const CARD_DATABASE = {
         id: "quillboltHedgehog",
         version: "2.4",
         name: "Quillbolt Hedgehog",
+        playstyles: ["extradeckspam"],
         type: "monster",
         attribute: "EARTH",
         level: 2,
@@ -5595,13 +6443,14 @@ const CARD_DATABASE = {
         def: 800,
         isTuner: true,
         effect:
-            "While in Defense Position, this card gains 600 DEF."
+            "When this card is Normal Summoned, Special Summon 1 Level 2 or lower monster from your Graveyard."
     },
 
     sonicChick: {
         id: "sonicChick",
         version: "2.4",
         name: "Sonic Chick",
+        playstyles: ["extradeckspam"],
         type: "monster",
         attribute: "WIND",
         level: 3,
@@ -5610,7 +6459,7 @@ const CARD_DATABASE = {
         def: 1500,
         isTuner: true,
         effect:
-            "When this card is Normal Summoned, gain 400 LP."
+            "Once per turn, this card cannot be destroyed by battle or by a Trap Card that would destroy it. When this effect saves it, gain 250 LP."
     },
 
     doubleWarrior: {
@@ -5624,7 +6473,7 @@ const CARD_DATABASE = {
         atk: 900,
         def: 900,
         effect:
-            "A powerful monster from a legendary Duelist's deck."
+            "The first time this card attacks each turn, it gains 900 ATK during damage calculation — doubling its strength for that battle."
     },
 
     ariaTheMelodiousDiva: {
@@ -5639,6 +6488,38 @@ const CARD_DATABASE = {
         def: 1200,
         effect:
             "When this card is Normal Summoned, gain 600 LP."
+    },
+
+    melodiousPrimaDonna: {
+        id: "melodiousPrimaDonna",
+        version: "2.6",
+        name: "Melodious Prima Donna",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 3,
+        monsterType: "Fairy",
+        atk: 1200,
+        def: 1400,
+        isPendulum: true,
+        pendulumScale: 1,
+        effect:
+            "Pendulum Scale 1. Can be Set in a Pendulum Zone instead of Summoned normally. When this card is Normal Summoned, draw 1 card."
+    },
+
+    melodiousOverture: {
+        id: "melodiousOverture",
+        version: "2.6",
+        name: "Melodious Overture",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 7,
+        monsterType: "Fairy",
+        atk: 2200,
+        def: 1800,
+        isPendulum: true,
+        pendulumScale: 8,
+        effect:
+            "Pendulum Scale 8. Can be Set in a Pendulum Zone instead of Summoned normally. While attacking, this card gains 400 ATK."
     },
 
     sonataTheMelodiousDiva: {
@@ -5922,7 +6803,7 @@ const CARD_DATABASE = {
             "Blue-Eyes White Dragon"
         ],
         effect:
-            "A powerful monster from a legendary Duelist's deck."
+            "An ultimate three-headed dragon born from the fusion of two Blue-Eyes White Dragons — pure destructive power, and nothing more."
     },
 
     blueEyesTwinBurstDragon: {
@@ -6041,6 +6922,37 @@ const CARD_DATABASE = {
             "This card cannot be destroyed by battle while in Defense Position."
     },
 
+    formulaSynchron: {
+        id: "formulaSynchron",
+        version: "2.6",
+        name: "Formula Synchron",
+        playstyles: ["extradeckspam"],
+        type: "synchro",
+        attribute: "WIND",
+        level: 2,
+        monsterType: "Machine",
+        atk: 200,
+        def: 1500,
+        isTuner: true,
+        effect:
+            "A Synchro Tuner — this card is both a Synchro Monster and a Tuner, and can be used as material for another Synchro Summon. When this card is Synchro Summoned, draw 1 card."
+    },
+
+    shootingStarDragon: {
+        id: "shootingStarDragon",
+        version: "2.6",
+        name: "Shooting Star Dragon",
+        type: "synchro",
+        attribute: "WIND",
+        level: 10,
+        monsterType: "Dragon",
+        atk: 3300,
+        def: 2500,
+        requiresTwoTuners: true,
+        effect:
+            "Accel Synchro — requires 2 Tuner monsters on your field (rather than the usual 1). The first time this card attacks each turn, it gains 700 ATK during damage calculation."
+    },
+
     junkWarrior: {
         id: "junkWarrior",
         version: "2.4",
@@ -6116,7 +7028,7 @@ const CARD_DATABASE = {
     savageHerald: {
         id: "savageHerald",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Savage Herald",
         type: "monster",
         attribute: "WIND",
@@ -6131,7 +7043,7 @@ const CARD_DATABASE = {
     savageBerserker: {
         id: "savageBerserker",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "stall"],
         name: "Savage Berserker",
         type: "monster",
         attribute: "WIND",
@@ -6176,7 +7088,7 @@ const CARD_DATABASE = {
     blitzHerald: {
         id: "blitzHerald",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Blitz Herald",
         type: "monster",
         attribute: "FIRE",
@@ -6191,7 +7103,7 @@ const CARD_DATABASE = {
     unboundWraith: {
         id: "unboundWraith",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "stall"],
         name: "Unbound Wraith",
         type: "monster",
         attribute: "WIND",
@@ -6251,7 +7163,7 @@ const CARD_DATABASE = {
     rampantBrigand: {
         id: "rampantBrigand",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Rampant Brigand",
         type: "monster",
         attribute: "FIRE",
@@ -6266,7 +7178,7 @@ const CARD_DATABASE = {
     brutalHerald: {
         id: "brutalHerald",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "stall"],
         name: "Brutal Herald",
         type: "monster",
         attribute: "EARTH",
@@ -6311,7 +7223,7 @@ const CARD_DATABASE = {
     unboundBrigand: {
         id: "unboundBrigand",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Unbound Brigand",
         type: "monster",
         attribute: "EARTH",
@@ -6326,7 +7238,7 @@ const CARD_DATABASE = {
     rampantStalker: {
         id: "rampantStalker",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "stall"],
         name: "Rampant Stalker",
         type: "monster",
         attribute: "EARTH",
@@ -6386,7 +7298,7 @@ const CARD_DATABASE = {
     savageBrigand: {
         id: "savageBrigand",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Savage Brigand",
         type: "monster",
         attribute: "EARTH",
@@ -6416,7 +7328,7 @@ const CARD_DATABASE = {
     elusiveNomad: {
         id: "elusiveNomad",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "swarm"],
         name: "Elusive Nomad",
         type: "monster",
         attribute: "WATER",
@@ -6431,7 +7343,7 @@ const CARD_DATABASE = {
     warpedStalker: {
         id: "warpedStalker",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Warped Stalker",
         type: "monster",
         attribute: "DARK",
@@ -6476,7 +7388,7 @@ const CARD_DATABASE = {
     phantomAdept: {
         id: "phantomAdept",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "swarm"],
         name: "Phantom Adept",
         type: "monster",
         attribute: "DARK",
@@ -6491,7 +7403,7 @@ const CARD_DATABASE = {
     shiftingStalker: {
         id: "shiftingStalker",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Shifting Stalker",
         type: "monster",
         attribute: "WATER",
@@ -6551,7 +7463,7 @@ const CARD_DATABASE = {
     deceptiveHerald: {
         id: "deceptiveHerald",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "swarm"],
         name: "Deceptive Herald",
         type: "monster",
         attribute: "DARK",
@@ -6566,7 +7478,7 @@ const CARD_DATABASE = {
     cunningKeeper: {
         id: "cunningKeeper",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Cunning Keeper",
         type: "monster",
         attribute: "WATER",
@@ -6611,7 +7523,7 @@ const CARD_DATABASE = {
     maskedWraith: {
         id: "maskedWraith",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "swarm"],
         name: "Masked Wraith",
         type: "monster",
         attribute: "WATER",
@@ -6626,7 +7538,7 @@ const CARD_DATABASE = {
     phantomShade: {
         id: "phantomShade",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Phantom Shade",
         type: "monster",
         attribute: "DARK",
@@ -6686,7 +7598,7 @@ const CARD_DATABASE = {
     hollowWraith: {
         id: "hollowWraith",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "swarm"],
         name: "Hollow Wraith",
         type: "monster",
         attribute: "DARK",
@@ -6716,7 +7628,7 @@ const CARD_DATABASE = {
     anchoringBerserker: {
         id: "anchoringBerserker",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "swarm"],
         name: "Anchoring Berserker",
         type: "monster",
         attribute: "LIGHT",
@@ -6731,7 +7643,7 @@ const CARD_DATABASE = {
     anchoringOutcast: {
         id: "anchoringOutcast",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Anchoring Outcast",
         type: "monster",
         attribute: "EARTH",
@@ -6776,7 +7688,7 @@ const CARD_DATABASE = {
     steadfastShade: {
         id: "steadfastShade",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "swarm"],
         name: "Steadfast Shade",
         type: "monster",
         attribute: "LIGHT",
@@ -6791,7 +7703,7 @@ const CARD_DATABASE = {
     steadfastOutcast: {
         id: "steadfastOutcast",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Steadfast Outcast",
         type: "monster",
         attribute: "LIGHT",
@@ -6851,7 +7763,7 @@ const CARD_DATABASE = {
     anchoringHerald: {
         id: "anchoringHerald",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "swarm"],
         name: "Anchoring Herald",
         type: "monster",
         attribute: "LIGHT",
@@ -6866,7 +7778,7 @@ const CARD_DATABASE = {
     anchoringWarden: {
         id: "anchoringWarden",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Anchoring Warden",
         type: "monster",
         attribute: "EARTH",
@@ -6911,7 +7823,7 @@ const CARD_DATABASE = {
     bolsteringWraith: {
         id: "bolsteringWraith",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "swarm"],
         name: "Bolstering Wraith",
         type: "monster",
         attribute: "LIGHT",
@@ -6926,7 +7838,7 @@ const CARD_DATABASE = {
     bolsteringNomad: {
         id: "bolsteringNomad",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Bolstering Nomad",
         type: "monster",
         attribute: "LIGHT",
@@ -6986,7 +7898,7 @@ const CARD_DATABASE = {
     steadfastReaver: {
         id: "steadfastReaver",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "swarm"],
         name: "Steadfast Reaver",
         type: "monster",
         attribute: "LIGHT",
@@ -7016,7 +7928,7 @@ const CARD_DATABASE = {
     moltenAdept: {
         id: "moltenAdept",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "swarm"],
         name: "Molten Adept",
         type: "monster",
         attribute: "FIRE",
@@ -7031,7 +7943,7 @@ const CARD_DATABASE = {
     blisteringHerald: {
         id: "blisteringHerald",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "stall"],
         name: "Blistering Herald",
         type: "monster",
         attribute: "FIRE",
@@ -7076,7 +7988,7 @@ const CARD_DATABASE = {
     searingBrigand: {
         id: "searingBrigand",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "swarm"],
         name: "Searing Brigand",
         type: "monster",
         attribute: "FIRE",
@@ -7091,7 +8003,7 @@ const CARD_DATABASE = {
     cinderReaver: {
         id: "cinderReaver",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "stall"],
         name: "Cinder Reaver",
         type: "monster",
         attribute: "DARK",
@@ -7151,7 +8063,7 @@ const CARD_DATABASE = {
     ashenWraith: {
         id: "ashenWraith",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "swarm"],
         name: "Ashen Wraith",
         type: "monster",
         attribute: "FIRE",
@@ -7166,7 +8078,7 @@ const CARD_DATABASE = {
     kindledReaver: {
         id: "kindledReaver",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "stall"],
         name: "Kindled Reaver",
         type: "monster",
         attribute: "FIRE",
@@ -7211,7 +8123,7 @@ const CARD_DATABASE = {
     charredCultist: {
         id: "charredCultist",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "swarm"],
         name: "Charred Cultist",
         type: "monster",
         attribute: "FIRE",
@@ -7226,7 +8138,7 @@ const CARD_DATABASE = {
     cinderMarauder: {
         id: "cinderMarauder",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "stall"],
         name: "Cinder Marauder",
         type: "monster",
         attribute: "FIRE",
@@ -7286,7 +8198,7 @@ const CARD_DATABASE = {
     ashenBerserker: {
         id: "ashenBerserker",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "swarm"],
         name: "Ashen Berserker",
         type: "monster",
         attribute: "DARK",
@@ -7301,7 +8213,7 @@ const CARD_DATABASE = {
     unboundPact: {
         id: "unboundPact",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Unbound Pact",
         type: "spell",
         spellType: "Normal Spell",
@@ -7323,7 +8235,7 @@ const CARD_DATABASE = {
     recklessDecree: {
         id: "recklessDecree",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "stall"],
         name: "Reckless Decree",
         type: "spell",
         spellType: "Normal Spell",
@@ -7411,7 +8323,7 @@ const CARD_DATABASE = {
     feralVerdict: {
         id: "feralVerdict",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Feral Verdict",
         type: "spell",
         spellType: "Normal Spell",
@@ -7433,7 +8345,7 @@ const CARD_DATABASE = {
     savageReckoning: {
         id: "savageReckoning",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "stall"],
         name: "Savage Reckoning",
         type: "spell",
         spellType: "Normal Spell",
@@ -7466,7 +8378,7 @@ const CARD_DATABASE = {
     veiledPact: {
         id: "veiledPact",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "swarm"],
         name: "Veiled Pact",
         type: "spell",
         spellType: "Normal Spell",
@@ -7488,7 +8400,7 @@ const CARD_DATABASE = {
     shiftingBargain: {
         id: "shiftingBargain",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Shifting Bargain",
         type: "spell",
         spellType: "Normal Spell",
@@ -7576,7 +8488,7 @@ const CARD_DATABASE = {
     maskedResonance: {
         id: "maskedResonance",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "swarm"],
         name: "Masked Resonance",
         type: "spell",
         spellType: "Normal Spell",
@@ -7598,7 +8510,7 @@ const CARD_DATABASE = {
     warpedCommunion: {
         id: "warpedCommunion",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Warped Communion",
         type: "spell",
         spellType: "Normal Spell",
@@ -7631,7 +8543,7 @@ const CARD_DATABASE = {
     patientResonance: {
         id: "patientResonance",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "swarm"],
         name: "Patient Resonance",
         type: "spell",
         spellType: "Normal Spell",
@@ -7653,7 +8565,7 @@ const CARD_DATABASE = {
     patientVerdict: {
         id: "patientVerdict",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Patient Verdict",
         type: "spell",
         spellType: "Normal Spell",
@@ -7741,7 +8653,7 @@ const CARD_DATABASE = {
     enduringSurge: {
         id: "enduringSurge",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "swarm"],
         name: "Enduring Surge",
         type: "spell",
         spellType: "Normal Spell",
@@ -7763,7 +8675,7 @@ const CARD_DATABASE = {
     guidingCascade: {
         id: "guidingCascade",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Guiding Cascade",
         type: "spell",
         spellType: "Normal Spell",
@@ -7796,7 +8708,7 @@ const CARD_DATABASE = {
     ashenGambit: {
         id: "ashenGambit",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "swarm"],
         name: "Ashen Gambit",
         type: "spell",
         spellType: "Normal Spell",
@@ -7818,7 +8730,7 @@ const CARD_DATABASE = {
     smolderingGambit: {
         id: "smolderingGambit",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "stall"],
         name: "Smoldering Gambit",
         type: "spell",
         spellType: "Normal Spell",
@@ -7906,7 +8818,7 @@ const CARD_DATABASE = {
     moltenSurge: {
         id: "moltenSurge",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "swarm"],
         name: "Molten Surge",
         type: "spell",
         spellType: "Normal Spell",
@@ -7928,7 +8840,7 @@ const CARD_DATABASE = {
     scorchingCommunion: {
         id: "scorchingCommunion",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "stall"],
         name: "Scorching Communion",
         type: "spell",
         spellType: "Normal Spell",
@@ -8045,7 +8957,7 @@ const CARD_DATABASE = {
     viciousGambit: {
         id: "viciousGambit",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "stall"],
         name: "Vicious Gambit",
         type: "trap",
         trapType: "Normal Trap",
@@ -8057,7 +8969,7 @@ const CARD_DATABASE = {
     rampantInterception: {
         id: "rampantInterception",
         version: "2.1",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "stall"],
         name: "Rampant Interception",
         type: "trap",
         trapType: "Normal Trap",
@@ -8225,7 +9137,7 @@ const CARD_DATABASE = {
     hollowRetort: {
         id: "hollowRetort",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Hollow Retort",
         type: "trap",
         trapType: "Normal Trap",
@@ -8237,7 +9149,7 @@ const CARD_DATABASE = {
     maskedVigil: {
         id: "maskedVigil",
         version: "2.1",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Masked Vigil",
         type: "trap",
         trapType: "Normal Trap",
@@ -8405,7 +9317,7 @@ const CARD_DATABASE = {
     resoluteInterception: {
         id: "resoluteInterception",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Resolute Interception",
         type: "trap",
         trapType: "Normal Trap",
@@ -8417,7 +9329,7 @@ const CARD_DATABASE = {
     steadfastRetort: {
         id: "steadfastRetort",
         version: "2.1",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Steadfast Retort",
         type: "trap",
         trapType: "Normal Trap",
@@ -8585,7 +9497,7 @@ const CARD_DATABASE = {
     scorchingWard: {
         id: "scorchingWard",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "stall"],
         name: "Scorching Ward",
         type: "trap",
         trapType: "Normal Trap",
@@ -8597,7 +9509,7 @@ const CARD_DATABASE = {
     blisteringBacklash: {
         id: "blisteringBacklash",
         version: "2.1",
-        playstyles: ["burn"],
+        playstyles: ["burn", "stall"],
         name: "Blistering Backlash",
         type: "trap",
         trapType: "Normal Trap",
@@ -10872,7 +11784,7 @@ const CARD_DATABASE = {
     blitzWolf: {
         id: "blitzWolf",
         version: "1.7",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "extradeckspam"],
         name: "Blitz Wolf",
         type: "monster",
         attribute: "WIND",
@@ -10903,7 +11815,7 @@ const CARD_DATABASE = {
     vanguardBerserker: {
         id: "vanguardBerserker",
         version: "1.7",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Vanguard Berserker",
         type: "monster",
         attribute: "FIRE",
@@ -10918,7 +11830,7 @@ const CARD_DATABASE = {
     frenziedTiger: {
         id: "frenziedTiger",
         version: "1.7",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "extradeckspam"],
         name: "Frenzied Tiger",
         type: "monster",
         attribute: "EARTH",
@@ -10983,7 +11895,7 @@ const CARD_DATABASE = {
     warlordOfRuin: {
         id: "warlordOfRuin",
         version: "1.7",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Warlord of Ruin",
         type: "fusion",
         attribute: "FIRE",
@@ -11002,7 +11914,7 @@ const CARD_DATABASE = {
     berserkingColossus: {
         id: "berserkingColossus",
         version: "1.7",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm"],
         name: "Berserking Colossus",
         type: "synchro",
         attribute: "FIRE",
@@ -11017,7 +11929,7 @@ const CARD_DATABASE = {
     twinFuryRampager: {
         id: "twinFuryRampager",
         version: "1.7",
-        playstyles: ["aggro"],
+        playstyles: ["aggro", "swarm", "extradeckspam"],
         name: "Twin Fury Rampager",
         type: "xyz",
         attribute: "EARTH",
@@ -11049,7 +11961,7 @@ const CARD_DATABASE = {
     trapWeaver: {
         id: "trapWeaver",
         version: "1.7",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Trap Weaver",
         type: "monster",
         attribute: "DARK",
@@ -11079,7 +11991,7 @@ const CARD_DATABASE = {
     bastionKeeper: {
         id: "bastionKeeper",
         version: "1.7",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Bastion Keeper",
         type: "monster",
         attribute: "EARTH",
@@ -11094,7 +12006,7 @@ const CARD_DATABASE = {
     puppetMaster: {
         id: "puppetMaster",
         version: "1.7",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "extradeckspam"],
         name: "Puppet Master",
         type: "monster",
         attribute: "DARK",
@@ -11110,7 +12022,7 @@ const CARD_DATABASE = {
     wardenOfSecrets: {
         id: "wardenOfSecrets",
         version: "1.7",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Warden of Secrets",
         type: "monster",
         attribute: "LIGHT",
@@ -11136,7 +12048,7 @@ const CARD_DATABASE = {
     silentSabotage: {
         id: "silentSabotage",
         version: "1.7",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Silent Sabotage",
         type: "spell",
         spellType: "Normal Spell",
@@ -11159,7 +12071,7 @@ const CARD_DATABASE = {
     grandIllusionist: {
         id: "grandIllusionist",
         version: "1.7",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Grand Illusionist",
         type: "fusion",
         attribute: "LIGHT",
@@ -11193,7 +12105,7 @@ const CARD_DATABASE = {
     twinWardSentinel: {
         id: "twinWardSentinel",
         version: "1.7",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall", "extradeckspam"],
         name: "Twin Ward Sentinel",
         type: "xyz",
         attribute: "LIGHT",
@@ -11225,7 +12137,7 @@ const CARD_DATABASE = {
     scrapCollector: {
         id: "scrapCollector",
         version: "1.7",
-        playstyles: ["support"],
+        playstyles: ["support", "extradeckspam"],
         name: "Scrap Collector",
         type: "monster",
         attribute: "EARTH",
@@ -11241,7 +12153,7 @@ const CARD_DATABASE = {
     fortuneSeeker: {
         id: "fortuneSeeker",
         version: "1.7",
-        playstyles: ["support"],
+        playstyles: ["support", "swarm"],
         name: "Fortune Seeker",
         type: "monster",
         attribute: "WIND",
@@ -11256,7 +12168,7 @@ const CARD_DATABASE = {
     elderSage: {
         id: "elderSage",
         version: "1.7",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Elder Sage",
         type: "monster",
         attribute: "LIGHT",
@@ -11271,7 +12183,7 @@ const CARD_DATABASE = {
     pathfinderScout: {
         id: "pathfinderScout",
         version: "1.7",
-        playstyles: ["support"],
+        playstyles: ["support", "extradeckspam"],
         name: "Pathfinder Scout",
         type: "monster",
         attribute: "EARTH",
@@ -11287,7 +12199,7 @@ const CARD_DATABASE = {
     grandArchivist: {
         id: "grandArchivist",
         version: "1.7",
-        playstyles: ["support"],
+        playstyles: ["support", "swarm"],
         name: "Grand Archivist",
         type: "monster",
         attribute: "LIGHT",
@@ -11336,7 +12248,7 @@ const CARD_DATABASE = {
     archiveSovereign: {
         id: "archiveSovereign",
         version: "1.7",
-        playstyles: ["support"],
+        playstyles: ["support", "swarm"],
         name: "Archive Sovereign",
         type: "fusion",
         attribute: "LIGHT",
@@ -11355,7 +12267,7 @@ const CARD_DATABASE = {
     wisdomIncarnate: {
         id: "wisdomIncarnate",
         version: "1.7",
-        playstyles: ["support"],
+        playstyles: ["support", "stall", "swarm"],
         name: "Wisdom Incarnate",
         type: "synchro",
         attribute: "LIGHT",
@@ -11370,7 +12282,7 @@ const CARD_DATABASE = {
     twinSeerOracle: {
         id: "twinSeerOracle",
         version: "1.7",
-        playstyles: ["support"],
+        playstyles: ["support", "swarm", "extradeckspam"],
         name: "Twin Seer Oracle",
         type: "xyz",
         attribute: "LIGHT",
@@ -11447,7 +12359,7 @@ const CARD_DATABASE = {
     kindlingSprite: {
         id: "kindlingSprite",
         version: "1.7",
-        playstyles: ["burn"],
+        playstyles: ["burn", "extradeckspam"],
         name: "Kindling Sprite",
         type: "monster",
         attribute: "FIRE",
@@ -11531,7 +12443,7 @@ const CARD_DATABASE = {
     pyroclasmDragon: {
         id: "pyroclasmDragon",
         version: "1.7",
-        playstyles: ["burn"],
+        playstyles: ["burn", "stall"],
         name: "Pyroclasm Dragon",
         type: "synchro",
         attribute: "FIRE",
@@ -11546,7 +12458,7 @@ const CARD_DATABASE = {
     twinBlazeFiend: {
         id: "twinBlazeFiend",
         version: "1.7",
-        playstyles: ["burn"],
+        playstyles: ["burn", "extradeckspam"],
         name: "Twin Blaze Fiend",
         type: "xyz",
         attribute: "FIRE",
@@ -11649,7 +12561,7 @@ const CARD_DATABASE = {
     webOfDeceit: {
         id: "webOfDeceit",
         version: "1.8",
-        playstyles: ["trickery"],
+        playstyles: ["trickery", "stall"],
         name: "Web of Deceit",
         type: "trap",
         trapType: "Normal Trap",
@@ -11673,7 +12585,7 @@ const CARD_DATABASE = {
     safetyNet: {
         id: "safetyNet",
         version: "1.8",
-        playstyles: ["support"],
+        playstyles: ["support", "stall"],
         name: "Safety Net",
         type: "trap",
         trapType: "Normal Trap",
@@ -12388,10 +13300,10 @@ const PREMADE_DECKS = {
             "elementalHeroNeosAlius",
             "elementalHeroStratos",
             "elementalHeroStratos",
+            "elementalHeroPendulumSage",
+            "elementalHeroPendulumVanguard",
             "mirrorForce",
             "mirrorForce",
-            "mirrorForce",
-            "magicCylinder",
             "magicCylinder",
             "magicCylinder",
             "fissure",
@@ -12654,7 +13566,9 @@ const PREMADE_DECKS = {
             "stardustDragon",
             "junkWarrior",
             "nitroWarrior",
-            "turboWarrior"
+            "turboWarrior",
+            "formulaSynchron",
+            "shootingStarDragon"
         ]
 
     },
@@ -12700,8 +13614,8 @@ const PREMADE_DECKS = {
             "darkHole",
             "healingLight",
             "healingLight",
-            "healingLight",
-            "healingLight",
+            "melodiousPrimaDonna",
+            "melodiousOverture",
             "powerBoost",
             "powerBoost",
             "powerBoost",
@@ -12839,6 +13753,8 @@ function createEmptyPlayer() {
         field: [],
 
         spellTrap: [],
+
+        pendulumZones: [null, null],
 
         extraDeck: [],
 
@@ -13064,7 +13980,141 @@ function newDuel() {
 
 let importedCustomCardIds = [];
 
+function isExtraDeckCardType(type) {
+
+    return type === "fusion" || type === "synchro" || type === "xyz";
+
+}
+
+
+function buildImportedCardEntry(id, card) {
+
+    const isExtraDeckType =
+        isExtraDeckCardType(card.type);
+
+    const entry = {
+        id: id,
+        imported: true,
+        version: "Custom",
+        deckMakerOnly: isExtraDeckType,
+        name: card.name,
+        type: card.type,
+        effect:
+            (card.description ? card.description : "A custom-created card.") +
+            (
+                isExtraDeckType
+                    ? " (Imported from the Card Creator — real stats and Summoning requirements, no special effect beyond flavor.)"
+                    : " (Imported from the Card Creator — flavor text only, no functional effect.)"
+            )
+    };
+
+
+    if (card.type === "monster") {
+
+        entry.attribute = card.attribute || "LIGHT";
+        entry.level = Number(card.level) || 4;
+        entry.monsterType = card.monsterType || "Warrior";
+        entry.isTuner = !!card.tuner;
+        entry.atk = Number(card.attack) || 0;
+        entry.def = Number(card.defense) || 0;
+
+        if (card.isPendulum) {
+
+            entry.isPendulum = true;
+
+            entry.pendulumScale =
+                Math.max(0, Math.min(13, Number(card.pendulumScale) || 4));
+
+        }
+
+    } else if (card.type === "spell") {
+
+        entry.spellType = card.spellType || "Normal Spell";
+
+    } else if (card.type === "trap") {
+
+        entry.trapType = card.trapType || "Normal Trap";
+
+    } else if (card.type === "fusion") {
+
+        entry.attribute = card.attribute || "LIGHT";
+        entry.level = Number(card.level) || 7;
+        entry.monsterType = card.monsterType || "Warrior";
+        entry.atk = Number(card.attack) || 0;
+        entry.def = Number(card.defense) || 0;
+
+        const materials =
+            Array.isArray(card.materials)
+                ? card.materials.map(m => String(m || "").trim()).filter(Boolean)
+                : [];
+
+        entry.materials =
+            materials.length === 2 ? materials : ["", ""];
+
+    } else if (card.type === "synchro") {
+
+        entry.attribute = card.attribute || "LIGHT";
+        entry.level = Number(card.level) || 8;
+        entry.monsterType = card.monsterType || "Dragon";
+        entry.atk = Number(card.attack) || 0;
+        entry.def = Number(card.defense) || 0;
+        entry.isTuner = !!card.tuner;
+
+        if (card.requiresTwoTuners) {
+            entry.requiresTwoTuners = true;
+        }
+
+    } else if (card.type === "xyz") {
+
+        entry.attribute = card.attribute || "LIGHT";
+        entry.rank = Number(card.rank) || 4;
+        entry.level = entry.rank;
+        entry.materialCount =
+            Math.max(2, Number(card.materialCount) || 2);
+        entry.monsterType = card.monsterType || "Warrior";
+        entry.atk = Number(card.attack) || 0;
+        entry.def = Number(card.defense) || 0;
+
+    }
+
+    return entry;
+
+}
+
+
+function migrateLegacyEckbuilerDataIntoProfile() {
+
+    const legacyCards =
+        localStorage.getItem("customYuGiOhCards");
+
+    const scopedCardsKey =
+        profileKey("customYuGiOhCards");
+
+    if (legacyCards && !localStorage.getItem(scopedCardsKey)) {
+
+        localStorage.setItem(scopedCardsKey, legacyCards);
+
+    }
+
+
+    const legacyDeck =
+        localStorage.getItem("eckbuilerActiveDeck");
+
+    const scopedDeckKey =
+        profileKey("eckbuilerActiveDeck");
+
+    if (legacyDeck && !localStorage.getItem(scopedDeckKey)) {
+
+        localStorage.setItem(scopedDeckKey, legacyDeck);
+
+    }
+
+}
+
+
 function importEckbuilerCards() {
+
+    migrateLegacyEckbuilerDataIntoProfile();
 
     importedCustomCardIds.forEach(function(id) {
         delete CARD_DATABASE[id];
@@ -13078,7 +14128,7 @@ function importEckbuilerCards() {
     try {
 
         raw = JSON.parse(
-            localStorage.getItem("customYuGiOhCards") || "[]"
+            localStorage.getItem(profileKey("customYuGiOhCards")) || "[]"
         );
 
     } catch (error) {
@@ -13102,7 +14152,8 @@ function importEckbuilerCards() {
         if (
             card.type !== "monster" &&
             card.type !== "spell" &&
-            card.type !== "trap"
+            card.type !== "trap" &&
+            !isExtraDeckCardType(card.type)
         ) {
             return;
         }
@@ -13111,43 +14162,148 @@ function importEckbuilerCards() {
         const id =
             "custom_" + card.id;
 
-        const entry = {
-            id: id,
-            imported: true,
-            version: "Custom",
-            name: card.name,
-            type: card.type,
-            effect:
-                (card.description ? card.description : "A custom-created card.") +
-                " (Imported from the Card Creator — flavor text only, no functional effect.)"
-        };
-
-
-        if (card.type === "monster") {
-
-            entry.attribute = card.attribute || "LIGHT";
-            entry.level = Number(card.level) || 4;
-            entry.monsterType = card.monsterType || "Warrior";
-            entry.isTuner = !!card.tuner;
-            entry.atk = Number(card.attack) || 0;
-            entry.def = Number(card.defense) || 0;
-
-        } else if (card.type === "spell") {
-
-            entry.spellType = card.spellType || "Normal Spell";
-
-        } else {
-
-            entry.trapType = card.trapType || "Normal Trap";
-
-        }
-
-
-        CARD_DATABASE[id] = entry;
+        CARD_DATABASE[id] =
+            buildImportedCardEntry(id, card);
 
         importedCustomCardIds.push(id);
 
     });
+
+}
+
+
+/*
+   Simple deterministic string hash — used to build stable
+   card ids for cards synced in from an eckbuiler deck that
+   don't match any existing card by name.
+*/
+function simpleStringHash(str) {
+
+    let hash = 0;
+
+    for (let i = 0; i < str.length; i++) {
+
+        hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+
+    }
+
+    return Math.abs(hash);
+
+}
+
+
+let syncedEckbuilerDeckCardIds = [];
+
+
+function syncEckbuilerDeck() {
+
+    syncedEckbuilerDeckCardIds.forEach(function(id) {
+
+        if (CARD_DATABASE[id] && CARD_DATABASE[id].fromEckbuilerDeckSync) {
+
+            delete CARD_DATABASE[id];
+
+        }
+
+    });
+
+    syncedEckbuilerDeckCardIds = [];
+
+
+    let raw;
+
+    try {
+
+        raw = JSON.parse(
+            localStorage.getItem(profileKey("eckbuilerActiveDeck")) || "null"
+        );
+
+    } catch (error) {
+
+        raw = null;
+
+    }
+
+
+    if (!raw || !Array.isArray(raw.cards) || raw.cards.length === 0) {
+        return;
+    }
+
+
+    const cardIds =
+        raw.cards.map(function(card) {
+
+            if (!card || !card.name || !card.type) {
+                return null;
+            }
+
+            const realMatch =
+                Object.entries(CARD_DATABASE).find(
+                    ([existingId, existingCard]) =>
+                        existingCard.name === card.name &&
+                        existingCard.type === card.type &&
+                        !existingCard.imported
+                );
+
+            if (realMatch) {
+                return realMatch[0];
+            }
+
+
+            if (
+                card.type !== "monster" &&
+                card.type !== "spell" &&
+                card.type !== "trap" &&
+                !isExtraDeckCardType(card.type)
+            ) {
+                return null;
+            }
+
+
+            const id =
+                "eckdeck_" +
+                card.name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase() +
+                "_" + simpleStringHash(card.name + card.type);
+
+            if (!CARD_DATABASE[id]) {
+
+                const entry =
+                    buildImportedCardEntry(id, card);
+
+                entry.fromEckbuilerDeckSync = true;
+
+                CARD_DATABASE[id] = entry;
+
+            }
+
+            syncedEckbuilerDeckCardIds.push(id);
+
+            return id;
+
+        }).filter(Boolean);
+
+
+    if (cardIds.length === 0) {
+        return;
+    }
+
+
+    const deckName =
+        "🃏 " + (raw.name || "Eckbuiler Deck");
+
+    const decks =
+        getCustomDecks();
+
+    decks[deckName] = {
+        name: deckName,
+        cards: cardIds,
+        extraDeck: (decks[deckName] && decks[deckName].extraDeck) || []
+    };
+
+    localStorage.setItem(
+        profileKey("customDecks"),
+        JSON.stringify(decks)
+    );
 
 }
 
@@ -13403,6 +14559,8 @@ function selectProfile(id) {
 
     setActiveProfileId(id);
 
+    applyAnalyzerGeneratedCards();
+
     applyTheme(getActiveThemeId());
 
     applyBackground(getActiveBackgroundId());
@@ -13412,6 +14570,10 @@ function selectProfile(id) {
     applyPanelTexture(getActivePanelTextureId());
 
     applyDuelBackground(getActiveDuelBackgroundId());
+
+    applyCardBack(getActiveCardBackId());
+
+    applyBanner(getActiveBannerId());
 
     document.getElementById("profileSelectScreen")
         .classList.add("hidden");
@@ -13616,9 +14778,9 @@ function openDeckConfigurer() {
         "🔧 Deck Configurer",
         `
             <p style="color:#999;font-size:13px;">
-                Two tools live here — build a deck from cards
-                that already exist, or design a brand new card
-                of your own.
+                Three tools live here — build a deck by hand,
+                auto-generate one around a playstyle, or design
+                a brand new card of your own.
             </p>
 
             <div style="background:#181818;border-radius:8px;padding:16px;margin-top:12px;cursor:pointer;" onclick="closeModal(); openDeckMaker();">
@@ -13628,10 +14790,24 @@ function openDeckConfigurer() {
                 </div>
             </div>
 
+            <div style="background:#181818;border-radius:8px;padding:16px;margin-top:10px;cursor:pointer;" onclick="closeModal(); openDeckGenerator();">
+                <div style="font-size:18px;">🎲 <strong>Generate a Deck</strong></div>
+                <div style="color:#999;font-size:12px;margin-top:4px;">
+                    Auto-build a full deck around a playstyle — Aggro, Trickery, Support, Burn, Stall, or Swarm.
+                </div>
+            </div>
+
             <div style="background:#181818;border-radius:8px;padding:16px;margin-top:10px;cursor:pointer;" onclick="goToDeckBuilder();">
                 <div style="font-size:18px;">🃏 <strong>Create a Card</strong></div>
                 <div style="color:#999;font-size:12px;margin-top:4px;">
                     Design your own monster, spell, or trap from scratch — anything you make shows up as a real, playable card in the Deck Maker.
+                </div>
+            </div>
+
+            <div style="background:#181818;border-radius:8px;padding:16px;margin-top:10px;cursor:pointer;" onclick="closeModal(); openDeckAnalyzer();">
+                <div style="font-size:18px;">📊 <strong>Deck Analyzer</strong></div>
+                <div style="color:#999;font-size:12px;margin-top:4px;">
+                    Pick a saved deck and see which Extra Deck combos it can already make — and generate new Fusion or Synchro monsters tailored to what's actually in it.
                 </div>
             </div>
 
@@ -13644,11 +14820,471 @@ function openDeckConfigurer() {
 }
 
 
+/* =====================================================
+   DECK ANALYZER
+   Takes a saved custom/generated deck, shows every
+   existing Fusion/Synchro/Xyz card it could already make,
+   and can generate brand new Extra Deck monsters tailored
+   to gaps in what's achievable.
+===================================================== */
+
+function openDeckAnalyzer() {
+
+    const decks =
+        getCustomDecks();
+
+    const names =
+        Object.keys(decks);
+
+    if (names.length === 0) {
+
+        openModal(
+            "📊 Deck Analyzer",
+            `
+                <p>
+                    You don't have any saved decks yet. Build
+                    one in the Deck Maker or Generate a Deck
+                    and save it first.
+                </p>
+                <button style="width:100%;margin-top:10px;" onclick="openDeckConfigurer()">
+                    ← Back
+                </button>
+            `
+        );
+
+        return;
+
+    }
+
+    const rows =
+        names.map(function(name) {
+
+            return `
+                <div style="background:#181818;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;" onclick="analyzeSelectedDeck('${escapeHTML(name).replace(/'/g, "\\'")}')">
+                    <strong>${escapeHTML(name)}</strong>
+                    <div style="color:#999;font-size:11px;margin-top:2px;">
+                        ${decks[name].cards.length} cards, ${(decks[name].extraDeck || []).length} in Extra Deck
+                    </div>
+                </div>
+            `;
+
+        }).join("");
+
+    openModal(
+        "📊 Deck Analyzer",
+        `
+            <p style="color:#999;font-size:13px;">
+                Choose a saved deck to analyze.
+            </p>
+            <div style="max-height:400px;overflow-y:auto;">
+                ${rows}
+            </div>
+            <button class="secondary" style="width:100%;margin-top:10px;" onclick="openDeckConfigurer()">
+                ← Back
+            </button>
+        `
+    );
+
+}
+
+
+function getAnalyzerGeneratedCards() {
+
+    try {
+
+        return JSON.parse(localStorage.getItem(profileKey("analyzerGeneratedCards")) || "{}");
+
+    } catch (error) {
+
+        return {};
+
+    }
+
+}
+
+
+function applyAnalyzerGeneratedCards() {
+
+    const generated =
+        getAnalyzerGeneratedCards();
+
+    Object.keys(generated).forEach(function(id) {
+
+        CARD_DATABASE[id] = generated[id];
+
+    });
+
+}
+
+
+function analyzeSelectedDeck(deckName) {
+
+    const decks =
+        getCustomDecks();
+
+    const deck =
+        decks[deckName];
+
+    if (!deck) {
+
+        openDeckAnalyzer();
+
+        return;
+
+    }
+
+    const pool =
+        deck.cards
+            .map(id => CARD_DATABASE[id])
+            .filter(card => card && card.type === "monster");
+
+    const currentExtra =
+        new Set(deck.extraDeck || []);
+
+    const achievable =
+        Object.values(CARD_DATABASE).filter(function(card) {
+
+            if (card.type === "fusion" && card.materials) {
+
+                return poolHasNamedMaterials(pool, card.materials);
+
+            }
+
+            if (card.type === "synchro") {
+
+                return poolHasSynchroCombo(pool, card.level, card.requiresTwoTuners);
+
+            }
+
+            if (card.type === "xyz") {
+
+                return poolHasXyzCombo(pool, card.rank, card.materialCount);
+
+            }
+
+            return false;
+
+        });
+
+    achievable.sort((a, b) => b.atk - a.atk);
+
+    const notInDeck =
+        achievable.filter(card => !currentExtra.has(card.id));
+
+    const alreadyIn =
+        achievable.filter(card => currentExtra.has(card.id));
+
+
+    const achievableRows =
+        notInDeck.slice(0, 15).map(function(card) {
+
+            const reqText =
+                card.materials
+                    ? card.materials.join(" + ")
+                    : `Level ${card.level}${card.requiresTwoTuners ? " (2 Tuners)" : ""} Synchro`;
+
+            return `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #262626;">
+                    <div>
+                        <div style="font-size:12px;">${escapeHTML(card.name)} <span style="color:#999;">ATK ${card.atk}</span></div>
+                        <div style="color:#777;font-size:10px;">${escapeHTML(reqText)}</div>
+                    </div>
+                    <button style="padding:4px 8px;font-size:11px;" onclick="addAnalyzerCardToDeck('${escapeHTML(deckName).replace(/'/g, "\\'")}', '${card.id}')">
+                        + Add
+                    </button>
+                </div>
+            `;
+
+        }).join("") || `<p style="color:#777;font-size:12px;">Nothing new found — every achievable combo is already in this deck's Extra Deck.</p>`;
+
+
+    /* ---- Gap detection: Synchro levels achievable but with
+       no existing card, and the deck's strongest un-fused
+       named pair with no existing Fusion card ---- */
+
+    const gapLevels = [];
+
+    for (let lvl = 3; lvl <= 12; lvl++) {
+
+        const singleTunerOk =
+            poolHasSynchroCombo(pool, lvl, false);
+
+        const hasExistingCard =
+            Object.values(CARD_DATABASE).some(
+                c => c.type === "synchro" && c.level === lvl && !c.requiresTwoTuners
+            );
+
+        if (singleTunerOk && !hasExistingCard) {
+            gapLevels.push(lvl);
+        }
+
+    }
+
+    const namedMonsters =
+        [...new Set(pool.map(c => c.name))]
+            .map(name => pool.find(c => c.name === name))
+            .sort((a, b) => b.atk - a.atk);
+
+    let fusionGap = null;
+
+    outer:
+    for (let i = 0; i < namedMonsters.length && i < 6; i++) {
+
+        for (let j = i + 1; j < namedMonsters.length && j < 6; j++) {
+
+            const a = namedMonsters[i];
+            const b = namedMonsters[j];
+
+            const existing =
+                Object.values(CARD_DATABASE).find(
+                    c => c.type === "fusion" && c.materials &&
+                        c.materials.length === 2 &&
+                        c.materials.includes(a.name) &&
+                        c.materials.includes(b.name)
+                );
+
+            if (!existing) {
+
+                fusionGap = [a, b];
+
+                break outer;
+
+            }
+
+        }
+
+    }
+
+    const gapHTML =
+        (gapLevels.length === 0 && !fusionGap)
+            ? `<p style="color:#777;font-size:12px;">No obvious gaps — this deck already has good Extra Deck coverage.</p>`
+            : `
+                ${gapLevels.slice(0, 3).map(lvl => `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #262626;">
+                        <div style="font-size:12px;">Level ${lvl} Synchro — achievable, but no card exists at this level yet.</div>
+                        <button style="padding:4px 8px;font-size:11px;" onclick="generateAnalyzerSynchro('${escapeHTML(deckName).replace(/'/g, "\\'")}', ${lvl})">
+                            🔮 Generate
+                        </button>
+                    </div>
+                `).join("")}
+                ${fusionGap ? `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #262626;">
+                        <div style="font-size:12px;">${escapeHTML(fusionGap[0].name)} + ${escapeHTML(fusionGap[1].name)} — no Fusion card uses this pair yet.</div>
+                        <button style="padding:4px 8px;font-size:11px;" onclick="generateAnalyzerFusion('${escapeHTML(deckName).replace(/'/g, "\\'")}', '${fusionGap[0].id}', '${fusionGap[1].id}')">
+                            🔮 Generate
+                        </button>
+                    </div>
+                ` : ""}
+            `;
+
+
+    openModal(
+        "📊 " + deckName,
+        `
+            <h3 style="color:var(--theme-primary-light);">✅ Achievable Combos (${alreadyIn.length} already in deck, ${notInDeck.length} more possible)</h3>
+            <div style="max-height:220px;overflow-y:auto;">
+                ${achievableRows}
+            </div>
+
+            <h3 style="color:var(--theme-primary-light);margin-top:14px;">🔮 Generate a New Extra Deck Monster</h3>
+            <p style="color:#999;font-size:11px;">
+                Combos this deck can make that no existing card covers yet.
+            </p>
+            ${gapHTML}
+
+            <button class="secondary" style="width:100%;margin-top:14px;" onclick="openDeckAnalyzer()">
+                ← Choose a Different Deck
+            </button>
+        `
+    );
+
+}
+
+
+function addAnalyzerCardToDeck(deckName, cardId) {
+
+    const decks =
+        getCustomDecks();
+
+    if (!decks[deckName]) {
+        return;
+    }
+
+    decks[deckName].extraDeck =
+        decks[deckName].extraDeck || [];
+
+    if (!decks[deckName].extraDeck.includes(cardId)) {
+
+        decks[deckName].extraDeck.push(cardId);
+
+    }
+
+    localStorage.setItem(
+        profileKey("customDecks"),
+        JSON.stringify(decks)
+    );
+
+    analyzeSelectedDeck(deckName);
+
+}
+
+
+function saveAnalyzerGeneratedCard(card) {
+
+    CARD_DATABASE[card.id] = card;
+
+    const generated =
+        getAnalyzerGeneratedCards();
+
+    generated[card.id] = card;
+
+    localStorage.setItem(
+        profileKey("analyzerGeneratedCards"),
+        JSON.stringify(generated)
+    );
+
+}
+
+
+function generateAnalyzerSynchro(deckName, level) {
+
+    const decks =
+        getCustomDecks();
+
+    const deck =
+        decks[deckName];
+
+    if (!deck) {
+        return;
+    }
+
+    const pool =
+        deck.cards
+            .map(id => CARD_DATABASE[id])
+            .filter(card => card && card.type === "monster");
+
+    const avgAtk =
+        Math.round(
+            pool.reduce((sum, c) => sum + c.atk, 0) / pool.length
+        );
+
+    const avgDef =
+        Math.round(
+            pool.reduce((sum, c) => sum + c.def, 0) / pool.length
+        );
+
+    const atk =
+        Math.min(3700, Math.round((avgAtk + level * 120) / 50) * 50);
+
+    const def =
+        Math.min(3200, Math.round((avgDef + level * 90) / 50) * 50);
+
+    const bonus =
+        150 + level * 30;
+
+    const id =
+        "analyzerSynchro" + level + "_" + Date.now().toString(36);
+
+    const attrPool =
+        [...new Set(pool.map(c => c.attribute))];
+
+    const typePool =
+        [...new Set(pool.map(c => c.monsterType))];
+
+    const card = {
+        id: id,
+        version: "Custom",
+        analyzerGenerated: true,
+        name: `Analyzed Synchro Lv.${level}`,
+        type: "synchro",
+        attribute: attrPool[0] || "LIGHT",
+        level: level,
+        monsterType: typePool[0] || "Warrior",
+        atk: atk,
+        def: def,
+        effect:
+            `Generated by the Deck Analyzer to fill a gap in this deck's Extra Deck. While attacking, this card gains ${bonus} ATK.`
+    };
+
+    FLAT_ATTACK_BONUS[id] = bonus;
+
+    saveAnalyzerGeneratedCard(card);
+
+    addAnalyzerCardToDeck(deckName, id);
+
+}
+
+
+function generateAnalyzerFusion(deckName, materialIdA, materialIdB) {
+
+    const decks =
+        getCustomDecks();
+
+    const deck =
+        decks[deckName];
+
+    if (!deck) {
+        return;
+    }
+
+    const a =
+        CARD_DATABASE[materialIdA];
+
+    const b =
+        CARD_DATABASE[materialIdB];
+
+    if (!a || !b) {
+        return;
+    }
+
+    const atk =
+        Math.min(3700, Math.round(((a.atk + b.atk) * 0.75 + 400) / 50) * 50);
+
+    const def =
+        Math.min(3200, Math.round(((a.def + b.def) * 0.7 + 300) / 50) * 50);
+
+    const level =
+        Math.min(12, (a.level || 4) + (b.level || 4) + 1);
+
+    const id =
+        "analyzerFusion_" + Date.now().toString(36);
+
+    const bonus =
+        250 + Math.round((a.level || 4) * 40);
+
+    const card = {
+        id: id,
+        version: "Custom",
+        analyzerGenerated: true,
+        name: `${a.name.split(" ")[0]}-${b.name.split(" ")[0]} Fusion`,
+        type: "fusion",
+        attribute: a.attribute || "LIGHT",
+        level: level,
+        monsterType: a.monsterType || b.monsterType || "Warrior",
+        atk: atk,
+        def: def,
+        materials: [a.name, b.name],
+        effect:
+            `Generated by the Deck Analyzer to fill a gap in this deck's Extra Deck. When this card destroys a monster by battle, inflict ${bonus} damage to your opponent.`
+    };
+
+    ON_DESTROY_BONUS_DAMAGE[id] = bonus;
+
+    saveAnalyzerGeneratedCard(card);
+
+    addAnalyzerCardToDeck(deckName, id);
+
+}
+
+
+
 function openDeckMaker() {
 
     deckMakerState = { cards: [], extraDeck: [] };
 
     importEckbuilerCards();
+
+    syncEckbuilerDeck();
 
     document.getElementById("deckSelectScreen")
         .classList.add("hidden");
@@ -14187,7 +15823,7 @@ function renderDeckMakerContents() {
                 } else if (card.type === "synchro") {
 
                     achievable =
-                        poolHasSynchroCombo(mainPool, card.level);
+                        poolHasSynchroCombo(mainPool, card.level, card.requiresTwoTuners);
 
                 } else if (card.type === "xyz") {
 
@@ -14344,6 +15980,21 @@ const DECK_GENERATOR_STYLES = [
         id: "burn",
         label: "🔥 Burn",
         blurb: "Direct damage and battle-triggered LP loss."
+    },
+    {
+        id: "stall",
+        label: "🛡️ Stall",
+        blurb: "Walls, LP gain and indestructible Defense Position monsters built to outlast the opponent."
+    },
+    {
+        id: "swarm",
+        label: "🐝 Swarm",
+        blurb: "Cheap, replaceable monsters and direct attackers built to flood the field and chip away."
+    },
+    {
+        id: "extradeckspam",
+        label: "🌀 Extra Deck Spam",
+        blurb: "Tuners and same-level monsters built to Fusion, Synchro, and Xyz Summon as often as possible."
     }
 ];
 
@@ -14413,6 +16064,7 @@ function submitSecretCode() {
 
 const REDEEM_CODES = {
     "DEVMODE": { type: "deck" },
+    "DEV-001": { type: "bossDev" },
     "DEVCASH": { type: "money", payload: 999999999 },
     "FIRSTDUEL": { type: "cards", payload: ["heraldOfTheFirstDuel"] },
     "GLASSCANNON": { type: "cards", payload: ["glassCannonDjinn"] },
@@ -14689,6 +16341,10 @@ function checkSecretCode(code) {
 
         unlockDevDeck();
 
+    } else if (entry.type === "bossDev") {
+
+        unlockDevBoss();
+
     } else if (entry.type === "cards") {
 
         unlockRedeemedCards(entry.payload);
@@ -14731,7 +16387,7 @@ function unlockRedeemedCards(cardIds) {
 }
 
 
-function unlockDevDeck() {
+function ensureDevDeckExists() {
 
     const decks =
         getCustomDecks();
@@ -14740,73 +16396,36 @@ function unlockDevDeck() {
         name: "🛠️ Dev Deck",
         cards: [
 
-            /* Extra Deck material fodder — kept to a single
-               copy each so the Extra Deck lineup below stays
-               fully achievable */
-            "wanderingAlchemist",
-            "voidSentinel",
-            "stormFalcon",
-            "coralSerpent",
-            "emberSalamander",
-            "ironWillGolem",
-            "twilightAssassin",
-            "skyMarshal",
-            "prismOracle",
+            /* ONLY Tier 12 — the single strongest roll tier
+               in the game. 2 copies of every Tier 12 card,
+               plus 2 extra copies of the top 2 by ATK to
+               round out to 40. */
 
-            /* The strongest standalone monster in the game */
-            "chronosTheTimelessOne",
+            "sovereignTransgressor", "sovereignTransgressor",
+            "sovereignColossus", "sovereignColossus",
+            "eternalCataclysm", "eternalCataclysm",
+            "zenithRavager", "zenithRavager",
+            "sovereignOverlord", "sovereignOverlord",
+            "ultimateOverlord", "ultimateOverlord", "ultimateOverlord",
+            "supremeColossus", "supremeColossus", "supremeColossus",
+            "zenithCataclysm", "zenithCataclysm",
+            "eternalDominion", "eternalDominion",
+            "apexBehemoth", "apexBehemoth",
+            "paramountHarbinger", "paramountHarbinger",
 
-            /* Secret cards */
-            "foolsGambit",
-            "whisperingVoid", "whisperingVoid",
+            "zenithZenith", "zenithZenith",
+            "zenithDominion", "zenithDominion",
+            "paramountZenith", "paramountZenith",
+            "zenithAscension", "zenithAscension",
 
-            /* Boss signature cards, Lv15-20 — the single
-               strongest individual monsters in the entire
-               game, stronger even than any Tier 10 roll card
-               before their play-count leveling is factored in */
-            "sigStormReaper",
-            "sigCrimsonHarbinger",
-            "sigBleakWarden",
-            "sigVerdantWarden",
-            "sigFrostSentinel",
-            "sigHollowWarden",
-
-            /* Roll Tier 10 monsters */
-            "stormbreakerTitan", "stormbreakerTitan",
-            "radiantVindicator", "radiantVindicator",
-            "gravekeepersVow", "gravekeepersVow",
-            "reapersHarvest", "reapersHarvest",
-
-            /* Roll Tier 10 spells (added in the tier expansion —
-               the deck had no Tier 10 spells before) */
-            "astralSurge", "astralSurge",
-            "rustedAwakening", "rustedAwakening",
-
-            /* Roll Tier 10 traps (same — new from the expansion) */
-            "moltenGuardpost", "moltenGuardpost",
-            "gloamingCounterstrike", "gloamingCounterstrike",
-
-            /* Roll Tier 9 depth */
-            "tempestRavager",
-            "bloodPactFiend",
-            "shatteringBlow",
-            "astralWraith",
-            "ashenAwakening"
+            "absoluteJudgment", "absoluteJudgment",
+            "ultimateBulwark", "ultimateBulwark",
+            "apexRetribution", "apexRetribution",
+            "supremeJudgment", "supremeJudgment"
 
         ],
         extraDeck: [
-            "twilightSovereign",
-            "coralDragonKing",
-            "skyJudgmentDragon",
-            "oraclesWrath",
-            "celestialEnforcer",
-            "infernoVanguard",
-            "abyssWarden",
-            "radiantOverseer",
-            "twinFangOverlord",
-            "prismColossus",
-            "voidReaper",
-            "sovereignsBlade"
+            "zenithOfAllCreation"
         ]
     };
 
@@ -14814,6 +16433,13 @@ function unlockDevDeck() {
         profileKey("customDecks"),
         JSON.stringify(decks)
     );
+
+}
+
+
+function unlockDevDeck() {
+
+    ensureDevDeckExists();
 
     renderDeckSelection();
 
@@ -14823,6 +16449,66 @@ function unlockDevDeck() {
             <p>
                 The 🛠️ Dev Deck has been unlocked —
                 look for it in your custom decks list.
+            </p>
+            <button style="width:100%;margin-top:10px;" onclick="closeModal()">
+                Nice!
+            </button>
+        `
+    );
+
+}
+
+
+function unlockDevBoss() {
+
+    ensureDevDeckExists();
+
+    const bosses =
+        getCustomBosses();
+
+    if (bosses.some(b => b.id === "dev-001")) {
+
+        openModal(
+            "🔒 Already Redeemed",
+            `
+                <p>DEV-001 has already been summoned.</p>
+                <button style="width:100%;margin-top:10px;" onclick="closeModal()">
+                    Close
+                </button>
+            `
+        );
+
+        return;
+
+    }
+
+    bosses.push({
+        id: "dev-001",
+        name: "DEV-001",
+        title: "The Deck Itself",
+        avatar: "🛠️",
+        deckId: "🛠️ Dev Deck",
+        deckKind: "custom",
+        difficulty: "hard",
+        luckyDraw: true,
+        bossLP: 20000,
+        customDpReward: 999999,
+        isCustomBoss: true,
+        isDevBoss: true
+    });
+
+    saveCustomBosses(bosses);
+
+    renderDeckSelection();
+
+    openModal(
+        "🎉 Code Accepted!",
+        `
+            <p>
+                <strong>DEV-001</strong> has been summoned —
+                find it in Boss Fights under the Custom tab.
+                It fights with the Dev Deck itself. There is
+                no other way to face a boss running that deck.
             </p>
             <button style="width:100%;margin-top:10px;" onclick="closeModal()">
                 Nice!
@@ -14893,17 +16579,22 @@ function resolveDeckGeneration(style) {
 
 function generateDeckForPlaystyle(style) {
 
-    const mainPoolCards =
-        Object.entries(CARD_DATABASE)
-            .filter(
-                ([id, card]) =>
-                    (card.type === "monster" || card.type === "spell" || card.type === "trap") &&
-                    !card.deckMakerOnly &&
-                    !card.imported &&
-                    !card.redeemCode &&
-                    !card.isSignatureCard &&
-                    (card.playstyles || []).includes(style)
-            );
+    const taggedByType =
+        function(type) {
+
+            return Object.entries(CARD_DATABASE)
+                .filter(
+                    ([id, card]) =>
+                        card.type === type &&
+                        !card.deckMakerOnly &&
+                        !card.imported &&
+                        !card.redeemCode &&
+                        !card.isSignatureCard &&
+                        (card.playstyles || []).includes(style)
+                )
+                .map(([id]) => id);
+
+        };
 
     const extraPoolCards =
         Object.entries(CARD_DATABASE)
@@ -14918,60 +16609,118 @@ function generateDeckForPlaystyle(style) {
             );
 
 
-    let deckIds = [];
+    /*
+       Every deck gets a reserved split — 24 monsters, 8
+       spells, 8 traps — regardless of how lopsided the
+       tagged pool for this playstyle happens to be. If a
+       type has too few (or zero) tagged cards, the shortfall
+       is filled from the generic staples, and any leftover
+       shortfall spills into the monster slots last.
+    */
 
-    mainPoolCards.forEach(function([id, card]) {
+    function fillTypeSlots(taggedIds, targetCount, fallbackIds) {
 
-        const copies =
-            card.type === "monster" ? 3 : 2;
+        const ids = [];
 
-        for (let i = 0; i < copies; i++) {
-            deckIds.push(id);
+        const pool =
+            shuffle(taggedIds.slice());
+
+        let pointer = 0;
+
+        while (ids.length < targetCount && pool.length > 0) {
+
+            const id =
+                pool[pointer % pool.length];
+
+            ids.push(id);
+
+            pointer++;
+
+            if (ids.filter(x => x === id).length >= 3) {
+
+                const idx = pool.indexOf(id);
+
+                if (idx !== -1) {
+                    pool.splice(idx, 1);
+                }
+
+                if (pool.length === 0) {
+                    break;
+                }
+
+            }
+
         }
 
-    });
 
+        let fbPool =
+            fallbackIds.slice();
 
-    let staplePool =
-        GENERIC_STAPLE_CARDS.slice();
+        let fbPointer = 0;
 
-    let staplePointer = 0;
+        while (ids.length < targetCount && fbPool.length > 0) {
 
-    while (deckIds.length < 40 && staplePool.length > 0) {
+            const id =
+                fbPool[fbPointer % fbPool.length];
 
-        const id =
-            staplePool[staplePointer % staplePool.length];
+            ids.push(id);
 
-        deckIds.push(id);
+            fbPointer++;
 
-        staplePointer++;
+            if (ids.filter(x => x === id).length >= 3) {
 
-        const countInDeck =
-            deckIds.filter(x => x === id).length;
+                fbPool =
+                    fbPool.filter(x => x !== id);
 
-        if (countInDeck >= 3) {
-
-            staplePool =
-                staplePool.filter(x => x !== id);
+            }
 
         }
+
+        return ids;
 
     }
 
 
-    if (deckIds.length < 40) {
+    const stapleSpells =
+        GENERIC_STAPLE_CARDS.filter(id => CARD_DATABASE[id] && CARD_DATABASE[id].type === "spell");
 
-        const allMonsterIds =
-            Object.entries(CARD_DATABASE)
-                .filter(
-                    ([id, card]) =>
-                        card.type === "monster" &&
-                        !card.deckMakerOnly &&
-                        !card.imported &&
-                        !card.redeemCode &&
-                        !card.isSignatureCard
-                )
-                .map(([id]) => id);
+    const stapleTraps =
+        GENERIC_STAPLE_CARDS.filter(id => CARD_DATABASE[id] && CARD_DATABASE[id].type === "trap");
+
+    const allMonsterIds =
+        Object.entries(CARD_DATABASE)
+            .filter(
+                ([id, card]) =>
+                    card.type === "monster" &&
+                    !card.deckMakerOnly &&
+                    !card.imported &&
+                    !card.redeemCode &&
+                    !card.isSignatureCard
+            )
+            .map(([id]) => id);
+
+
+    let monsterIds =
+        fillTypeSlots(taggedByType("monster"), 24, allMonsterIds);
+
+    let spellIds =
+        fillTypeSlots(taggedByType("spell"), 8, stapleSpells);
+
+    let trapIds =
+        fillTypeSlots(taggedByType("trap"), 8, stapleTraps);
+
+
+    let deckIds =
+        [...monsterIds, ...spellIds, ...trapIds];
+
+
+    /*
+       If any category still came up short even after the
+       fallback (extremely small tagged pools), top up with
+       more monsters so the deck still reaches 40.
+    */
+
+    if (deckIds.length < 40) {
 
         let i = 0;
 
@@ -15017,7 +16766,7 @@ function generateDeckForPlaystyle(style) {
         } else if (card.type === "synchro") {
 
             achievable =
-                poolHasSynchroCombo(mainPoolForCheck, card.level);
+                poolHasSynchroCombo(mainPoolForCheck, card.level, card.requiresTwoTuners);
 
         } else if (card.type === "xyz") {
 
@@ -15358,7 +17107,7 @@ function subsetSumPossible(levels, target) {
 }
 
 
-function poolHasSynchroCombo(pool, targetLevel) {
+function poolHasSynchroCombo(pool, targetLevel, requiresTwoTuners) {
 
     const monsters =
         pool.filter(
@@ -15371,6 +17120,48 @@ function poolHasSynchroCombo(pool, targetLevel) {
 
     if (tuners.length === 0) {
         return false;
+    }
+
+
+    if (requiresTwoTuners) {
+
+        if (tuners.length < 2) {
+            return false;
+        }
+
+        for (let i = 0; i < tuners.length; i++) {
+
+            for (let j = i + 1; j < tuners.length; j++) {
+
+                const usedSum =
+                    tuners[i].level + tuners[j].level;
+
+                const remaining =
+                    targetLevel - usedSum;
+
+                if (remaining < 0) {
+                    continue;
+                }
+
+                if (remaining === 0) {
+                    return true;
+                }
+
+                const otherLevels =
+                    monsters
+                        .filter(card => card !== tuners[i] && card !== tuners[j])
+                        .map(card => card.level);
+
+                if (subsetSumPossible(otherLevels, remaining)) {
+                    return true;
+                }
+
+            }
+
+        }
+
+        return false;
+
     }
 
 
@@ -15487,7 +17278,8 @@ function filterExtraDeckByOwnedMaterials(extraDeckCards, cardPool) {
 
             return poolHasSynchroCombo(
                 cardPool,
-                card.level
+                card.level,
+                card.requiresTwoTuners
             );
 
         }
@@ -15857,9 +17649,65 @@ const VILLAIN_BOSSES = [
     }
 ];
 
+/*
+   Rush Duel-themed bosses. They currently use the same
+   standard duel rules as everything else — real Rush Duel
+   mechanics (Maximum Summon, different draw rules, etc.)
+   are a separate future feature. These are playable now,
+   just narratively flagged as Rush Duel opponents.
+*/
+const RUSH_BOSSES = [
+    {
+        id: "rushYuga",
+        name: "Yuga Ohdo",
+        title: "Rush Duel Inventor",
+        avatar: "🎨",
+        deckId: "elementalHero",
+        difficulty: "normal",
+        rushThemed: true,
+        signatureCardId: "sigInventorsGambit",
+        bossLP: 8000
+    },
+    {
+        id: "rushLuke",
+        name: "Luke",
+        title: "The Beast Duelist",
+        avatar: "🐺",
+        deckId: "blackwing",
+        difficulty: "normal",
+        rushThemed: true,
+        signatureCardId: "sigFeralInstinctBeast",
+        bossLP: 8000
+    },
+    {
+        id: "rushGoha",
+        name: "Goha Enterprises Duelist",
+        title: "Corporate Rush Champion",
+        avatar: "🏢",
+        deckId: "sixSamurai",
+        difficulty: "hard",
+        rushThemed: true,
+        signatureCardId: "sigCorporateEnforcer",
+        bossLP: 9000
+    }
+];
+
 let pendingBossChallenge = null;
 let currentBossId = null;
 let preBossDifficulty = null;
+
+
+function findAnyBoss(bossId) {
+
+    return (
+        BOSSES.find(b => b.id === bossId) ||
+        VILLAIN_BOSSES.find(b => b.id === bossId) ||
+        RUSH_BOSSES.find(b => b.id === bossId) ||
+        getCustomBosses().find(b => b.id === bossId) ||
+        null
+    );
+
+}
 
 
 /* =====================================================
@@ -17419,6 +19267,878 @@ function buildDuelBackgroundsTabHTML() {
 }
 
 
+/* =====================================================
+   AVATARS
+   The original 8 stay free. 24 more are purchasable, same
+   roll/direct pattern as everything else. Unlike the other
+   cosmetics this one lives on the profile object itself,
+   not a body attribute.
+===================================================== */
+
+const AVATARS = [
+    { id: "🎴", free: true }, { id: "🐉", free: true }, { id: "🔥", free: true }, { id: "⚔️", free: true },
+    { id: "🌟", free: true }, { id: "💀", free: true }, { id: "🛡️", free: true }, { id: "🎭", free: true },
+    { id: "🦁" }, { id: "🐺" }, { id: "🦅" }, { id: "🐍" }, { id: "🦂" }, { id: "🕷️" }, { id: "🦇" }, { id: "🐲" },
+    { id: "👑" }, { id: "⚡" }, { id: "🌙" }, { id: "☀️" }, { id: "❄️" }, { id: "🌊" }, { id: "🌋" }, { id: "🍀" },
+    { id: "💎" }, { id: "🔮" }, { id: "⚙️" }, { id: "🎯" }, { id: "🏆" }, { id: "👁️" }, { id: "🌌" }, { id: "🗿" }
+];
+
+
+function getUnlockedAvatars() {
+
+    try {
+
+        const stored =
+            JSON.parse(localStorage.getItem(profileKey("unlockedAvatars")) || "[]");
+
+        const freeIds =
+            AVATARS.filter(a => a.free).map(a => a.id);
+
+        return [...new Set([...freeIds, ...stored])];
+
+    } catch (error) {
+
+        return AVATARS.filter(a => a.free).map(a => a.id);
+
+    }
+
+}
+
+
+function unlockAvatar(avatarId) {
+
+    const unlocked =
+        getUnlockedAvatars();
+
+    if (!unlocked.includes(avatarId)) {
+
+        const stored =
+            unlocked.filter(id => !AVATARS.find(a => a.id === id && a.free));
+
+        stored.push(avatarId);
+
+        localStorage.setItem(
+            profileKey("unlockedAvatars"),
+            JSON.stringify(stored)
+        );
+
+    }
+
+}
+
+
+function setProfileAvatar(avatarId) {
+
+    const profiles =
+        getProfiles();
+
+    const activeId =
+        getActiveProfileId();
+
+    if (profiles[activeId]) {
+
+        profiles[activeId].avatar = avatarId;
+
+        saveProfiles(profiles);
+
+        renderDeckSelection();
+
+    }
+
+}
+
+
+function rollAvatar() {
+
+    const cost = 800;
+
+    if (!spendDuelPoints(cost)) {
+
+        showInsufficientFunds(cost);
+
+        return;
+
+    }
+
+
+    const unlocked =
+        getUnlockedAvatars();
+
+    const available =
+        AVATARS.filter(a => !unlocked.includes(a.id));
+
+    if (available.length === 0) {
+
+        addDuelPoints(cost);
+
+        openModal(
+            "🎉 All Avatars Owned!",
+            `
+                <p>You already own every avatar. Refunded ${cost} DP.</p>
+                <button style="width:100%;margin-top:10px;" onclick="switchStoreTab('avatars')">
+                    ← Back to Store
+                </button>
+            `
+        );
+
+        return;
+
+    }
+
+
+    const won =
+        available[Math.floor(Math.random() * available.length)];
+
+    unlockAvatar(won.id);
+
+    openModal(
+        "🎉 Avatar Unlocked!",
+        `
+            <p style="font-size:40px;text-align:center;">${won.id}</p>
+            <button style="width:100%;" onclick="setProfileAvatar('${won.id}'); switchStoreTab('avatars');">
+                Wear It Now
+            </button>
+            <button class="secondary" style="width:100%;margin-top:8px;" onclick="switchStoreTab('avatars')">
+                Keep Current Avatar
+            </button>
+        `
+    );
+
+}
+
+
+function buyAvatarDirect(avatarId) {
+
+    const cost = 2400;
+
+    if (getUnlockedAvatars().includes(avatarId)) {
+
+        setProfileAvatar(avatarId);
+
+        switchStoreTab("avatars");
+
+        return;
+
+    }
+
+
+    if (!spendDuelPoints(cost)) {
+
+        showInsufficientFunds(cost);
+
+        return;
+
+    }
+
+
+    unlockAvatar(avatarId);
+
+    setProfileAvatar(avatarId);
+
+    switchStoreTab("avatars");
+
+}
+
+
+function buildAvatarsTabHTML() {
+
+    const unlocked =
+        getUnlockedAvatars();
+
+    const profiles =
+        getProfiles();
+
+    const active =
+        profiles[getActiveProfileId()] ? profiles[getActiveProfileId()].avatar : null;
+
+    const grid =
+        AVATARS.map(function(avatar) {
+
+            const isOwned =
+                unlocked.includes(avatar.id);
+
+            const isActive =
+                avatar.id === active;
+
+            return `
+                <div style="background:#181818;border-radius:8px;padding:10px;text-align:center;border:1px solid ${isActive ? "var(--theme-primary)" : "#333"};">
+                    <div style="font-size:28px;">${avatar.id}</div>
+                    ${
+                        isOwned
+                            ? (isActive
+                                ? '<div style="color:#55d66b;font-size:10px;margin-top:4px;">✓ Active</div>'
+                                : `<button style="width:100%;margin-top:6px;padding:4px;font-size:11px;" onclick="setProfileAvatar('${avatar.id}'); switchStoreTab('avatars');">Wear</button>`)
+                            : `<button style="width:100%;margin-top:6px;padding:4px;font-size:11px;" onclick="buyAvatarDirect('${avatar.id}')">2400 DP</button>`
+                    }
+                </div>
+            `;
+
+        }).join("");
+
+    return `
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:340px;overflow-y:auto;">
+            ${grid}
+        </div>
+        <div style="background:#181818;border-radius:8px;padding:14px;margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <strong>🎭 Random Avatar Roll</strong>
+                    <div style="color:#999;font-size:12px;">A random avatar you don't already own.</div>
+                </div>
+                <button onclick="rollAvatar()">800 DP</button>
+            </div>
+        </div>
+        <p style="color:#777;font-size:11px;margin-top:10px;">
+            The original 8 are free for every profile. Direct
+            purchase (2400 DP) picks exactly the one you want.
+        </p>
+
+        <h3 style="color:var(--theme-primary-light);margin-top:16px;">🏷️ Profile Banner</h3>
+        <p style="color:#999;font-size:11px;">
+            A glowing border around your profile pill, shown
+            wherever your name appears.
+        </p>
+        ${buildBannerRowsHTML()}
+    `;
+
+}
+
+
+const PROFILE_BANNERS = [
+    { id: "none", name: "None", desc: "No banner." },
+    { id: "gold", name: "Gold Trim", desc: "A warm golden glow." },
+    { id: "crimson", name: "Crimson Flame", desc: "A fierce red glow." },
+    { id: "azure", name: "Azure Frost", desc: "A cool blue glow." },
+    { id: "emerald", name: "Emerald Vine", desc: "A vivid green glow." },
+    { id: "royal", name: "Royal Purple", desc: "A regal violet glow." },
+    { id: "obsidian", name: "Obsidian Chrome", desc: "A sleek silver glow." }
+];
+
+
+function getUnlockedBanners() {
+
+    try {
+
+        const stored =
+            JSON.parse(localStorage.getItem(profileKey("unlockedBanners")) || "[]");
+
+        return ["none", ...stored.filter(id => id !== "none")];
+
+    } catch (error) {
+
+        return ["none"];
+
+    }
+
+}
+
+
+function unlockBanner(bannerId) {
+
+    const unlocked =
+        getUnlockedBanners();
+
+    if (!unlocked.includes(bannerId)) {
+
+        const stored =
+            unlocked.filter(id => id !== "none");
+
+        stored.push(bannerId);
+
+        localStorage.setItem(
+            profileKey("unlockedBanners"),
+            JSON.stringify(stored)
+        );
+
+    }
+
+}
+
+
+function getActiveBannerId() {
+
+    return localStorage.getItem(profileKey("activeBanner")) || "none";
+
+}
+
+
+function setActiveBanner(bannerId) {
+
+    localStorage.setItem(
+        profileKey("activeBanner"),
+        bannerId
+    );
+
+    applyBanner(bannerId);
+
+}
+
+
+function applyBanner(bannerId) {
+
+    document.body.setAttribute("data-banner", bannerId);
+
+}
+
+
+function buyBannerDirect(bannerId) {
+
+    const cost = 1200;
+
+    if (getUnlockedBanners().includes(bannerId)) {
+
+        setActiveBanner(bannerId);
+
+        switchStoreTab("avatars");
+
+        return;
+
+    }
+
+    if (!spendDuelPoints(cost)) {
+
+        showInsufficientFunds(cost);
+
+        return;
+
+    }
+
+    unlockBanner(bannerId);
+
+    setActiveBanner(bannerId);
+
+    switchStoreTab("avatars");
+
+}
+
+
+function buildBannerRowsHTML() {
+
+    const unlocked =
+        getUnlockedBanners();
+
+    const active =
+        getActiveBannerId();
+
+    return PROFILE_BANNERS.map(function(banner) {
+
+        const isOwned =
+            unlocked.includes(banner.id);
+
+        const isActive =
+            banner.id === active;
+
+        return `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #262626;">
+                <div style="font-size:12px;">
+                    ${escapeHTML(banner.name)}
+                    ${isActive ? '<span style="color:#55d66b;margin-left:6px;">✓</span>' : ""}
+                </div>
+                ${
+                    isOwned
+                        ? (isActive
+                            ? ""
+                            : `<button style="padding:4px 10px;font-size:11px;" onclick="setActiveBanner('${banner.id}'); switchStoreTab('avatars');">Wear</button>`)
+                        : `<button style="padding:4px 10px;font-size:11px;" onclick="buyBannerDirect('${banner.id}')">1200 DP</button>`
+                }
+            </div>
+        `;
+
+    }).join("");
+
+}
+
+
+/* =====================================================
+   CARD BACKS
+   Independent of everything else — CSS-only patterns for
+   face-down cards (opponent's hand, Set monsters/spells/
+   traps). Applied via body[data-cardback], same pattern
+   as backgrounds/buttons/panels.
+===================================================== */
+
+const CARD_BACKS = [
+    { id: "crimson", name: "Crimson Stripe", desc: "The original diagonal red stripe pattern." },
+    { id: "void", name: "Void Grid", desc: "A dark navy grid." },
+    { id: "golden", name: "Golden Emblem", desc: "A warm golden glow." },
+    { id: "azure", name: "Azure Waves", desc: "Deep blue diagonal bands." },
+    { id: "emerald", name: "Emerald Weave", desc: "A subtle green crosshatch." },
+    { id: "shadow", name: "Shadow Sigil", desc: "A dark violet glow." },
+    { id: "molten", name: "Molten Core", desc: "A smoldering orange-red glow." }
+];
+
+
+function getUnlockedCardBacks() {
+
+    try {
+
+        const stored =
+            JSON.parse(localStorage.getItem(profileKey("unlockedCardBacks")) || "[]");
+
+        return ["crimson", ...stored.filter(id => id !== "crimson")];
+
+    } catch (error) {
+
+        return ["crimson"];
+
+    }
+
+}
+
+
+function unlockCardBack(backId) {
+
+    const unlocked =
+        getUnlockedCardBacks();
+
+    if (!unlocked.includes(backId)) {
+
+        const stored =
+            unlocked.filter(id => id !== "crimson");
+
+        stored.push(backId);
+
+        localStorage.setItem(
+            profileKey("unlockedCardBacks"),
+            JSON.stringify(stored)
+        );
+
+    }
+
+}
+
+
+function getActiveCardBackId() {
+
+    return localStorage.getItem(profileKey("activeCardBack")) || "crimson";
+
+}
+
+
+function setActiveCardBack(backId) {
+
+    localStorage.setItem(
+        profileKey("activeCardBack"),
+        backId
+    );
+
+    applyCardBack(backId);
+
+}
+
+
+function applyCardBack(backId) {
+
+    document.body.setAttribute("data-cardback", backId);
+
+}
+
+
+function rollCardBack() {
+
+    const cost = 800;
+
+    if (!spendDuelPoints(cost)) {
+
+        showInsufficientFunds(cost);
+
+        return;
+
+    }
+
+
+    const unlocked =
+        getUnlockedCardBacks();
+
+    const available =
+        CARD_BACKS.filter(b => !unlocked.includes(b.id));
+
+    if (available.length === 0) {
+
+        addDuelPoints(cost);
+
+        openModal(
+            "🎉 All Card Backs Owned!",
+            `
+                <p>You already own every card back. Refunded ${cost} DP.</p>
+                <button style="width:100%;margin-top:10px;" onclick="switchStoreTab('cardbacks')">
+                    ← Back to Store
+                </button>
+            `
+        );
+
+        return;
+
+    }
+
+
+    const won =
+        available[Math.floor(Math.random() * available.length)];
+
+    unlockCardBack(won.id);
+
+    openModal(
+        "🎉 Card Back Unlocked!",
+        `
+            <p>You got: <strong>${escapeHTML(won.name)}</strong></p>
+            <p style="color:#999;font-size:12px;">${escapeHTML(won.desc)}</p>
+            <button style="width:100%;" onclick="setActiveCardBack('${won.id}'); switchStoreTab('cardbacks');">
+                Wear It Now
+            </button>
+            <button class="secondary" style="width:100%;margin-top:8px;" onclick="switchStoreTab('cardbacks')">
+                Keep Current Card Back
+            </button>
+        `
+    );
+
+}
+
+
+function buyCardBackDirect(backId) {
+
+    const cost = 2400;
+
+    if (getUnlockedCardBacks().includes(backId)) {
+
+        setActiveCardBack(backId);
+
+        switchStoreTab("cardbacks");
+
+        return;
+
+    }
+
+
+    if (!spendDuelPoints(cost)) {
+
+        showInsufficientFunds(cost);
+
+        return;
+
+    }
+
+
+    unlockCardBack(backId);
+
+    setActiveCardBack(backId);
+
+    switchStoreTab("cardbacks");
+
+}
+
+
+function buildCardBacksTabHTML() {
+
+    const unlocked =
+        getUnlockedCardBacks();
+
+    const active =
+        getActiveCardBackId();
+
+    const rows =
+        CARD_BACKS.map(function(back) {
+
+            const isOwned =
+                unlocked.includes(back.id);
+
+            const isActive =
+                back.id === active;
+
+            return `
+                <div style="background:#181818;border-radius:8px;padding:12px;margin-bottom:8px;border:1px solid ${isActive ? "var(--theme-primary)" : "#333"};">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <strong>${escapeHTML(back.name)}</strong>
+                            ${isActive ? '<span style="color:#55d66b;font-size:11px;margin-left:6px;">✓ Active</span>' : ""}
+                            ${isOwned && !isActive ? '<span style="color:#999;font-size:11px;margin-left:6px;">Owned</span>' : ""}
+                            <div style="color:#999;font-size:11px;margin-top:2px;">${escapeHTML(back.desc)}</div>
+                        </div>
+                        <div>
+                            ${
+                                isOwned
+                                    ? (isActive
+                                        ? ""
+                                        : `<button onclick="setActiveCardBack('${back.id}'); switchStoreTab('cardbacks');">Wear</button>`)
+                                    : `<button onclick="buyCardBackDirect('${back.id}')">Buy — 2400 DP</button>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+
+        }).join("");
+
+    return `
+        ${rows}
+        <div style="background:#181818;border-radius:8px;padding:14px;margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <strong>🎴 Random Card Back Roll</strong>
+                    <div style="color:#999;font-size:12px;">A random card back you don't already own.</div>
+                </div>
+                <button onclick="rollCardBack()">800 DP</button>
+            </div>
+        </div>
+        <p style="color:#777;font-size:11px;margin-top:10px;">
+            Changes the look of face-down cards — your opponent's
+            hand and any Set monsters, Spells, or Traps.
+        </p>
+    `;
+
+}
+
+
+/* =====================================================
+   BOOSTS
+   Gameplay-utility purchases rather than cosmetics: DP
+   earn rate, streak protection, and signature card
+   leveling boosters.
+===================================================== */
+
+const DP_BOOST_COSTS = [3000, 6000, 10000];
+const DP_BOOST_PER_TIER = 0.05;
+
+
+function getDpBoostTier() {
+
+    return getProfileStat("dpBoostTier");
+
+}
+
+
+function getDpBoostMultiplier() {
+
+    return 1 + (getDpBoostTier() * DP_BOOST_PER_TIER);
+
+}
+
+
+function buyDpBoostTier() {
+
+    const tier =
+        getDpBoostTier();
+
+    if (tier >= DP_BOOST_COSTS.length) {
+        return;
+    }
+
+    const cost =
+        DP_BOOST_COSTS[tier];
+
+    if (!spendDuelPoints(cost)) {
+
+        showInsufficientFunds(cost);
+
+        return;
+
+    }
+
+    incrementProfileStat("dpBoostTier");
+
+    switchStoreTab("boosts");
+
+}
+
+
+function buyStreakShield() {
+
+    const cost = 1500;
+
+    if (!spendDuelPoints(cost)) {
+
+        showInsufficientFunds(cost);
+
+        return;
+
+    }
+
+    incrementProfileStat("streakShields");
+
+    switchStoreTab("boosts");
+
+}
+
+
+function getBoosterFragments() {
+
+    try {
+
+        return JSON.parse(localStorage.getItem(profileKey("boosterFragments")) || "{}");
+
+    } catch (error) {
+
+        return {};
+
+    }
+
+}
+
+
+function buySignatureBooster(cardId) {
+
+    const cost = 400;
+
+    if (!spendDuelPoints(cost)) {
+
+        showInsufficientFunds(cost);
+
+        return;
+
+    }
+
+
+    const fragments =
+        getBoosterFragments();
+
+    fragments[cardId] =
+        (fragments[cardId] || 0) + 1;
+
+    let leveledUp = false;
+
+    if (fragments[cardId] >= 3) {
+
+        fragments[cardId] -= 3;
+
+        incrementCardPlayCount(cardId);
+
+        leveledUp = true;
+
+    }
+
+    localStorage.setItem(
+        profileKey("boosterFragments"),
+        JSON.stringify(fragments)
+    );
+
+
+    if (leveledUp) {
+
+        openModal(
+            "🎉 Booster Converted!",
+            `
+                <p>
+                    Three fragments combined into a full Summon's
+                    worth of progress — ${escapeHTML(CARD_DATABASE[cardId].name)}
+                    is now Level ${getSignatureCardLevel(cardId)}!
+                </p>
+                <button style="width:100%;margin-top:10px;" onclick="switchStoreTab('boosts')">
+                    Continue
+                </button>
+            `
+        );
+
+    } else {
+
+        switchStoreTab("boosts");
+
+    }
+
+}
+
+
+function buildBoostsTabHTML() {
+
+    const dpTier =
+        getDpBoostTier();
+
+    const dpMultiplier =
+        getDpBoostMultiplier();
+
+    const dpBoostHTML =
+        dpTier >= DP_BOOST_COSTS.length
+            ? `
+                <div style="background:#181818;border-radius:8px;padding:14px;margin-bottom:10px;">
+                    <strong>💰 DP Earn Rate</strong>
+                    <div style="color:#55d66b;font-size:12px;margin-top:4px;">
+                        Maxed out — +${Math.round((dpMultiplier - 1) * 100)}% permanently.
+                    </div>
+                </div>
+            `
+            : `
+                <div style="background:#181818;border-radius:8px;padding:14px;margin-bottom:10px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <strong>💰 DP Earn Rate</strong>
+                            <div style="color:#999;font-size:12px;margin-top:2px;">
+                                Currently +${Math.round((dpMultiplier - 1) * 100)}% — next tier: +${Math.round((dpTier + 1) * DP_BOOST_PER_TIER * 100)}% total, permanent.
+                            </div>
+                        </div>
+                        <button onclick="buyDpBoostTier()">${DP_BOOST_COSTS[dpTier]} DP</button>
+                    </div>
+                </div>
+            `;
+
+    const shieldCount =
+        getProfileStat("streakShields");
+
+    const shieldHTML = `
+        <div style="background:#181818;border-radius:8px;padding:14px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <strong>🛡️ Win-Streak Shield</strong>
+                    <div style="color:#999;font-size:12px;margin-top:2px;">
+                        You own ${shieldCount}. Absorbs your next loss instead of resetting your streak.
+                    </div>
+                </div>
+                <button onclick="buyStreakShield()">1500 DP</button>
+            </div>
+        </div>
+    `;
+
+    const defeatedBosses =
+        getDefeatedBosses();
+
+    const allBossData =
+        [...BOSSES, ...VILLAIN_BOSSES].filter(b => defeatedBosses.includes(b.id));
+
+    const fragments =
+        getBoosterFragments();
+
+    const boosterRows =
+        allBossData.length === 0
+            ? `<p style="color:#777;font-size:12px;">Defeat a boss first to unlock its signature card for boosting.</p>`
+            : allBossData.map(function(boss) {
+
+                const cardId =
+                    boss.signatureCardId;
+
+                const card =
+                    CARD_DATABASE[cardId];
+
+                const level =
+                    getSignatureCardLevel(cardId);
+
+                const frag =
+                    fragments[cardId] || 0;
+
+                return `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #262626;">
+                        <div>
+                            <div style="font-size:13px;">${escapeHTML(card.name)} <span style="color:#999;">Lv.${level}</span></div>
+                            <div style="color:#777;font-size:11px;">Fragments: ${frag} / 3</div>
+                        </div>
+                        <button style="padding:6px 10px;font-size:12px;" onclick="buySignatureBooster('${cardId}')">400 DP</button>
+                    </div>
+                `;
+
+            }).join("");
+
+    return `
+        ${dpBoostHTML}
+        ${shieldHTML}
+
+        <h3 style="color:var(--theme-primary-light);margin-top:16px;">⚡ Signature Card Boosters</h3>
+        <p style="color:#999;font-size:11px;">
+            400 DP buys a third of a Summon's worth of leveling
+            progress — stockpile 3 to convert into one real
+            Summon's worth, same as actually playing the card.
+        </p>
+        ${boosterRows}
+    `;
+
+}
+
+
 
 function buildTitlesTabHTML() {
 
@@ -17589,6 +20309,12 @@ function renderVillainBossCard(boss, defeated) {
     const sigCardLevel =
         getSignatureCardLevel(boss.signatureCardId);
 
+    const difficultyColors = {
+        easy: "#55d66b",
+        normal: "#d6a928",
+        hard: "#e05252"
+    };
+
     return `
         <div style="background:#181818;border-radius:8px;padding:14px;margin-bottom:10px;border-left:3px solid #7c2020;">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
@@ -17599,11 +20325,13 @@ function renderVillainBossCard(boss, defeated) {
                     </div>
                     <div style="color:#999;font-size:12px;">${escapeHTML(boss.title)}</div>
                     <div style="margin-top:4px;">
-                        <span style="background:#7c2020;color:#fff;font-size:10px;font-weight:bold;padding:1px 7px;border-radius:5px;">
-                            🍀 LUCKY DRAW
-                        </span>
-                        <span style="background:#e05252;color:#111;font-size:10px;font-weight:bold;padding:1px 7px;border-radius:5px;margin-left:4px;">
-                            HARD
+                        ${boss.luckyDraw ? `
+                            <span style="background:#7c2020;color:#fff;font-size:10px;font-weight:bold;padding:1px 7px;border-radius:5px;">
+                                🍀 LUCKY DRAW
+                            </span>
+                        ` : ""}
+                        <span style="background:${difficultyColors[boss.difficulty] || "#e05252"};color:#111;font-size:10px;font-weight:bold;padding:1px 7px;border-radius:5px;margin-left:4px;">
+                            ${boss.difficulty.toUpperCase()}
                         </span>
                     </div>
                     <div style="color:#d6a928;font-size:11px;margin-top:4px;">
@@ -17616,6 +20344,55 @@ function renderVillainBossCard(boss, defeated) {
     `;
 
 }
+
+
+function renderCustomBossCard(boss, defeated) {
+
+    const isDefeated =
+        defeated.includes(boss.id);
+
+    const difficultyColors = {
+        easy: "#55d66b",
+        normal: "#d6a928",
+        hard: "#e05252"
+    };
+
+    return `
+        <div style="background:#181818;border-radius:8px;padding:14px;margin-bottom:10px;border-left:3px solid #4a4a7c;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <div>
+                    <div style="font-size:18px;">
+                        ${boss.avatar} <strong>${escapeHTML(boss.name)}</strong>
+                        ${isDefeated ? '<span style="color:#55d66b;font-size:12px;margin-left:6px;">✅ Defeated</span>' : ""}
+                    </div>
+                    <div style="color:#999;font-size:12px;">${escapeHTML(boss.title)}</div>
+                    <div style="margin-top:4px;">
+                        ${boss.luckyDraw ? `
+                            <span style="background:#7c2020;color:#fff;font-size:10px;font-weight:bold;padding:1px 7px;border-radius:5px;">
+                                🍀 LUCKY DRAW
+                            </span>
+                        ` : ""}
+                        <span style="background:${difficultyColors[boss.difficulty] || "#d6a928"};color:#111;font-size:10px;font-weight:bold;padding:1px 7px;border-radius:5px;margin-left:4px;">
+                            ${boss.difficulty.toUpperCase()}
+                        </span>
+                        <span style="background:#222;color:#ccc;font-size:10px;padding:1px 7px;border-radius:5px;margin-left:4px;">
+                            ${boss.bossLP.toLocaleString()} LP
+                        </span>
+                    </div>
+                    <div style="color:#d6a928;font-size:11px;margin-top:4px;">
+                        Reward: +${boss.customDpReward} DP${isDefeated ? " (claimed)" : ""}
+                    </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                    <button onclick="challengeBoss('${boss.id}')">⚔️ Challenge</button>
+                    <button class="secondary" style="font-size:11px;padding:4px 8px;" onclick="deleteCustomBoss('${boss.id}')">🗑️ Delete</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+}
+
 
 
 function switchBossTab(tab) {
@@ -17639,7 +20416,7 @@ function openBossFights() {
     };
 
     const tabButtonsHTML = `
-        <div style="display:flex;gap:6px;margin-bottom:14px;">
+        <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
             <button
                 class="${activeBossTab === "tiered" ? "" : "secondary"}"
                 style="flex:1;"
@@ -17654,6 +20431,22 @@ function openBossFights() {
                 onclick="switchBossTab('villains')">
 
                 👹 Villains (9)
+
+            </button>
+            <button
+                class="${activeBossTab === "rush" ? "" : "secondary"}"
+                style="flex:1;"
+                onclick="switchBossTab('rush')">
+
+                🌀 Rush Duel (${RUSH_BOSSES.length})
+
+            </button>
+            <button
+                class="${activeBossTab === "custom" ? "" : "secondary"}"
+                style="flex:1;"
+                onclick="switchBossTab('custom')">
+
+                🛠️ Custom (${getCustomBosses().length})
 
             </button>
         </div>
@@ -17675,6 +20468,43 @@ function openBossFights() {
             instead of more LP. Same reward rules as the tiered
             bosses: first win grants the signature card and
             1500 DP.
+        `;
+
+    } else if (activeBossTab === "rush") {
+
+        bodyHTML =
+            RUSH_BOSSES.map(boss => renderVillainBossCard(boss, defeated)).join("");
+
+        footerText = `
+            Rush Duel-themed opponents. They currently play by
+            the same standard rules as everything else in the
+            game — real Rush Duel mechanics (Maximum Summon,
+            different draw rules) are a separate feature still
+            to come. For now, think of these as a themed roster
+            using the existing rules.
+        `;
+
+    } else if (activeBossTab === "custom") {
+
+        const customBosses =
+            getCustomBosses();
+
+        bodyHTML =
+            (customBosses.length === 0
+                ? `<p style="color:#777;font-size:12px;">You haven't created any custom bosses yet.</p>`
+                : customBosses.map(boss => renderCustomBossCard(boss, defeated)).join("")
+            ) +
+            `
+                <button style="width:100%;margin-top:6px;" onclick="openCustomBossCreator()">
+                    ➕ Create a New Boss
+                </button>
+            `;
+
+        footerText = `
+            Bosses you've built yourself — pick any deck
+            (premade or one of your own saved decks), set the
+            LP, difficulty, and DP reward. No signature card
+            reward, just straightforward DP on first win.
         `;
 
     } else {
@@ -17756,8 +20586,7 @@ function challengeBoss(bossId) {
     closeModal();
 
     const boss =
-        BOSSES.find(b => b.id === bossId) ||
-        VILLAIN_BOSSES.find(b => b.id === bossId);
+        findAnyBoss(bossId);
 
     openModal(
         "⚔️ Challenge Accepted",
@@ -17775,6 +20604,190 @@ function challengeBoss(bossId) {
 }
 
 
+/* =====================================================
+   CUSTOM BOSS CREATOR
+===================================================== */
+
+function getCustomBosses() {
+
+    try {
+
+        return JSON.parse(localStorage.getItem(profileKey("customBosses")) || "[]");
+
+    } catch (error) {
+
+        return [];
+
+    }
+
+}
+
+
+function saveCustomBosses(bosses) {
+
+    localStorage.setItem(
+        profileKey("customBosses"),
+        JSON.stringify(bosses)
+    );
+
+}
+
+
+function deleteCustomBoss(bossId) {
+
+    const bosses =
+        getCustomBosses().filter(b => b.id !== bossId);
+
+    saveCustomBosses(bosses);
+
+    openBossFights();
+
+}
+
+
+function getAllDeckNamesForBossCreator() {
+
+    const premade =
+        ["dragon","magician","warrior","extraMain","graveUprising","radiantWardens","demonsReckoning",
+         "exodia","elementalHero","blackwing","redEyes","sixSamurai","yusei","melodious","blueEyesArsenal"];
+
+    /*
+       The Dev Deck is deliberately excluded here — the only
+       boss allowed to run it is DEV-001, created via the
+       DEV-001 redeem code, not the manual Boss Creator.
+    */
+    const custom =
+        Object.keys(getCustomDecks())
+            .filter(name => name !== "🛠️ Dev Deck");
+
+    return { premade, custom };
+
+}
+
+
+function openCustomBossCreator() {
+
+    const { premade, custom } =
+        getAllDeckNamesForBossCreator();
+
+    const deckOptions =
+        premade.map(id => `<option value="premade:${id}">${escapeHTML(PREMADE_DECKS[id].name)}</option>`).join("") +
+        custom.map(name => `<option value="custom:${escapeHTML(name)}">${escapeHTML(name)}</option>`).join("");
+
+    openModal(
+        "🛠️ Create a Custom Boss",
+        `
+            <label style="font-size:12px;color:#999;">Name</label>
+            <input id="cbName" type="text" placeholder="Boss name" style="width:100%;margin-bottom:8px;" maxlength="40">
+
+            <label style="font-size:12px;color:#999;">Title</label>
+            <input id="cbTitle" type="text" placeholder="A short title" style="width:100%;margin-bottom:8px;" maxlength="50">
+
+            <label style="font-size:12px;color:#999;">Avatar (one emoji)</label>
+            <input id="cbAvatar" type="text" placeholder="👑" style="width:100%;margin-bottom:8px;" maxlength="4">
+
+            <label style="font-size:12px;color:#999;">Deck</label>
+            <select id="cbDeck" style="width:100%;margin-bottom:8px;">
+                ${deckOptions}
+            </select>
+
+            <label style="font-size:12px;color:#999;">Life Points (4000–20000)</label>
+            <input id="cbLP" type="number" value="8000" min="4000" max="20000" step="500" style="width:100%;margin-bottom:8px;">
+
+            <label style="font-size:12px;color:#999;">Difficulty</label>
+            <select id="cbDifficulty" style="width:100%;margin-bottom:8px;">
+                <option value="easy">Easy</option>
+                <option value="normal" selected>Normal</option>
+                <option value="hard">Hard</option>
+            </select>
+
+            <label style="font-size:12px;color:#999;">DP Reward (first win only, 500–5000)</label>
+            <input id="cbReward" type="number" value="1500" min="500" max="5000" step="100" style="width:100%;margin-bottom:8px;">
+
+            <label style="display:flex;align-items:center;gap:6px;margin-bottom:10px;font-size:13px;">
+                <input id="cbLuckyDraw" type="checkbox">
+                Give this boss the Lucky Draw mechanic
+            </label>
+
+            <button style="width:100%;" onclick="saveCustomBossFromForm()">
+                Create Boss
+            </button>
+            <button class="secondary" style="width:100%;margin-top:8px;" onclick="switchBossTab('custom')">
+                Cancel
+            </button>
+        `
+    );
+
+}
+
+
+function saveCustomBossFromForm() {
+
+    const name =
+        document.getElementById("cbName").value.trim();
+
+    const title =
+        document.getElementById("cbTitle").value.trim() || "Custom Boss";
+
+    const avatar =
+        document.getElementById("cbAvatar").value.trim() || "👑";
+
+    const deckValue =
+        document.getElementById("cbDeck").value;
+
+    const lp =
+        Math.max(4000, Math.min(20000, parseInt(document.getElementById("cbLP").value) || 8000));
+
+    const difficulty =
+        document.getElementById("cbDifficulty").value;
+
+    const reward =
+        Math.max(500, Math.min(5000, parseInt(document.getElementById("cbReward").value) || 1500));
+
+    const luckyDraw =
+        document.getElementById("cbLuckyDraw").checked;
+
+    if (!name) {
+
+        log(`
+            <strong>System:</strong>
+            Give your boss a name first.
+        `);
+
+        return;
+
+    }
+
+    const [deckKind, deckId] =
+        deckValue.split(":");
+
+    const bosses =
+        getCustomBosses();
+
+    const id =
+        "custom_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 6);
+
+    bosses.push({
+        id: id,
+        name: name,
+        title: title,
+        avatar: avatar,
+        deckId: deckId,
+        deckKind: deckKind,
+        difficulty: difficulty,
+        luckyDraw: luckyDraw,
+        bossLP: lp,
+        customDpReward: reward,
+        isCustomBoss: true
+    });
+
+    saveCustomBosses(bosses);
+
+    switchBossTab("custom");
+
+}
+
+
 function applyBossOverrideIfChallenged() {
 
     if (!pendingBossChallenge) {
@@ -17782,8 +20795,7 @@ function applyBossOverrideIfChallenged() {
     }
 
     const boss =
-        BOSSES.find(b => b.id === pendingBossChallenge) ||
-        VILLAIN_BOSSES.find(b => b.id === pendingBossChallenge);
+        findAnyBoss(pendingBossChallenge);
 
     if (!boss) {
 
@@ -17794,16 +20806,40 @@ function applyBossOverrideIfChallenged() {
     }
 
 
-    opponent.deck =
-        shuffle(
-            buildDeck(boss.deckId)
-        );
+    if (boss.deckKind === "custom") {
 
-    opponent.extraDeck =
-        filterExtraDeckByOwnedMaterials(
-            buildExtraDeck(boss.deckId),
-            opponent.deck
-        );
+        const customDeckData =
+            getCustomDecks()[boss.deckId];
+
+        opponent.deck =
+            shuffle(
+                (customDeckData ? customDeckData.cards : [])
+                    .map(cloneCard)
+                    .filter(Boolean)
+            );
+
+        opponent.extraDeck =
+            filterExtraDeckByOwnedMaterials(
+                (customDeckData ? (customDeckData.extraDeck || []) : [])
+                    .map(cloneCard)
+                    .filter(Boolean),
+                opponent.deck
+            );
+
+    } else {
+
+        opponent.deck =
+            shuffle(
+                buildDeck(boss.deckId)
+            );
+
+        opponent.extraDeck =
+            filterExtraDeckByOwnedMaterials(
+                buildExtraDeck(boss.deckId),
+                opponent.deck
+            );
+
+    }
 
     opponent.lp = boss.bossLP;
 
@@ -17915,6 +20951,8 @@ function startCustomDuel(name) {
 
     importEckbuilerCards();
 
+    syncEckbuilerDeck();
+
     const decks =
         getCustomDecks();
 
@@ -18012,6 +21050,9 @@ function initializeDuel() {
     player.spellTrap = [];
     opponent.spellTrap = [];
 
+    player.pendulumZones = [null, null];
+    opponent.pendulumZones = [null, null];
+
     player.graveyard = [];
     opponent.graveyard = [];
 
@@ -18021,8 +21062,7 @@ function initializeDuel() {
     if (currentBossId) {
 
         const boss =
-            BOSSES.find(b => b.id === currentBossId) ||
-            VILLAIN_BOSSES.find(b => b.id === currentBossId);
+            findAnyBoss(currentBossId);
 
         if (boss) {
 
@@ -18207,6 +21247,8 @@ function renderAll() {
 
     renderSpellTrapZones();
 
+    renderPendulumZones();
+
     updateCounters();
 
     updateStatus();
@@ -18214,6 +21256,43 @@ function renderAll() {
     renderPhaseTracker();
 
     renderPrimaryControls();
+
+}
+
+
+function renderPendulumZones() {
+
+    const container =
+        document.getElementById("playerPendulumZones");
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML =
+        [0, 1].map(function(i) {
+
+            const card =
+                player.pendulumZones[i];
+
+            if (!card) {
+
+                return `
+                    <div style="flex:1;height:60px;border:2px dashed #444;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#555;font-size:11px;">
+                        Empty
+                    </div>
+                `;
+
+            }
+
+            return `
+                <div style="flex:1;height:60px;border:2px solid var(--theme-primary);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#181818;padding:4px;">
+                    <div style="font-size:10px;color:#ccc;text-align:center;line-height:1.2;">${escapeHTML(card.name)}</div>
+                    <div style="font-size:11px;color:var(--theme-primary-light);font-weight:bold;">Scale ${card.pendulumScale}</div>
+                </div>
+            `;
+
+        }).join("");
 
 }
 
@@ -18324,9 +21403,25 @@ function renderPrimaryControls() {
 
         buttons.push(primaryControlButton("activateSelected()", "✨ Activate / Set"));
 
-        buttons.push(primaryControlButton("fusionSummon()", "🔥 Fusion", "fusion-button"));
+        buttons.push(primaryControlButton("fusionSummon()", "🌀 Extra Deck", "fusion-button"));
 
         buttons.push(primaryControlButton("changePosition()", "🔄 Change Position"));
+
+        if (
+            selectedCard !== null &&
+            player.hand[selectedCard] &&
+            player.hand[selectedCard].isPendulum
+        ) {
+
+            buttons.push(primaryControlButton("setPendulumScale()", "🔮 Set Pendulum Scale"));
+
+        }
+
+        if (getPendulumSummonRange()) {
+
+            buttons.push(primaryControlButton("pendulumSummon()", "⚡ Pendulum Summon"));
+
+        }
 
         if (currentPhase === "main1") {
 
@@ -19414,6 +22509,10 @@ function getRequiredTributes(card) {
         return 0;
     }
 
+    if (card.noTributeRequired) {
+        return 0;
+    }
+
     if (card.level >= 7) {
         return 2;
     }
@@ -19458,6 +22557,223 @@ function tributeModeActive() {
     }
 
     return getRequiredTributes(card) > 0;
+
+}
+
+
+function setPendulumScale() {
+
+    if (!playerTurn || duelOver) {
+        return;
+    }
+
+    if (currentPhase !== "main1" && currentPhase !== "main2") {
+
+        log(`
+            <strong>System:</strong>
+            You can only set a Pendulum Scale during a Main Phase.
+        `);
+
+        return;
+
+    }
+
+    if (selectedCard === null) {
+
+        log(`
+            <strong>System:</strong>
+            Select a Pendulum Monster in your hand first.
+        `);
+
+        return;
+
+    }
+
+    const card =
+        player.hand[selectedCard];
+
+    if (!card || !card.isPendulum) {
+
+        log(`
+            <strong>System:</strong>
+            That card isn't a Pendulum Monster.
+        `);
+
+        return;
+
+    }
+
+    const emptySlot =
+        player.pendulumZones[0] === null
+            ? 0
+            : (player.pendulumZones[1] === null ? 1 : -1);
+
+    if (emptySlot === -1) {
+
+        log(`
+            <strong>System:</strong>
+            Both Pendulum Zones are full — send one to the
+            Graveyard first if you want to replace it.
+        `);
+
+        return;
+
+    }
+
+    player.hand.splice(selectedCard, 1);
+
+    player.pendulumZones[emptySlot] = card;
+
+    selectedCard = null;
+
+    log(`
+        <strong>You:</strong>
+        Set ${escapeHTML(card.name)} as a Pendulum Scale
+        (Scale ${card.pendulumScale}).
+    `);
+
+    renderAll();
+
+}
+
+
+function getPendulumSummonRange() {
+
+    const [left, right] =
+        player.pendulumZones;
+
+    if (!left || !right) {
+        return null;
+    }
+
+    const lo =
+        Math.min(left.pendulumScale, right.pendulumScale);
+
+    const hi =
+        Math.max(left.pendulumScale, right.pendulumScale);
+
+    return { lo, hi };
+
+}
+
+
+function pendulumSummon() {
+
+    if (!playerTurn || duelOver) {
+        return;
+    }
+
+    if (currentPhase !== "main1" && currentPhase !== "main2") {
+
+        log(`
+            <strong>System:</strong>
+            You can only Pendulum Summon during a Main Phase.
+        `);
+
+        return;
+
+    }
+
+    const range =
+        getPendulumSummonRange();
+
+    if (!range) {
+
+        log(`
+            <strong>System:</strong>
+            You need a Pendulum Monster set in both
+            Pendulum Zones first.
+        `);
+
+        return;
+
+    }
+
+    if (player.field.length >= 5) {
+
+        log(`
+            <strong>System:</strong>
+            Your Monster Zones are full.
+        `);
+
+        return;
+
+    }
+
+    const eligible =
+        player.hand
+            .map((card, index) => ({ card, index }))
+            .filter(({ card }) =>
+                card.type === "monster" &&
+                card.level > range.lo &&
+                card.level < range.hi
+            );
+
+    if (eligible.length === 0) {
+
+        log(`
+            <strong>System:</strong>
+            No monster in your hand has a Level between
+            ${range.lo} and ${range.hi}.
+        `);
+
+        return;
+
+    }
+
+    const items =
+        eligible.map(({ card, index }) => ({
+            label: `${card.name} (Level ${card.level})`,
+            data: index
+        }));
+
+    openChoiceScreen(
+        "🔮 Pendulum Summon",
+        `Special Summon 1 monster from your hand with a Level between ${range.lo} and ${range.hi}.`,
+        items,
+        "resolvePendulumSummon"
+    );
+
+}
+
+
+function resolvePendulumSummon(handIndex) {
+
+    const card =
+        player.hand[handIndex];
+
+    if (!card) {
+
+        closeModal();
+
+        return;
+
+    }
+
+    if (player.field.length >= 5) {
+
+        closeModal();
+
+        return;
+
+    }
+
+    player.hand.splice(handIndex, 1);
+
+    player.field.push({
+        ...card,
+        faceUp: true,
+        position: "attack"
+    });
+
+    closeModal();
+
+    log(`
+        <strong>You:</strong>
+        Pendulum Summoned ${escapeHTML(card.name)}!
+    `);
+
+    renderAll();
 
 }
 
@@ -20063,6 +23379,67 @@ function useMonsterSummonEffect(
 
         const message =
             `${card.name}'s effect added ${escapeHTML(found.name)} from the Deck to the hand.`;
+
+        log(`
+            <strong>${nameFor(owner)}:</strong>
+            ${message}
+        `);
+
+        return message;
+
+    }
+
+
+    if (ON_SUMMON_REVIVE_LOW_LEVEL_IDS.includes(card.id)) {
+
+        if (owner.field.length >= 5) {
+
+            const message =
+                `${card.name}'s effect fizzled — no room on the field.`;
+
+            log(`
+                <strong>${nameFor(owner)}:</strong>
+                ${message}
+            `);
+
+            return message;
+
+        }
+
+        const target =
+            owner.graveyard.find(
+                gyCard =>
+                    (gyCard.type === "monster" || gyCard.type === "fusion") &&
+                    gyCard.level <= 2
+            );
+
+        if (!target) {
+
+            const message =
+                `${card.name}'s effect found no Level 2 or lower monster in the Graveyard.`;
+
+            log(`
+                <strong>${nameFor(owner)}:</strong>
+                ${message}
+            `);
+
+            return message;
+
+        }
+
+        const idx =
+            owner.graveyard.indexOf(target);
+
+        owner.graveyard.splice(idx, 1);
+
+        owner.field.push({
+            ...target,
+            faceUp: true,
+            position: "attack"
+        });
+
+        const message =
+            `${card.name}'s effect Special Summoned ${escapeHTML(target.name)} from the Graveyard!`;
 
         log(`
             <strong>${nameFor(owner)}:</strong>
@@ -21796,6 +25173,22 @@ function activateSelected() {
     }
 
 
+    const fizzleReason =
+        spellWouldFizzle(card, player);
+
+    if (fizzleReason) {
+
+        log(`
+            <strong>System:</strong>
+            You can't activate ${escapeHTML(card.name)} —
+            ${fizzleReason}
+        `);
+
+        return;
+
+    }
+
+
     openModal(
         card.name,
         renderCardDetailHTML(card) +
@@ -21804,6 +25197,66 @@ function activateSelected() {
             "✨ Activate"
         )
     );
+
+}
+
+
+function spellWouldFizzle(card, owner) {
+
+    const opponentSide =
+        owner === player ? opponent : player;
+
+    if (DESTROY_WEAKEST_SPELL_IDS.includes(card.id) ||
+        DESTROY_HALF_DAMAGE_SPELL_IDS.includes(card.id) ||
+        card.id === "fissure") {
+
+        if (!opponentSide.field.some(m => m.faceUp)) {
+            return "your opponent has no monster on the field to target.";
+        }
+
+    }
+
+    if (card.id === "monsterReborn") {
+
+        const hasTarget =
+            player.graveyard.some(c => c.type === "monster" || c.type === "fusion") ||
+            opponent.graveyard.some(c => c.type === "monster" || c.type === "fusion");
+
+        if (!hasTarget) {
+            return "there's no monster in either Graveyard to revive.";
+        }
+
+    }
+
+    if (GY_TO_HAND_SPELL_IDS.includes(card.id)) {
+
+        if (!owner.graveyard.some(c => c.type === "monster" || c.type === "fusion")) {
+            return "there's no monster in your Graveyard to target.";
+        }
+
+    }
+
+    if (card.id === "tunersCall") {
+
+        if (!owner.deck.some(c => c.isTuner)) {
+            return "there's no Tuner monster left in your Deck.";
+        }
+
+    }
+
+    if (card.id === "rapidMobilization") {
+
+        if (!owner.hand.some(c => c.isTuner)) {
+            return "you have no Tuner monster in your hand to Special Summon.";
+        }
+
+        if (owner.field.length >= 5) {
+            return "your Monster Zones are full.";
+        }
+
+    }
+
+    return null;
 
 }
 
@@ -23342,7 +26795,7 @@ function fusionSummon() {
 }
 
 
-function hasSynchroCombo(targetLevel) {
+function hasSynchroCombo(targetLevel, requiresTwoTuners) {
 
     const monsters =
         player.field.filter(
@@ -23363,7 +26816,7 @@ function hasSynchroCombo(targetLevel) {
 
         let sum = 0;
 
-        let hasTuner = false;
+        let tunerCount = 0;
 
         let materialCount = 0;
 
@@ -23375,7 +26828,7 @@ function hasSynchroCombo(targetLevel) {
                 sum += monsters[i].level || 0;
 
                 if (monsters[i].isTuner) {
-                    hasTuner = true;
+                    tunerCount++;
                 }
 
                 materialCount++;
@@ -23385,8 +26838,13 @@ function hasSynchroCombo(targetLevel) {
         }
 
 
+        const tunerRequirementMet =
+            requiresTwoTuners
+                ? tunerCount >= 2
+                : tunerCount >= 1;
+
         if (
-            hasTuner &&
+            tunerRequirementMet &&
             materialCount >= 2 &&
             sum === targetLevel
         ) {
@@ -23417,7 +26875,8 @@ function openExtraDeckModal() {
         `;
 
 
-    player.extraDeck.forEach(function(extraCard, extraIndex) {
+    const entries =
+        player.extraDeck.map(function(extraCard, extraIndex) {
 
         let canSummon = false;
 
@@ -23460,15 +26919,17 @@ function openExtraDeckModal() {
             } else {
 
                 canSummon =
-                    hasSynchroCombo(extraCard.level);
+                    hasSynchroCombo(extraCard.level, extraCard.requiresTwoTuners);
 
                 requirementText =
-                    `Requires: 1 Tuner + non-Tuner monster(s) on your field totaling Level ${extraCard.level}`;
+                    extraCard.requiresTwoTuners
+                        ? `Accel Synchro — Requires: 2 Tuner monsters (+ non-Tuners if needed) on your field totaling Level ${extraCard.level}`
+                        : `Requires: 1 Tuner + non-Tuner monster(s) on your field totaling Level ${extraCard.level}`;
 
             }
 
             iconLabel =
-                "✨ Synchro Summon";
+                extraCard.requiresTwoTuners ? "⚡ Accel Synchro Summon" : "✨ Synchro Summon";
 
         } else if (extraCard.type === "xyz") {
 
@@ -23517,6 +26978,25 @@ function openExtraDeckModal() {
                         : `openExtraMaterialSelection(${extraIndex})`
                   );
 
+        return { extraCard, extraIndex, canSummon, requirementText, iconLabel, buttonAction };
+
+    });
+
+
+    /*
+       Cards ready to summon right now float to the top.
+       Within each group, original Extra Deck order is kept.
+    */
+    entries.sort(function(a, b) {
+
+        return (b.canSummon ? 1 : 0) - (a.canSummon ? 1 : 0);
+
+    });
+
+
+    entries.forEach(function(entry) {
+
+        const { extraCard, canSummon, requirementText, iconLabel, buttonAction } = entry;
 
         html +=
             `
@@ -24448,6 +27928,38 @@ function getAttackModifiers(
     }
 
 
+    if (ALWAYS_HIGHEST_ATK_IDS.includes(attacker.id)) {
+
+        const otherFieldATKs =
+            [...player.field, ...opponent.field]
+                .filter(m => m !== attacker && m.faceUp)
+                .map(m => m.atk || 0);
+
+        const highestOther =
+            otherFieldATKs.length > 0 ? Math.max(...otherFieldATKs) : 0;
+
+        const currentTotal =
+            attacker.atk + bonus;
+
+        if (highestOther >= currentTotal) {
+
+            const supremacyBonus =
+                (highestOther - currentTotal) + 100;
+
+            bonus += supremacyBonus;
+
+            log(`
+                <strong>${nameFor(attackerOwner)}:</strong>
+                ${escapeHTML(attacker.name)}'s supremacy
+                cannot be matched — it surges to stay
+                the strongest monster on the field!
+            `);
+
+        }
+
+    }
+
+
     if (
         attacker.id === "ancientSkyDrake" &&
         defender &&
@@ -24665,10 +28177,12 @@ const RETALIATION_DAMAGE = {
 };
 
 const DEFENSE_BOOST_AMOUNT = {
+    pendulumArchiveSentinel: 500,
+    zenithOverlord: 665,
+    eternalCataclysm: 680,
     sigLeviathansHerald: 600,
     elementalHeroClayman: 500,
     legendarySixSamuraiEnishi: 400,
-    quillboltHedgehog: 600,
     saggiTheDarkClown: 500,
     elementalHeroTerraFirma: 600,
     canonTheMelodiousDiva: 600,
@@ -24707,6 +28221,8 @@ const DEFENSE_BOOST_AMOUNT = {
 };
 
 const ON_DESTROY_BONUS_DAMAGE = {
+    transcendentDevastator: 615,
+    zenithRavager: 630,
     sigMillenniumJudgment: 500,
     sigMeteorstrikeChronofiend: 600,
     elementalHeroWildheart: 300,
@@ -24755,6 +28271,12 @@ const ON_DESTROY_BONUS_DAMAGE = {
 };
 
 const ONCE_PER_TURN_ATTACK_BONUS = {
+    sigFeralInstinctBeast: 450,
+    elementalHeroPendulumVanguard: 400,
+    zenithTransgressor: 615,
+    sovereignColossus: 630,
+    doubleWarrior: 900,
+    shootingStarDragon: 700,
     sigTurboOverdrive: 600,
     blackwingShuraTheBlueFlame: 400,
     handOfTheSixSamurai: 300,
@@ -24798,6 +28320,13 @@ const ONCE_PER_TURN_ATTACK_BONUS = {
 };
 
 const FLAT_ATTACK_BONUS = {
+    sigInventorsGambit: 400,
+    pendulumVanguardWarden: 300,
+    zenithOfAllCreation: 500,
+    sovereignAnnihilator: 565,
+    sovereignTransgressor: 580,
+    melodiousOverture: 400,
+    elementalHeroNeosAlius: 400,
     elementalHeroSparkman: 400,
     blackwingGaleTheWhirlwind: 300,
     blackwingBoraTheSpear: 300,
@@ -24840,6 +28369,8 @@ const FLAT_ATTACK_BONUS = {
 };
 
 const GRAVEYARD_SIZE_ATK_BONUS = {
+    supremeRavager: 133,
+    sovereignOverlord: 136,
     sigIliasterOvermind: 200,
     timeWizard: 100,
     legendarySixSamuraiMizuho: 90,
@@ -24866,6 +28397,8 @@ const GRAVEYARD_SIZE_ATK_BONUS = {
 };
 
 const DESTROY_ST_ON_SUMMON_IDS = [
+    "paramountBehemoth",
+    "paramountHarbinger",
     "sigMeklordEmperorsWrath",
     "sigEmberSovereign",
     "gildedOracle",
@@ -24883,9 +28416,10 @@ const DESTROY_ST_ON_SUMMON_IDS = [
 ];
 
 const LP_GAIN_ON_SUMMON = {
+    supremeAnnihilator: 820,
+    supremeColossus: 840,
     elementalHeroBubbleman: 800,
     redEyesRetroDragon: 500,
-    sonicChick: 400,
     ariaTheMelodiousDiva: 600,
     bloomDivaTheMelodiousChoir: 500,
     lordOfD: 400,
@@ -24919,6 +28453,8 @@ const LP_GAIN_ON_SUMMON = {
 };
 
 const DAMAGE_ON_SUMMON = {
+    eternalTransgressor: 665,
+    zenithCataclysm: 680,
     elementalHeroBurstinatrix: 300,
     rampantWarden: 378,
     blitzBrigand: 348,
@@ -24944,13 +28480,17 @@ const DAMAGE_ON_SUMMON = {
 };
 
 const DRAW_ON_SUMMON_IDS = [
+    "elementalHeroPendulumSage",
+    "paramountCataclysm",
+    "ultimateOverlord",
+    "melodiousPrimaDonna",
+    "formulaSynchron",
     "sigZarcsFusionNightmare",
     "elementalHeroAvian",
     "elementalHeroStratos",
     "blackwingVayuTheEmblemOfHonor",
     "redEyesBlackChick",
     "kagemushaOfTheSixSamurai",
-    "junkSynchron",
     "sonataTheMelodiousDiva",
     "kaibaman",
     "koumoriDragon",
@@ -24998,6 +28538,8 @@ const DRAW_TWO_SPELL_IDS = [
 ];
 
 const FLAT_DAMAGE_SPELLS = {
+    apexConvergence: 1240,
+    zenithZenith: 1280,
     recklessAscension: 545,
     savageGambit: 616,
     veiledRite: 475,
@@ -25017,6 +28559,8 @@ const FLAT_DAMAGE_SPELLS = {
 };
 
 const FLAT_LP_GAIN_SPELLS = {
+    ultimateConvergence: 1340,
+    zenithDominion: 1380,
     recklessDecree: 668,
     savageReckoning: 734,
     shiftingBargain: 658,
@@ -25035,6 +28579,8 @@ const FLAT_LP_GAIN_SPELLS = {
 };
 
 const DESTROY_WEAKEST_SPELL_IDS = [
+    "absoluteApotheosis",
+    "zenithAscension",
     "unboundSurge",
     "savageRite",
     "deceptiveWindfall",
@@ -25053,6 +28599,8 @@ const DESTROY_WEAKEST_SPELL_IDS = [
 ];
 
 const GY_SCALED_LP_SPELLS = {
+    absoluteZenith: 565,
+    paramountZenith: 580,
     unboundDecree: 390,
     blitzDecree: 322,
     hollowResonance: 348,
@@ -25374,6 +28922,8 @@ function getRespondingTrapIndexes(owner) {
 
 
 const TRAP_DESTROY_ATTACKER_IDS = [
+    "absoluteRetribution",
+    "absoluteJudgment",
     "viciousDeterrent",
     "hollowSnare",
     "vigilantBacklash",
@@ -25384,6 +28934,8 @@ const TRAP_DESTROY_ATTACKER_IDS = [
 ];
 
 const TRAP_DMG_EQUAL_ATK_IDS = [
+    "paramountJudgment",
+    "ultimateBulwark",
     "recklessWard",
     "deceptiveVigil",
     "bolsteringSnare",
@@ -25405,6 +28957,8 @@ const TRAP_DMG_HALF_ATK_IDS = [
 ];
 
 const TRAP_FLAT_DAMAGE = {
+    transcendentRetribution: 1340,
+    supremeJudgment: 1380,
     blitzRebuke: 760,
     elusiveRebuke: 566,
     anchoringTrapfall: 701,
@@ -25445,6 +28999,8 @@ const TRAP_DMG_GY_MULT = {
 };
 
 const TRAP_DESTROY_PLUS_DAMAGE = {
+    supremeFinality: 720,
+    apexRetribution: 740,
     unboundRebuke: 282,
     phantomVigil: 301,
     vigilantTrapfall: 339,
@@ -26603,6 +30159,23 @@ function declineTrapResponse() {
 }
 
 
+const SPELL_TRAP_IMMUNE_WHILE_ATTACKING_IDS = [
+    "stormwingDragon",
+    "zenithOfAllCreation"
+];
+
+/*
+   A unique mechanic reserved for exactly one card. While
+   attacking, this card's ATK automatically surges to
+   exceed the strongest other monster on the field by 100 —
+   no card the Deck Analyzer (or anything else) generates
+   can ever out-stat it in actual combat.
+*/
+const ALWAYS_HIGHEST_ATK_IDS = [
+    "zenithOfAllCreation"
+];
+
+
 function resolveAttack(
     attackerOwner,
     defenderOwner,
@@ -26630,19 +30203,19 @@ function resolveAttack(
 
 
     const respondingTraps =
-        attacker.id === "stormwingDragon"
+        SPELL_TRAP_IMMUNE_WHILE_ATTACKING_IDS.includes(attacker.id)
             ? []
             : getRespondingTrapIndexes(defenderOwner);
 
 
     if (
-        attacker.id === "stormwingDragon" &&
+        SPELL_TRAP_IMMUNE_WHILE_ATTACKING_IDS.includes(attacker.id) &&
         getRespondingTrapIndexes(defenderOwner).length > 0
     ) {
 
         log(`
             <strong>System:</strong>
-            Stormwing Dragon's effect prevents
+            ${escapeHTML(attacker.name)}'s effect prevents
             a Trap Card from being activated
             in response to this attack!
         `);
@@ -26733,6 +30306,10 @@ function resolveAttack(
 ===================================================== */
 
 const SELF_PROTECTION_IDS = [
+    "sigCorporateEnforcer",
+    "paramountDominion",
+    "eternalDominion",
+    "sonicChick",
     "sigDiaboundKernel",
     "sigBariansMalevolence",
     "sigMoltenChampion",
@@ -26745,6 +30322,10 @@ const SELF_PROTECTION_IDS = [
 ];
 
 const SELF_PROTECTION_BONUS_LP = {
+    sigCorporateEnforcer: 500,
+    paramountDominion: 820,
+    eternalDominion: 840,
+    sonicChick: 250,
     sigDiaboundKernel: 550,
     sigBariansMalevolence: 650,
     sigMoltenChampion: 350,
@@ -26776,6 +30357,8 @@ const DIRECT_ATTACK_ONLY_IDS = [
    Pure walls: strong on defense, nothing special on offense.
 */
 const DEF_MODE_INDESTRUCTIBLE_IDS = [
+    "transcendentCataclysm",
+    "apexBehemoth",
     "greatShogunShien",
     "legendarySixSamuraiShiEn",
     "stardustDragon",
@@ -26798,11 +30381,31 @@ const ON_SUMMON_SEARCH_TYPE = {
     dragonKnightMarshal: "Warrior"
 };
 
+/*
+   Lore-accurate revival effect for Junk Synchron and
+   Quillbolt Hedgehog — both Special Summon a Level 2 or
+   lower monster from the Graveyard on Normal Summon in
+   the real card game.
+*/
+const ON_SUMMON_REVIVE_LOW_LEVEL_IDS = [
+    "junkSynchron",
+    "quillboltHedgehog"
+];
+
 const ALWAYS_PROTECTED_IDS = [
     "chronosTheTimelessOne"
 ];
 
-function isProtectedFromDestruction(monster, owner) {
+const PIERCES_PROTECTION_IDS = [
+    "zenithOfAllCreation"
+];
+
+
+function isProtectedFromDestruction(monster, owner, attackingCard) {
+
+    if (attackingCard && PIERCES_PROTECTION_IDS.includes(attackingCard.id)) {
+        return false;
+    }
 
     if (ALWAYS_PROTECTED_IDS.includes(monster.id)) {
         return true;
@@ -27056,7 +30659,7 @@ function executeCombat(
                     destroyed by battle while in Defense Position!
                 `);
 
-            } else if (isProtectedFromDestruction(defender, defenderOwner)) {
+            } else if (isProtectedFromDestruction(defender, defenderOwner, attacker)) {
 
                 log(`
                     <strong>${nameFor(defenderOwner)}:</strong>
@@ -27187,7 +30790,7 @@ function executeCombat(
             applyLPChange(defenderOwner, -damage);
 
 
-            if (isProtectedFromDestruction(defender, defenderOwner)) {
+            if (isProtectedFromDestruction(defender, defenderOwner, attacker)) {
 
                 log(`
                     <strong>${nameFor(defenderOwner)}:</strong>
@@ -27273,7 +30876,7 @@ function executeCombat(
                 isProtectedFromDestruction(attacker, attackerOwner);
 
             const defenderProtected =
-                isProtectedFromDestruction(defender, defenderOwner);
+                isProtectedFromDestruction(defender, defenderOwner, attacker);
 
             if (!attackerProtected) {
 
@@ -27590,8 +31193,7 @@ function opponentTurn() {
     if (currentBossId) {
 
         const boss =
-            BOSSES.find(b => b.id === currentBossId) ||
-            VILLAIN_BOSSES.find(b => b.id === currentBossId);
+            findAnyBoss(currentBossId);
 
         if (boss && boss.luckyDraw && Math.random() < 0.35) {
 
@@ -28642,7 +32244,7 @@ function calculateDuelReward(won) {
         Math.floor(duelStats.playerDamageDealt / 100);
 
     return Math.round(
-        (base + bonus) * difficultyMultiplier
+        (base + bonus) * difficultyMultiplier * getDpBoostMultiplier()
     );
 
 }
@@ -28753,7 +32355,10 @@ function renderStoreModal() {
         { id: "backgrounds", label: "🖼️ BGs" },
         { id: "buttons", label: "🔘 Buttons" },
         { id: "panels", label: "🗃️ Panels" },
-        { id: "duelbgs", label: "⚔️ Duel BGs" }
+        { id: "duelbgs", label: "⚔️ Duel BGs" },
+        { id: "avatars", label: "🎭 Avatars" },
+        { id: "cardbacks", label: "🎴 Card Backs" },
+        { id: "boosts", label: "⚡ Boosts" }
     ];
 
     const tabButtonsHTML =
@@ -28812,6 +32417,18 @@ function renderStoreModal() {
     } else if (activeStoreTab === "duelbgs") {
 
         contentHTML = buildDuelBackgroundsTabHTML();
+
+    } else if (activeStoreTab === "avatars") {
+
+        contentHTML = buildAvatarsTabHTML();
+
+    } else if (activeStoreTab === "cardbacks") {
+
+        contentHTML = buildCardBacksTabHTML();
+
+    } else if (activeStoreTab === "boosts") {
+
+        contentHTML = buildBoostsTabHTML();
 
     } else {
 
@@ -28917,29 +32534,82 @@ const ROLL_LEVELS = [
     { level: 1, cost: 100, floor: 1, weights: [40, 30, 20, 10] },
     { level: 2, cost: 650, floor: 3, weights: [30, 28, 24, 18] },
     { level: 3, cost: 1250, floor: 5, weights: [26, 25, 25, 24] },
-    { level: 4, cost: 2000, floor: 7, weights: [18, 22, 28, 32] }
+    { level: 4, cost: 2000, floor: 7, weights: [18, 22, 28, 32] },
+    { level: 5, cost: 3200, floor: 9, weights: [15, 20, 27, 38] }
 ];
+
+
+const PITY_INCREMENT_PER_MISS = 1.2;
+const PITY_MAX_BONUS = 30;
+
+
+function getRollPity(level) {
+
+    const raw =
+        localStorage.getItem(profileKey("rollPity_" + level));
+
+    const value =
+        parseFloat(raw);
+
+    return isNaN(value) ? 0 : value;
+
+}
+
+
+function incrementRollPity(level) {
+
+    const current =
+        getRollPity(level);
+
+    const next =
+        Math.min(PITY_MAX_BONUS, current + PITY_INCREMENT_PER_MISS);
+
+    localStorage.setItem(
+        profileKey("rollPity_" + level),
+        String(next)
+    );
+
+}
+
+
+function resetRollPity(level) {
+
+    localStorage.setItem(
+        profileKey("rollPity_" + level),
+        "0"
+    );
+
+}
 
 
 function rollWeightedTier(config) {
 
+    const pityBonus =
+        getRollPity(config.level);
+
+    const weights =
+        config.weights.slice();
+
+    weights[weights.length - 1] += pityBonus;
+
+
     const total =
-        config.weights.reduce((a, b) => a + b, 0);
+        weights.reduce((a, b) => a + b, 0);
 
     let r =
         Math.random() * total;
 
-    for (let i = 0; i < config.weights.length; i++) {
+    for (let i = 0; i < weights.length; i++) {
 
-        if (r < config.weights[i]) {
+        if (r < weights[i]) {
             return config.floor + i;
         }
 
-        r -= config.weights[i];
+        r -= weights[i];
 
     }
 
-    return config.floor + config.weights.length - 1;
+    return config.floor + weights.length - 1;
 
 }
 
@@ -29099,6 +32769,17 @@ function performRoll(level) {
     }
 
 
+    if (tier === maxTier) {
+
+        resetRollPity(level);
+
+    } else {
+
+        incrementRollPity(level);
+
+    }
+
+
     const [id, card] =
         candidates[Math.floor(Math.random() * candidates.length)];
 
@@ -29129,7 +32810,19 @@ function checkWin() {
 
         incrementProfileStat("totalLosses");
 
-        setProfileStat("currentStreak", 0);
+        let streakShielded = false;
+
+        if (getProfileStat("streakShields") > 0) {
+
+            incrementProfileStat("streakShields", -1);
+
+            streakShielded = true;
+
+        } else {
+
+            setProfileStat("currentStreak", 0);
+
+        }
 
         incrementDeckStat(currentDeckName, "plays");
 
@@ -29157,6 +32850,15 @@ function checkWin() {
 
         addDuelPoints(lossReward);
 
+        const shieldMessageHTML =
+            streakShielded
+                ? `
+                    <div style="margin-top:12px;padding:10px 12px;background:#1b1b1b;border-left:4px solid #55d6ff;border-radius:6px;color:#9bdcff;font-size:13px;">
+                        🛡️ A Win-Streak Shield absorbed this loss — your streak is safe.
+                    </div>
+                `
+                : "";
+
         openModal(
             "Defeat",
             `
@@ -29166,6 +32868,8 @@ function checkWin() {
                 </p>
 
                 ${buildRewardHTML(lossReward)}
+
+                ${shieldMessageHTML}
 
                 ${buildHintHTML(lossHint)}
 
@@ -29244,10 +32948,43 @@ function checkWin() {
         if (currentBossId) {
 
             const boss =
-                BOSSES.find(b => b.id === currentBossId) ||
-                VILLAIN_BOSSES.find(b => b.id === currentBossId);
+                findAnyBoss(currentBossId);
 
-            if (boss) {
+            if (boss && boss.isCustomBoss) {
+
+                const alreadyDefeated =
+                    getDefeatedBosses().includes(currentBossId);
+
+                if (!alreadyDefeated) {
+
+                    markBossDefeated(currentBossId);
+
+                    const dpAmount =
+                        boss.customDpReward || 1500;
+
+                    addDuelPoints(dpAmount);
+
+                    bossRewardHTML = `
+                        <div style="margin-top:12px;padding:12px;background:#2a1a05;border:1px solid #d6a928;border-radius:8px;">
+                            <div style="color:#d6a928;font-weight:bold;margin-bottom:4px;">
+                                👑 ${escapeHTML(boss.name)} Defeated!
+                            </div>
+                            <div style="color:#9be3b8;">+${dpAmount} DP</div>
+                        </div>
+                    `;
+
+                } else {
+
+                    bossRewardHTML = `
+                        <div style="margin-top:12px;padding:10px;background:#181818;border-radius:8px;color:#999;font-size:13px;">
+                            You've already defeated
+                            ${escapeHTML(boss.name)} before.
+                        </div>
+                    `;
+
+                }
+
+            } else if (boss) {
 
                 const alreadyDefeated =
                     getDefeatedBosses().includes(currentBossId);
@@ -30103,6 +33840,10 @@ function actuallyInitializeGame() {
 
     importEckbuilerCards();
 
+    syncEckbuilerDeck();
+
+    applyAnalyzerGeneratedCards();
+
     applyTheme(getActiveThemeId());
 
     applyBackground(getActiveBackgroundId());
@@ -30112,6 +33853,10 @@ function actuallyInitializeGame() {
     applyPanelTexture(getActivePanelTextureId());
 
     applyDuelBackground(getActiveDuelBackgroundId());
+
+    applyCardBack(getActiveCardBackId());
+
+    applyBanner(getActiveBannerId());
 
 
     if (Object.keys(getProfiles()).length > 1) {
@@ -30267,5 +34012,4 @@ if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("./service-worker.js");
     });
 }
-</script>
 </html>
