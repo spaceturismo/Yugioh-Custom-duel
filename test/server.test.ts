@@ -112,9 +112,9 @@ test("authoritatively controls a two-player room", async () => {
     assert.equal(startError.message, "Both players must be ready to start.");
 
     const selectedDeck = { id: "mage", name: "Mage", type: "monster" };
-    first.send(JSON.stringify({ type: "select_deck", mainDeck: [selectedDeck], extraDeck: [] }));
-    second.send(JSON.stringify({ type: "select_deck", mainDeck: [selectedDeck], extraDeck: [] }));
-    await receiveUntil(first, "room_state", (message) => message.state.deckCounts["player-2"] === 1);
+    first.send(JSON.stringify({ type: "select_deck", mainDeck: Array.from({ length: 6 }, () => selectedDeck), extraDeck: [] }));
+    second.send(JSON.stringify({ type: "select_deck", mainDeck: Array.from({ length: 6 }, () => selectedDeck), extraDeck: [] }));
+    await receiveUntil(first, "room_state", (message) => message.state.deckCounts["player-2"] === 6);
     first.send(JSON.stringify({ type: "set_ready", ready: true }));
     second.send(JSON.stringify({ type: "set_ready", ready: true }));
     await receiveUntil(first, "room_state", (message) => message.state.ready["player-2"] === true);

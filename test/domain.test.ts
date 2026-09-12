@@ -196,3 +196,35 @@ test("parses deck selection and readiness requests", () => {
     });
     assert.equal(parseClientMessage('{"type":"set_ready","ready":"yes"}'), null);
 });
+
+test("owns submitted decks and deals an initial hand when the game starts", () => {
+    const state = createRoomState("ABC123");
+    state.players.push("player-1", "player-2");
+    const card = { id: "mage", name: "Mage", type: "monster" };
+    const mainDeck = Array.from({ length: 10 }, (_, index) => ({ ...card, id: `mage-${index}` }));
+
+    assert.equal(selectDeck(state, "player-1", mainDeck, []), null);
+    assert.equal(selectDeck(state, "player-2", mainDeck, []), null);
+    setPlayerReady(state, "player-1", true);
+    setPlayerReady(state, "player-2", true);
+    assert.equal(startGame(state), null);
+    assert.equal(state.hands["player-1"].length, 5);
+    assert.equal(state.decks["player-1"].length, 5);
+    assert.notEqual(state.hands["player-1"][0], state.hands["player-2"][0]);
+});
+
+test("draw moves one server-owned card from deck to hand", () => {
+    const state = createRoomState("ABC123");
+    state.players.push("player-1", "player-2");
+    const deck = Array.from({ length: 6 }, (_, index) => ({ id: `mage-${index}`, name: "Mage", type: "monster" }));
+    selectDeck(state, "player-1", deck, []);
+    selectDeck(state, "player-2", deck, []);
+    setPlayerReady(state, "player-1", true);
+    setPlayerReady(state, "player-2", true);
+    startGame(state);
+
+    assert.equal(drawCard(state, "player-1"), null);
+    assert.equal(state.hands["player-1"].length, 6);
+    assert.equal(state.decks["player-1"].length, 0);
+    assert.equal(state.hands["player-1"].at(-1).id, "mage-5");
+});
