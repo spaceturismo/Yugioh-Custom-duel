@@ -106,6 +106,17 @@ test("authoritatively controls a two-player room", async () => {
     assert.equal(secondJoined.playerId, "player-2");
 
     first.send(JSON.stringify({ type: "start_game" }));
+    const startError = await receiveUntil(first, "error");
+    assert.equal(startError.message, "Both players must be ready to start.");
+
+    const selectedDeck = { id: "mage", name: "Mage", type: "monster" };
+    first.send(JSON.stringify({ type: "select_deck", mainDeck: [selectedDeck], extraDeck: [] }));
+    second.send(JSON.stringify({ type: "select_deck", mainDeck: [selectedDeck], extraDeck: [] }));
+    await receiveUntil(first, "room_state", (message) => message.state.deckCounts["player-2"] === 1);
+    first.send(JSON.stringify({ type: "set_ready", ready: true }));
+    second.send(JSON.stringify({ type: "set_ready", ready: true }));
+    await receiveUntil(first, "room_state", (message) => message.state.ready["player-2"] === true);
+    first.send(JSON.stringify({ type: "start_game" }));
     const active = await receiveUntil(
         first,
         "room_state",
@@ -120,7 +131,7 @@ test("authoritatively controls a two-player room", async () => {
         "room_state",
         (message) => message.state.handCounts["player-1"] === 6
     );
-    assert.equal(drawn.state.deckCounts["player-1"], 39);
+    assert.equal(drawn.state.deckCounts["player-1"], 0);
     assert.equal(drawn.state.handCounts["player-1"], 6);
 
     second.send(JSON.stringify({ type: "draw" }));

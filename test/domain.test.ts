@@ -9,6 +9,7 @@ import {
     validateDeckCards
 } from "../server/src/card-model";
 import { loadDeckRules } from "../server/src/config";
+import { selectDeck, setPlayerReady } from "../server/src/domain";
 
 test("creates a fresh room with standard starting values", () => {
     const state = createRoomState("ABC123");
@@ -20,6 +21,8 @@ test("creates a fresh room with standard starting values", () => {
     assert.deepEqual(state.lifePoints, { "player-1": 8000, "player-2": 8000 });
     assert.deepEqual(state.deckCounts, { "player-1": 40, "player-2": 40 });
     assert.deepEqual(state.handCounts, { "player-1": 5, "player-2": 5 });
+    assert.deepEqual(state.extraDeckCounts, { "player-1": 0, "player-2": 0 });
+    assert.deepEqual(state.ready, { "player-1": false, "player-2": false });
 });
 
 test("requires two players before starting and gives player one the first turn", () => {
@@ -27,6 +30,8 @@ test("requires two players before starting and gives player one the first turn",
     assert.equal(startGame(state), "Two players are required to start.");
 
     state.players.push("player-1", "player-2");
+    setPlayerReady(state, "player-1", true);
+    setPlayerReady(state, "player-2", true);
     assert.equal(startGame(state), null);
     assert.equal(state.phase, "active");
     assert.equal(state.currentTurn, "player-1");
@@ -35,6 +40,8 @@ test("requires two players before starting and gives player one the first turn",
 test("draw changes only the active player's deck and hand", () => {
     const state = createRoomState("ABC123");
     state.players.push("player-1", "player-2");
+    setPlayerReady(state, "player-1", true);
+    setPlayerReady(state, "player-2", true);
     startGame(state);
 
     assert.equal(drawCard(state, "player-1"), null);
@@ -47,6 +54,8 @@ test("draw changes only the active player's deck and hand", () => {
 test("end turn transfers authority to the other player", () => {
     const state = createRoomState("ABC123");
     state.players.push("player-1", "player-2");
+    setPlayerReady(state, "player-1", true);
+    setPlayerReady(state, "player-2", true);
     startGame(state);
 
     assert.equal(endTurn(state, "player-1"), null);
@@ -150,4 +159,40 @@ test("loads positive tournament deck limits and ignores invalid settings", () =>
         maxExtraDeckSize: 8
     });
     assert.deepEqual(loadDeckRules({ MAIN_DECK_MAX: "-1", EXTRA_DECK_MAX: "nope" }), DEFAULT_DECK_RULES);
+});
+
+test("requires both players to be ready before starting", () => {
+    const state = createRoomState("ABC123");
+    state.players.push("player-1", "player-2");
+
+    assert.equal(startGame(state), "Both players must be ready to start.");
+});
+
+test("selects validated decks and synchronizes readiness", () => {
+    const state = createRoomState("ABC123");
+    state.players.push("player-1", "player-2");
+    const card = { id: "mage", name: "Mage", type: "monster" };
+    const mainDeck = Array.from({ length: 60 }, () => card);
+    const extraDeck = Array.from({ length: 15 }, () => card);
+
+    assert.equal(selectDeck(state, "player-1", mainDeck, extraDeck), null);
+    assert.equal(state.deckCounts["player-1"], 60);
+    assert.equal(state.extraDeckCounts["player-1"], 15);
+    assert.equal(state.ready["player-1"], false);
+    assert.equal(setPlayerReady(state, "player-1", true), null);
+    assert.equal(state.ready["player-1"], true);
+    assert.equal(selectDeck(state, "player-1", Array.from({ length: 61 }, () => card), []), "Main Deck cannot exceed 60 cards.");
+});
+
+test("parses deck selection and readiness requests", () => {
+    assert.deepEqual(parseClientMessage('{"type":"select_deck","mainDeck":[],"extraDeck":[]}'), {
+        type: "select_deck",
+        mainDeck: [],
+        extraDeck: []
+    });
+    assert.deepEqual(parseClientMessage('{"type":"set_ready","ready":true}'), {
+        type: "set_ready",
+        ready: true
+    });
+    assert.equal(parseClientMessage('{"type":"set_ready","ready":"yes"}'), null);
 });

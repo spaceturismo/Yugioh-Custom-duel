@@ -4,7 +4,9 @@ export type ClientMessage =
     | { type: "start_game" }
     | { type: "draw" }
     | { type: "end_turn" }
-    | { type: "validate_deck"; mainDeck: unknown[]; extraDeck: unknown[] };
+    | { type: "validate_deck"; mainDeck: unknown[]; extraDeck: unknown[] }
+    | { type: "select_deck"; mainDeck: unknown[]; extraDeck: unknown[] }
+    | { type: "set_ready"; ready: boolean };
 
 const MESSAGE_TYPES = new Set([
     "create_room",
@@ -12,7 +14,9 @@ const MESSAGE_TYPES = new Set([
     "start_game",
     "draw",
     "end_turn",
-    "validate_deck"
+    "validate_deck",
+    "select_deck",
+    "set_ready"
 ]);
 
 export function parseClientMessage(raw: string): ClientMessage | null {
@@ -39,5 +43,17 @@ export function parseClientMessage(raw: string): ClientMessage | null {
             : null;
     }
 
-    return { type: message.type as Exclude<ClientMessage["type"], "join_room" | "validate_deck"> };
+    if (message.type === "select_deck") {
+        return Array.isArray(message.mainDeck) && Array.isArray(message.extraDeck)
+            ? { type: "select_deck", mainDeck: message.mainDeck, extraDeck: message.extraDeck }
+            : null;
+    }
+
+    if (message.type === "set_ready") {
+        return typeof message.ready === "boolean"
+            ? { type: "set_ready", ready: message.ready }
+            : null;
+    }
+
+    return { type: message.type as Exclude<ClientMessage["type"], "join_room" | "validate_deck" | "select_deck" | "set_ready"> };
 }
