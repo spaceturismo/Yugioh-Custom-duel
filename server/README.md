@@ -28,6 +28,13 @@ The initial protocol is intentionally small:
 
 The server owns room membership, turn order, deck counts, hand counts, and life points. Matches are currently held in memory and are discarded when every client disconnects. The existing duel UI is not connected to this protocol yet; that is the next integration slice.
 
+## Source layout
+
+- `src/domain.ts` contains the shared room state shape and server-validated game actions.
+- `src/rooms.ts` owns room creation, membership, and disconnect cleanup.
+- `src/static-server.ts` serves the existing static app.
+- `src/server.ts` wires HTTP and WebSocket transport to those modules.
+
 ## Validate
 
 ```powershell
