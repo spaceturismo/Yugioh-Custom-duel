@@ -7,7 +7,7 @@ const {
     createEmptyPlayer,
     shuffle
 } = require("../client/duel-model.js");
-const { createCardCatalog } = require("../client/card-catalog.js");
+const { createCardCatalog, normalizeCustomCard } = require("../client/card-catalog.js");
 
 test("creates an empty player with independent game collections", () => {
     const player = createEmptyPlayer();
@@ -93,4 +93,41 @@ test("catalog supports validated custom cards and replacement", () => {
     assert.equal(catalog.registerCustom({ id: "bad", name: "", type: "unknown" }), false);
     assert.equal(catalog.removeCustom("custom_1"), true);
     assert.equal(catalog.get("custom_1"), null);
+});
+
+test("normalizes creator monster cards into playable catalog cards", () => {
+    const card = normalizeCustomCard({
+        id: "42",
+        name: "Solar Knight",
+        type: "monster",
+        description: "A bright champion.",
+        attribute: "LIGHT",
+        level: "6",
+        monsterType: "Warrior",
+        tuner: true,
+        attack: "1800",
+        defense: "1200"
+    });
+
+    assert.deepEqual(card, {
+        id: "custom_42",
+        imported: true,
+        version: "Custom",
+        name: "Solar Knight",
+        type: "monster",
+        attribute: "LIGHT",
+        level: 6,
+        monsterType: "Warrior",
+        isTuner: true,
+        atk: 1800,
+        def: 1200,
+        effect: "A bright champion. (Imported from the Card Creator — flavor text only, no functional effect.)"
+    });
+});
+
+test("normalizes spell and trap cards and rejects unsupported creator cards", () => {
+    assert.equal(normalizeCustomCard({ id: "spell", name: "Boost", type: "spell", spellType: "Quick-Play" }).spellType, "Quick-Play");
+    assert.equal(normalizeCustomCard({ id: "trap", name: "Wall", type: "trap", trapType: "Counter Trap" }).trapType, "Counter Trap");
+    assert.equal(normalizeCustomCard({ id: "bad", name: "", type: "monster" }), null);
+    assert.equal(normalizeCustomCard({ id: "bad", name: "Bad", type: "ritual" }), null);
 });

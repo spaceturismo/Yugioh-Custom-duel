@@ -12994,6 +12994,8 @@ let importedCustomCardIds = [];
 
 function importEckbuilerCards() {
 
+    const normalizeCustomCard = window.cardCatalog.normalizeCustomCard;
+
     importedCustomCardIds.forEach(function(id) {
         cardCatalog.removeCustom(id);
     });
@@ -13023,56 +13025,9 @@ function importEckbuilerCards() {
 
     raw.forEach(function(card) {
 
-        if (!card || !card.name || !card.type) {
-            return;
-        }
-
-        if (
-            card.type !== "monster" &&
-            card.type !== "spell" &&
-            card.type !== "trap"
-        ) {
-            return;
-        }
-
-
-        const id =
-            "custom_" + card.id;
-
-        const entry = {
-            id: id,
-            imported: true,
-            version: "Custom",
-            name: card.name,
-            type: card.type,
-            effect:
-                (card.description ? card.description : "A custom-created card.") +
-                " (Imported from the Card Creator — flavor text only, no functional effect.)"
-        };
-
-
-        if (card.type === "monster") {
-
-            entry.attribute = card.attribute || "LIGHT";
-            entry.level = Number(card.level) || 4;
-            entry.monsterType = card.monsterType || "Warrior";
-            entry.isTuner = !!card.tuner;
-            entry.atk = Number(card.attack) || 0;
-            entry.def = Number(card.defense) || 0;
-
-        } else if (card.type === "spell") {
-
-            entry.spellType = card.spellType || "Normal Spell";
-
-        } else {
-
-            entry.trapType = card.trapType || "Normal Trap";
-
-        }
-
-
-        if (cardCatalog.registerCustom(entry)) {
-            importedCustomCardIds.push(id);
+        const entry = normalizeCustomCard(card);
+        if (entry && cardCatalog.registerCustom(entry)) {
+            importedCustomCardIds.push(entry.id);
         }
 
     });
