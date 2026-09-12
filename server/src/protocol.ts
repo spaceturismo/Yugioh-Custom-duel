@@ -7,7 +7,8 @@ export type ClientMessage =
     | { type: "validate_deck"; mainDeck: unknown[]; extraDeck: unknown[] }
     | { type: "select_deck"; mainDeck: unknown[]; extraDeck: unknown[] }
     | { type: "set_ready"; ready: boolean }
-    | { type: "play_card"; handIndex: number };
+    | { type: "play_card"; handIndex: number }
+    | { type: "attack"; attackerIndex: number; defenderIndex: number };
 
 const MESSAGE_TYPES = new Set([
     "create_room",
@@ -18,7 +19,8 @@ const MESSAGE_TYPES = new Set([
     "validate_deck",
     "select_deck",
     "set_ready",
-    "play_card"
+    "play_card",
+    "attack"
 ]);
 
 export function parseClientMessage(raw: string): ClientMessage | null {
@@ -63,5 +65,12 @@ export function parseClientMessage(raw: string): ClientMessage | null {
             : null;
     }
 
-    return { type: message.type as Exclude<ClientMessage["type"], "join_room" | "validate_deck" | "select_deck" | "set_ready" | "play_card"> };
+    if (message.type === "attack") {
+        return typeof message.attackerIndex === "number" && Number.isInteger(message.attackerIndex) && message.attackerIndex >= 0 &&
+            typeof message.defenderIndex === "number" && Number.isInteger(message.defenderIndex) && message.defenderIndex >= 0
+            ? { type: "attack", attackerIndex: message.attackerIndex, defenderIndex: message.defenderIndex }
+            : null;
+    }
+
+    return { type: message.type as Exclude<ClientMessage["type"], "join_room" | "validate_deck" | "select_deck" | "set_ready" | "play_card" | "attack"> };
 }

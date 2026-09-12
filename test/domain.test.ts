@@ -9,7 +9,7 @@ import {
     validateDeckCards
 } from "../server/src/card-model";
 import { loadDeckRules } from "../server/src/config";
-import { playCard, selectDeck, setPlayerReady } from "../server/src/domain";
+import { attack, playCard, selectDeck, setPlayerReady } from "../server/src/domain";
 
 test("creates a fresh room with standard starting values", () => {
     const state = createRoomState("ABC123");
@@ -200,6 +200,12 @@ test("parses deck selection and readiness requests", () => {
         handIndex: 0
     });
     assert.equal(parseClientMessage('{"type":"play_card","handIndex":-1}'), null);
+    assert.deepEqual(parseClientMessage('{"type":"attack","attackerIndex":0,"defenderIndex":1}'), {
+        type: "attack",
+        attackerIndex: 0,
+        defenderIndex: 1
+    });
+    assert.equal(parseClientMessage('{"type":"attack","attackerIndex":0}'), null);
 });
 
 test("owns submitted decks and deals an initial hand when the game starts", () => {
@@ -250,4 +256,23 @@ test("plays a card from the active player's hand onto their field", () => {
     assert.equal(state.fields["player-1"][0].id, "mage-0");
     assert.equal(playCard(state, "player-2", 0), "It is not your turn.");
     assert.equal(playCard(state, "player-1", 9), "Card was not found in your hand.");
+});
+
+test("resolves a field attack with server-owned life points", () => {
+    const state = createRoomState("ABC123");
+    state.players.push("player-1", "player-2");
+    const attacker = { id: "attacker", name: "Attacker", type: "monster" as const, atk: 1800, def: 1200 };
+    const defender = { id: "defender", name: "Defender", type: "monster" as const, atk: 1400, def: 1000 };
+    state.decks["player-1"] = [attacker];
+    state.decks["player-2"] = [defender];
+    state.players.forEach((playerId) => setPlayerReady(state, playerId, true));
+    startGame(state);
+    state.fields["player-1"].push(state.hands["player-1"].pop());
+    state.fields["player-2"].push(state.hands["player-2"].pop());
+
+    assert.equal(attack(state, "player-1", 0, "player-2", 0), null);
+    assert.equal(state.lifePoints["player-2"], 7600);
+    assert.equal(state.fields["player-2"].length, 0);
+    assert.equal(state.graveyards["player-2"].length, 1);
+    assert.equal(attack(state, "player-2", 0, "player-1", 0), "It is not your turn.");
 });

@@ -313,3 +313,10 @@ test("sends a play-card action through the multiplayer client", () => {
     client.playCard(2);
     assert.deepEqual(sent, [{ type: "play_card", handIndex: 2 }]);
 });
+
+test("sends an attack action through the multiplayer client", () => {
+    const sent = [];
+    const client = createMultiplayerClient({ send: (message) => sent.push(message) });
+    client.attack(0, 1);
+    assert.deepEqual(sent, [{ type: "attack", attackerIndex: 0, defenderIndex: 1 }]);
+});

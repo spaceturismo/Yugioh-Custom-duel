@@ -16,6 +16,7 @@ export interface RoomState {
     hands: Record<PlayerId, CardRecord[]>;
     extraDecks: Record<PlayerId, CardRecord[]>;
     fields: Record<PlayerId, CardRecord[]>;
+    graveyards: Record<PlayerId, CardRecord[]>;
 }
 
 export interface ClientMessage {
@@ -37,7 +38,8 @@ export function createRoomState(roomId: string): RoomState {
         decks: { "player-1": [], "player-2": [] },
         hands: { "player-1": [], "player-2": [] },
         extraDecks: { "player-1": [], "player-2": [] }
-        ,fields: { "player-1": [], "player-2": [] }
+        ,fields: { "player-1": [], "player-2": [] },
+        graveyards: { "player-1": [], "player-2": [] }
     };
 }
 
@@ -113,5 +115,35 @@ export function playCard(state: RoomState, playerId: PlayerId, handIndex: number
     state.hands[playerId].splice(handIndex, 1);
     state.fields[playerId].push(card);
     state.handCounts[playerId] = state.hands[playerId].length;
+    return null;
+}
+
+export function attack(
+    state: RoomState,
+    attackerId: PlayerId,
+    attackerIndex: number,
+    defenderId: PlayerId,
+    defenderIndex: number
+): string | null {
+    if (state.phase !== "active") return "The game has not started.";
+    if (state.currentTurn !== attackerId) return "It is not your turn.";
+    const attacker = state.fields[attackerId][attackerIndex];
+    const defender = state.fields[defenderId][defenderIndex];
+    if (!attacker || !defender) return "Attack target was not found.";
+    const difference = (attacker.atk || 0) - (defender.atk || 0);
+    if (difference > 0) {
+        state.lifePoints[defenderId] -= difference;
+        state.fields[defenderId].splice(defenderIndex, 1);
+        state.graveyards[defenderId].push(defender);
+    } else if (difference < 0) {
+        state.lifePoints[attackerId] += difference;
+        state.fields[attackerId].splice(attackerIndex, 1);
+        state.graveyards[attackerId].push(attacker);
+    } else {
+        state.fields[defenderId].splice(defenderIndex, 1);
+        state.fields[attackerId].splice(attackerIndex, 1);
+        state.graveyards[defenderId].push(defender);
+        state.graveyards[attackerId].push(attacker);
+    }
     return null;
 }

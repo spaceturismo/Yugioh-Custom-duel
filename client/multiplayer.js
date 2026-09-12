@@ -32,6 +32,9 @@
             playCard(handIndex) {
                 transport.send({ type: "play_card", handIndex });
             },
+            attack(attackerIndex, defenderIndex) {
+                transport.send({ type: "attack", attackerIndex, defenderIndex });
+            },
             onMessage(listener) {
                 listeners.add(listener);
                 return () => listeners.delete(listener);
