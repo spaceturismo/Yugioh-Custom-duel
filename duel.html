@@ -13059,6 +13059,7 @@ function renderServerDuelState(state) {
     multiplayerLastTurn = view.currentTurn;
     currentPhase = view.currentPhase || currentPhase;
     playerTurn = view.currentTurn === multiplayerPlayerId;
+    player.normalSummoned = view.player.normalSummoned;
     player.hand = view.player.hand;
     player.field = view.player.field;
     player.graveyard = view.player.graveyard;
@@ -24446,8 +24447,8 @@ function changePosition() {
 
 function attackSelected() {
 
-    if (multiplayerPlayerId && multiplayerDuelSync && selectedFieldCard !== null && selectedAttackTarget !== null) {
-        multiplayerDuelSync.attack(selectedFieldCard, selectedAttackTarget);
+    if (multiplayerPlayerId && multiplayerDuelSync && selectedFieldCard !== null && (selectedAttackTarget !== null || opponent.field.length === 0)) {
+        multiplayerDuelSync.attack(selectedFieldCard, opponent.field.length === 0 ? -1 : selectedAttackTarget);
         selectedFieldCard = null;
         selectedAttackTarget = null;
         return;

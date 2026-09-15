@@ -366,7 +366,7 @@ test("projects authoritative room state into a private player view", () => {
         currentTurn: "player-1",
         currentPhase: "main1",
         winner: null,
-        player: { lifePoints: 8000, deckCount: 30, handCount: 6, extraDeckCount: 3, hand: [{ id: "hand" }], field: [{ id: "field" }], graveyard: [] },
+        player: { lifePoints: 8000, deckCount: 30, handCount: 6, extraDeckCount: 3, normalSummoned: false, hand: [{ id: "hand" }], field: [{ id: "field" }], graveyard: [] },
         opponent: { lifePoints: 7200, deckCount: 28, handCount: 4, extraDeckCount: 2, hand: [], field: [{ id: "enemy" }], graveyard: [{ id: "grave" }] }
     });
 });

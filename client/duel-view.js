@@ -15,6 +15,7 @@
                 deckCount: state.deckCounts[playerId],
                 handCount: state.handCounts[playerId],
                 extraDeckCount: state.extraDeckCounts[playerId],
+                normalSummoned: state.normalSummoned?.[playerId] || false,
                 hand: state.hands[playerId] || [],
                 field: state.fields[playerId] || [],
                 graveyard: state.graveyards[playerId] || []

@@ -104,7 +104,7 @@ export function parseClientMessage(raw: string): ClientMessage | null {
 
     if (message.type === "attack") {
         return typeof message.attackerIndex === "number" && Number.isInteger(message.attackerIndex) && message.attackerIndex >= 0 &&
-            typeof message.defenderIndex === "number" && Number.isInteger(message.defenderIndex) && message.defenderIndex >= 0
+            typeof message.defenderIndex === "number" && Number.isInteger(message.defenderIndex) && message.defenderIndex >= -1
             ? { type: "attack", attackerIndex: message.attackerIndex, defenderIndex: message.defenderIndex }
             : null;
     }

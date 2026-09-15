@@ -15,6 +15,7 @@ export interface RoomState {
     handCounts: Record<PlayerId, number>;
     extraDeckCounts: Record<PlayerId, number>;
     ready: Record<PlayerId, boolean>;
+    normalSummoned: Record<PlayerId, boolean>;
     decks: Record<PlayerId, CardRecord[]>;
     hands: Record<PlayerId, CardRecord[]>;
     extraDecks: Record<PlayerId, CardRecord[]>;
@@ -40,6 +41,7 @@ export function createRoomState(roomId: string): RoomState {
         handCounts: { "player-1": 5, "player-2": 5 },
         extraDeckCounts: { "player-1": 0, "player-2": 0 },
         ready: { "player-1": false, "player-2": false },
+        normalSummoned: { "player-1": false, "player-2": false },
         decks: { "player-1": [], "player-2": [] },
         hands: { "player-1": [], "player-2": [] },
         extraDecks: { "player-1": [], "player-2": [] }
@@ -101,6 +103,7 @@ export function advancePhase(state: RoomState, playerId: PlayerId): string | nul
     state.currentPhase = nextPhase[state.currentPhase];
     if (state.currentPhase === "draw") {
         state.currentTurn = playerId === "player-1" ? "player-2" : "player-1";
+        state.normalSummoned[state.currentTurn] = false;
     }
     return null;
 }
@@ -162,8 +165,18 @@ export function attack(
     if (state.currentTurn !== attackerId) return "It is not your turn.";
     if (state.currentPhase !== "battle") return "You can only attack during the Battle Phase.";
     const attacker = state.fields[attackerId][attackerIndex];
+    if (!attacker) return "Attacking monster was not found.";
+    if (defenderIndex < 0) {
+        if (state.fields[defenderId].length > 0) return "A direct attack is only allowed when the opponent controls no monsters.";
+        state.lifePoints[defenderId] -= attacker.atk || 0;
+        if (state.lifePoints[defenderId] <= 0) {
+            state.phase = "finished";
+            state.winner = attackerId;
+        }
+        return null;
+    }
     const defender = state.fields[defenderId][defenderIndex];
-    if (!attacker || !defender) return "Attack target was not found.";
+    if (!defender) return "Attack target was not found.";
     const difference = (attacker.atk || 0) - (defender.atk || 0);
     if (difference > 0) {
         state.lifePoints[defenderId] -= difference;
@@ -213,6 +226,7 @@ export function summon(
     const hand = state.hands[playerId];
     const card = hand[handIndex];
     if (!card || card.type !== "monster") return "Select a monster from your hand.";
+    if (state.normalSummoned[playerId]) return "You already Normal Summoned or Set a monster this turn.";
     const required = tributeCount(card);
     if (tributeIndexes.length !== required) return `This summon requires ${required} tribute(s).`;
     const unique = new Set(tributeIndexes);
@@ -225,6 +239,7 @@ export function summon(
     const summoned = { ...hand.splice(handIndex, 1)[0], position, faceUp: true };
     state.fields[playerId].push(summoned);
     state.handCounts[playerId] = hand.length;
+    state.normalSummoned[playerId] = true;
     return null;
 }
 

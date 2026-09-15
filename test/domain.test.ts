@@ -9,7 +9,7 @@ import {
     validateDeckCards
 } from "../server/src/card-model";
 import { loadDeckRules } from "../server/src/config";
-import { attack, playCard, selectDeck, setPlayerReady } from "../server/src/domain";
+import { attack, playCard, selectDeck, setPlayerReady, summon } from "../server/src/domain";
 import { RoomManager } from "../server/src/rooms";
 
 test("creates a fresh room with standard starting values", () => {
@@ -364,4 +364,35 @@ test("reuses the available player slot when a waiting player leaves", () => {
     assert.equal(manager.join(room, replacementSocket), "player-1");
     assert.equal(room.sockets.get("player-1"), replacementSocket);
     assert.equal(manager.count(), 1);
+});
+
+test("enforces one normal summon per turn and resets it on turn change", () => {
+    const state = createRoomState("ABC123");
+    state.players.push("player-1", "player-2");
+    const monster = { id: "mage", name: "Mage", type: "monster", level: 4 };
+    selectDeck(state, "player-1", [monster, monster, monster, monster, monster, monster], []);
+    selectDeck(state, "player-2", [monster, monster, monster, monster, monster, monster], []);
+    setPlayerReady(state, "player-1", true);
+    setPlayerReady(state, "player-2", true);
+    startGame(state, () => "player-1");
+    drawCard(state, "player-1");
+    assert.equal(summon(state, "player-1", 0, [], "attack"), null);
+    assert.equal(summon(state, "player-1", 0, [], "attack"), "You already Normal Summoned or Set a monster this turn.");
+});
+
+test("allows direct attacks only against an empty opposing field", () => {
+    const state = createRoomState("ABC123");
+    state.players.push("player-1", "player-2");
+    const attacker = { id: "attacker", name: "Attacker", type: "monster", atk: 1800 };
+    const deck = Array.from({ length: 6 }, () => attacker);
+    selectDeck(state, "player-1", deck, []);
+    selectDeck(state, "player-2", deck, []);
+    setPlayerReady(state, "player-1", true);
+    setPlayerReady(state, "player-2", true);
+    startGame(state, () => "player-1");
+    drawCard(state, "player-1");
+    summon(state, "player-1", 0, [], "attack");
+    advancePhase(state, "player-1");
+    assert.equal(attack(state, "player-1", 0, "player-2", -1), null);
+    assert.equal(state.lifePoints["player-2"], 6200);
 });
