@@ -188,3 +188,79 @@ export function attack(
     }
     return null;
 }
+
+function requireActiveMainPhase(state: RoomState, playerId: PlayerId): string | null {
+    if (state.phase !== "active") return "The game has not started.";
+    if (state.currentTurn !== playerId) return "It is not your turn.";
+    if (state.currentPhase !== "main1" && state.currentPhase !== "main2") return "This action is only available during a Main Phase.";
+    return null;
+}
+
+function tributeCount(card: CardRecord): number {
+    const level = typeof card.level === "number" ? card.level : 4;
+    return level >= 7 ? 2 : level >= 5 ? 1 : 0;
+}
+
+export function summon(
+    state: RoomState,
+    playerId: PlayerId,
+    handIndex: number,
+    tributeIndexes: number[],
+    position: "attack" | "defense"
+): string | null {
+    const phaseError = requireActiveMainPhase(state, playerId);
+    if (phaseError) return phaseError;
+    const hand = state.hands[playerId];
+    const card = hand[handIndex];
+    if (!card || card.type !== "monster") return "Select a monster from your hand.";
+    const required = tributeCount(card);
+    if (tributeIndexes.length !== required) return `This summon requires ${required} tribute(s).`;
+    const unique = new Set(tributeIndexes);
+    if (unique.size !== tributeIndexes.length || tributeIndexes.some((index) => !state.fields[playerId][index])) {
+        return "Choose valid tribute monsters.";
+    }
+    for (const index of [...tributeIndexes].sort((a, b) => b - a)) {
+        state.graveyards[playerId].push(state.fields[playerId].splice(index, 1)[0]);
+    }
+    const summoned = { ...hand.splice(handIndex, 1)[0], position, faceUp: true };
+    state.fields[playerId].push(summoned);
+    state.handCounts[playerId] = hand.length;
+    return null;
+}
+
+export function activate(state: RoomState, playerId: PlayerId, handIndex: number): string | null {
+    const phaseError = requireActiveMainPhase(state, playerId);
+    if (phaseError) return phaseError;
+    const hand = state.hands[playerId];
+    const card = hand[handIndex];
+    if (!card || (card.type !== "spell" && card.type !== "trap")) return "Select a spell or trap from your hand.";
+    state.graveyards[playerId].push(hand.splice(handIndex, 1)[0]);
+    state.handCounts[playerId] = hand.length;
+    return null;
+}
+
+export function changePosition(state: RoomState, playerId: PlayerId, fieldIndex: number): string | null {
+    const phaseError = requireActiveMainPhase(state, playerId);
+    if (phaseError) return phaseError;
+    const card = state.fields[playerId][fieldIndex];
+    if (!card) return "Monster was not found on the field.";
+    card.position = card.position === "defense" ? "attack" : "defense";
+    return null;
+}
+
+export function fusionSummon(state: RoomState, playerId: PlayerId, extraIndex: number, materialIndexes: number[]): string | null {
+    const phaseError = requireActiveMainPhase(state, playerId);
+    if (phaseError) return phaseError;
+    const fusion = state.extraDecks[playerId][extraIndex];
+    if (!fusion || fusion.type !== "fusion") return "Fusion monster was not found in the Extra Deck.";
+    if (materialIndexes.length < 2 || new Set(materialIndexes).size !== materialIndexes.length || materialIndexes.some((index) => !state.fields[playerId][index])) {
+        return "Choose at least two valid fusion materials.";
+    }
+    for (const index of [...materialIndexes].sort((a, b) => b - a)) {
+        state.graveyards[playerId].push(state.fields[playerId].splice(index, 1)[0]);
+    }
+    state.extraDecks[playerId].splice(extraIndex, 1);
+    state.extraDeckCounts[playerId] = state.extraDecks[playerId].length;
+    state.fields[playerId].push({ ...fusion, position: "attack", faceUp: true });
+    return null;
+}

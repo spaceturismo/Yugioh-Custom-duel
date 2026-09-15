@@ -35,6 +35,18 @@
             playCard(handIndex) {
                 transport.send({ type: "play_card", handIndex });
             },
+            summon(handIndex, tributeIndexes, position) {
+                transport.send({ type: "summon", handIndex, tributeIndexes, position });
+            },
+            activate(handIndex) {
+                transport.send({ type: "activate", handIndex });
+            },
+            changePosition(fieldIndex) {
+                transport.send({ type: "change_position", fieldIndex });
+            },
+            fusionSummon(extraIndex, materialIndexes) {
+                transport.send({ type: "fusion_summon", extraIndex, materialIndexes });
+            },
             attack(attackerIndex, defenderIndex) {
                 transport.send({ type: "attack", attackerIndex, defenderIndex });
             },

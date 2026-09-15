@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { WebSocket, WebSocketServer } from "ws";
-import { advancePhase, attack, drawCard, endTurn, playCard, selectDeck, setPlayerReady, startGame } from "./domain";
+import { activate, advancePhase, attack, changePosition, drawCard, endTurn, fusionSummon, playCard, selectDeck, setPlayerReady, startGame, summon } from "./domain";
 import { loadDeckRules } from "./config";
 import { validateDeck } from "./card-model";
 import { ClientMessage, parseClientMessage } from "./protocol";
@@ -64,6 +64,10 @@ function handleAction(socket: WebSocket, message: ClientMessage): void {
     if (message.type === "select_deck") messageError = selectDeck(room.state, playerId, message.mainDeck, message.extraDeck, deckRules);
     else if (message.type === "set_ready") messageError = setPlayerReady(room.state, playerId, message.ready);
     else if (message.type === "play_card") messageError = playCard(room.state, playerId, message.handIndex);
+    else if (message.type === "summon") messageError = summon(room.state, playerId, message.handIndex, message.tributeIndexes, message.position);
+    else if (message.type === "activate") messageError = activate(room.state, playerId, message.handIndex);
+    else if (message.type === "change_position") messageError = changePosition(room.state, playerId, message.fieldIndex);
+    else if (message.type === "fusion_summon") messageError = fusionSummon(room.state, playerId, message.extraIndex, message.materialIndexes);
     else if (message.type === "attack") messageError = attack(room.state, playerId, message.attackerIndex, playerId === "player-1" ? "player-2" : "player-1", message.defenderIndex);
     else if (message.type === "start_game") messageError = startGame(room.state, chooseFirstPlayer);
     else if (message.type === "draw") messageError = drawCard(room.state, playerId);

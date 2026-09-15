@@ -19598,7 +19598,11 @@ function tributeModeActive() {
 function summonSelected() {
 
     if (multiplayerPlayerId && multiplayerDuelSync && selectedCard !== null) {
-        multiplayerDuelSync.playCard(selectedCard);
+        multiplayerDuelSync.summon(
+            selectedCard,
+            tributeSelection,
+            pendingSummonMode === "defense" ? "defense" : "attack"
+        );
         selectedCard = null;
         return;
     }
@@ -21822,6 +21826,12 @@ function activateSelected() {
 
     }
 
+    if (multiplayerPlayerId && multiplayerDuelSync && selectedCard !== null) {
+        multiplayerDuelSync.activate(selectedCard);
+        selectedCard = null;
+        return;
+    }
+
 
     if (
         selectedSpellTrap !== null
@@ -23771,6 +23781,17 @@ function confirmFusionSummon(extraIndex) {
             .map(a => a.index)
             .sort((a, b) => b - a);
 
+    if (multiplayerPlayerId && multiplayerDuelSync) {
+        if (assignments.some(a => a.source !== "field")) {
+            log("<strong>System:</strong> PvP Fusion currently requires materials on your field.");
+            closeModal();
+            return;
+        }
+        multiplayerDuelSync.fusionSummon(extraIndex, fieldIndexesToRemove);
+        closeModal();
+        return;
+    }
+
 
     handIndexesToRemove.forEach(function(index) {
 
@@ -24350,7 +24371,6 @@ function changePosition() {
         return;
     }
 
-
     if (
         player.attackedThisTurn.includes(
             selectedFieldCard
@@ -24366,6 +24386,12 @@ function changePosition() {
 
         return;
 
+    }
+
+    if (multiplayerPlayerId && multiplayerDuelSync) {
+        multiplayerDuelSync.changePosition(selectedFieldCard);
+        selectedFieldCard = null;
+        return;
     }
 
 

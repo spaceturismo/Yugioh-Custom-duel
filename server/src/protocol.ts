@@ -9,6 +9,10 @@ export type ClientMessage =
     | { type: "select_deck"; mainDeck: unknown[]; extraDeck: unknown[] }
     | { type: "set_ready"; ready: boolean }
     | { type: "play_card"; handIndex: number }
+    | { type: "summon"; handIndex: number; tributeIndexes: number[]; position: "attack" | "defense" }
+    | { type: "activate"; handIndex: number }
+    | { type: "change_position"; fieldIndex: number }
+    | { type: "fusion_summon"; extraIndex: number; materialIndexes: number[] }
     | { type: "attack"; attackerIndex: number; defenderIndex: number };
 
 const MESSAGE_TYPES = new Set([
@@ -22,6 +26,10 @@ const MESSAGE_TYPES = new Set([
     "select_deck",
     "set_ready",
     "play_card",
+    "summon",
+    "activate",
+    "change_position",
+    "fusion_summon",
     "attack"
 ]);
 
@@ -67,6 +75,33 @@ export function parseClientMessage(raw: string): ClientMessage | null {
             : null;
     }
 
+    if (message.type === "summon") {
+        return typeof message.handIndex === "number" && Number.isInteger(message.handIndex) && message.handIndex >= 0 &&
+            Array.isArray(message.tributeIndexes) && message.tributeIndexes.every((index) => typeof index === "number" && Number.isInteger(index) && index >= 0) &&
+            (message.position === "attack" || message.position === "defense")
+            ? { type: "summon", handIndex: message.handIndex, tributeIndexes: message.tributeIndexes, position: message.position }
+            : null;
+    }
+
+    if (message.type === "activate") {
+        return typeof message.handIndex === "number" && Number.isInteger(message.handIndex) && message.handIndex >= 0
+            ? { type: "activate", handIndex: message.handIndex }
+            : null;
+    }
+
+    if (message.type === "change_position") {
+        return typeof message.fieldIndex === "number" && Number.isInteger(message.fieldIndex) && message.fieldIndex >= 0
+            ? { type: "change_position", fieldIndex: message.fieldIndex }
+            : null;
+    }
+
+    if (message.type === "fusion_summon") {
+        return typeof message.extraIndex === "number" && Number.isInteger(message.extraIndex) && message.extraIndex >= 0 &&
+            Array.isArray(message.materialIndexes) && message.materialIndexes.every((index) => typeof index === "number" && Number.isInteger(index) && index >= 0)
+            ? { type: "fusion_summon", extraIndex: message.extraIndex, materialIndexes: message.materialIndexes }
+            : null;
+    }
+
     if (message.type === "attack") {
         return typeof message.attackerIndex === "number" && Number.isInteger(message.attackerIndex) && message.attackerIndex >= 0 &&
             typeof message.defenderIndex === "number" && Number.isInteger(message.defenderIndex) && message.defenderIndex >= 0
@@ -74,5 +109,5 @@ export function parseClientMessage(raw: string): ClientMessage | null {
             : null;
     }
 
-    return { type: message.type as Exclude<ClientMessage["type"], "join_room" | "validate_deck" | "select_deck" | "set_ready" | "play_card" | "attack"> };
+    return { type: message.type } as ClientMessage;
 }

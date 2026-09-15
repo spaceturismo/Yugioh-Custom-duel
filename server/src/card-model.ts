@@ -1,4 +1,4 @@
-export type CardType = "monster" | "spell" | "trap";
+export type CardType = "monster" | "spell" | "trap" | "fusion" | "synchro" | "xyz";
 
 export interface CardRecord {
     id: string;
@@ -14,7 +14,7 @@ export function isValidCardRecord(card: unknown): card is CardRecord {
     const record = card as Record<string, unknown>;
     if (typeof record.id !== "string" || record.id.length === 0) return false;
     if (typeof record.name !== "string" || record.name.trim().length === 0) return false;
-    if (record.type !== "monster" && record.type !== "spell" && record.type !== "trap") return false;
+    if (!(["monster", "spell", "trap", "fusion", "synchro", "xyz"] as CardType[]).includes(record.type as CardType)) return false;
     if (record.atk !== undefined && typeof record.atk !== "number") return false;
     if (record.def !== undefined && typeof record.def !== "number") return false;
     return true;
