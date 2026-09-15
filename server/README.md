@@ -11,7 +11,15 @@ npm install
 npm run server:dev
 ```
 
-Open `http://localhost:8787/` for the static app. The server endpoints are:
+Open `http://localhost:8787/` for the static app on the host computer. For another device on the same Wi-Fi network, open the LAN URL printed by the server, such as `http://192.168.1.158:8792/`. Do not use `localhost` on the second device.
+
+If the app is hosted somewhere else, pass the server endpoint in the URL:
+
+```text
+https://your-pages-site.example/duel.html?server=192.168.1.158:8792
+```
+
+The server endpoints are:
 
 - `GET /health`
 - `WebSocket /ws`

@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { networkInterfaces } from "node:os";
 import { WebSocket, WebSocketServer } from "ws";
 import { activate, advancePhase, attack, changePosition, drawCard, endTurn, fusionSummon, playCard, selectDeck, setPlayerReady, startGame, summon } from "./domain";
 import { loadDeckRules } from "./config";
@@ -8,6 +9,7 @@ import { Room, RoomManager } from "./rooms";
 import { serveStatic } from "./static-server";
 
 const port = Number(process.env.PORT || 8787);
+const host = process.env.HOST || "0.0.0.0";
 const rooms = new RoomManager();
 const deckRules = loadDeckRules();
 const chooseFirstPlayer = () => process.env.NODE_ENV === "test"
@@ -118,7 +120,15 @@ webSocketServer.on("connection", (socket) => {
     });
 });
 
-httpServer.listen(port, () => {
-    console.log(`Custom Duel local server listening at http://localhost:${port}`);
+httpServer.listen(port, host, () => {
+    console.log(`Custom Duel server listening at http://localhost:${port}`);
     console.log(`WebSocket endpoint: ws://localhost:${port}/ws`);
+    for (const interfaces of Object.values(networkInterfaces())) {
+        for (const address of interfaces || []) {
+            if (address.family === "IPv4" && !address.internal) {
+                console.log(`LAN URL: http://${address.address}:${port}`);
+                console.log(`LAN WebSocket: ws://${address.address}:${port}/ws`);
+            }
+        }
+    }
 });

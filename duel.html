@@ -13188,12 +13188,17 @@ function copyMultiplayerRoomCode() {
 
 function initializeMultiplayerLobby() {
     if (multiplayerLobby) return;
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const configuredServer = new URLSearchParams(window.location.search).get("server") || window.CUSTOM_DUEL_SERVER;
+    let endpoint = configuredServer || `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}`;
+    if (configuredServer && !/^(ws|wss):\/\//i.test(endpoint)) {
+        endpoint = `${/^https:/i.test(endpoint) ? "wss" : "ws"}://${endpoint.replace(/^https?:\/\//i, "")}`;
+    }
+    endpoint = endpoint.replace(/\/$/, "");
     let socket;
     try {
-        socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
+        socket = new WebSocket(`${endpoint}/ws`);
     } catch (error) {
-        renderMultiplayerLobby({ status: "error", error: "Multiplayer is unavailable." });
+        renderMultiplayerLobby({ status: "error", error: `Multiplayer is unavailable at ${endpoint}.` });
         return;
     }
     multiplayerClient = window.duelMultiplayer.createMultiplayerClient({
@@ -13212,8 +13217,8 @@ function initializeMultiplayerLobby() {
         }
         catch (error) { renderMultiplayerLobby({ status: "error", error: "Invalid server response." }); }
     });
-    socket.addEventListener("error", () => renderMultiplayerLobby({ status: "error", error: "Multiplayer connection failed." }));
-    socket.addEventListener("close", () => renderMultiplayerLobby({ status: "error", error: "Multiplayer connection closed." }));
+    socket.addEventListener("error", () => renderMultiplayerLobby({ status: "error", error: `Connection failed at ${endpoint}. Use the server device's LAN URL, not localhost.` }));
+    socket.addEventListener("close", () => renderMultiplayerLobby({ status: "error", error: `Connection lost from ${endpoint}. Refresh both devices to reconnect.` }));
 }
 
 function createMultiplayerRoom() {
